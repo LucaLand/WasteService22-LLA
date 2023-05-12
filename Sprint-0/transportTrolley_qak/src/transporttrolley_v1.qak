@@ -1,0 +1,140 @@
+System transporttrolley
+
+Request pickupReq : pickupReq(ID, type)	//Richiesta di pickup di un relativo materiale
+Reply pickupOk : pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
+
+
+//Context ctxwasteserviceRH ip[host="127.0.0.1" port=8072] 	//Utilizziamo due contesti diversi per i due attori solo a scopo di testing per tenere i file indipendenti
+															//I due attori funzionano in realtà nello stesso contesto WasteService 
+Context ctxwasteservice ip[host="localhost" port=8073]
+
+//ExternalQActor depositrequesthandler context ctxwasteserviceRH
+
+QActor transporttrolley context ctxwasteservice {
+	[#
+		val name = "TransportTrolley"
+		var materialType = ""	
+	#]
+	
+	
+	State s0 initial{
+		println("\t $name: Started!")
+	}
+	Goto waiting
+	
+	
+	State waiting {
+		println("\t $name: ready and waiting for pickupRequest!")
+	}
+	Transition t0 whenRequest pickupReq -> pickup
+	
+	
+	State pickup {
+		//printCurrentMessage
+		println("\t $name: pickupRequest received! (Messaggio)")
+		
+		onMsg(pickupReq : pickupReq(ID, type)){
+			[# 	
+				val ID = payloadArg(0)
+				materialType = payloadArg(1)
+			#]
+			println("\t $name: pickupRequest received! (Messaggio222)")
+		}
+		
+		delay 10000
+		println("\t $name: PickupOK!")
+		replyTo pickupReq with pickupOk : pickupOk(1)
+	}
+	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
+	
+	
+	State depositPlastic {
+		println("\t $name: Depositing plastic!")
+		delay 7000
+	}
+	Goto goHome
+	//Transition t1 whenRequest pickupReq -> pickup(from PB)
+	
+	
+	State depositGlass {
+		println("\t $name: Depositing glass!")
+		delay 7000
+	}
+	Goto goHome
+	//Transition t2 whenRequest pickupReq -> pickup(form GB)
+	
+	
+	State goHome {
+		println("\t $name: Finished Deposit - Going home")
+		delay 7000
+	}
+	Goto waiting
+	
+}
+
+
+//RequestHandlerActor 1-TT 
+QActor depositrequesthandler context ctxwasteservice{
+	[# 	var accepted = false; 
+		val name = "RequestHandler"
+		
+		var T = ""
+		var ID = 0
+	#]
+	State s0 initial {
+		println("\t $name: Started!")
+	}
+	Goto waiting
+	
+	State waiting{
+		println("\t $name: ready and waiting for deposit request...")
+	}
+	Transition t0 whenTime 7000 -> requestHandling
+	
+	State requestHandling {
+		println("\t $name: Deposit Request arrived!")
+		[# 
+			accepted = false 
+			ID++
+		#]
+		//If di esempio test per mandare richieste di pick up diverse
+			if[# ID.toInt()%2 == 0 #]{			
+				[# 
+					accepted = true 
+					T = "plastic"
+				#]
+			}else{
+				[# 
+					accepted = true 
+					T = "glass"
+				#]
+			}
+	}
+	Goto requestAccepted if[# accepted == true #] else requestRejected 
+	
+	State requestAccepted {
+		//replyTo wasteDeposit with loadaccept : loadaccept($ID)
+		println("\t $name: Request -$ID- Accepted!")
+	}
+	Goto pickingUp
+	
+	State requestRejected {
+		//replyTo wasteDeposit with loadrejecetd : loadrejecetd($ID)
+		println("\t $name: Request -$ID- Refused!")
+	}
+	Goto waiting
+	
+	State pickingUp {
+		println("\t $name: Requesting pickingUp...")
+		request transporttrolley -m pickupReq : pickupReq($ID, $T)
+	}
+	Transition t1 whenReply pickupOk -> waiting
+	
+	//Neww Serve?
+	State pickupOk {
+		onMsg(pickupOk : pickupOk(ID)){
+			println("\t $name: PickupOK received! Finished ${payloadArg(0)}")
+			//forward smartdevice -m pickupOk : pickupOk($ID)
+		}
+	}
+}
