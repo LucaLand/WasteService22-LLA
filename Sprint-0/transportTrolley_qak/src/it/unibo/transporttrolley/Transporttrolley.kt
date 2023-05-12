@@ -38,7 +38,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 												val ID = payloadArg(0)
 												materialType = payloadArg(1)
 								println("	 $name: pickupRequest($ID) received!")
-								println("$name in ${currentState.stateName} | $currentMsg")
 								delay(10000) 
 								println("	 $name: PickupOK!")
 								answer("pickupReq", "pickupOk", "pickupOk($ID)"   )  
