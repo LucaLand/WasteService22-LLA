@@ -1,0 +1,47 @@
+System raspberry
+
+	//Event robotState : robotState(STATE)  //STATE = athome, moving, stopped
+	
+	//Lo modelliamo con 3 eventi in modo da poter gestire le diverse transazioni tra stati
+	Event robotAtHome : robotAtHome(E)
+	Event robotMoving : robotMoving(E)
+	Event robotStopped : robotStopped(E)
+
+
+Context ctxRaspberry ip[host="localhost" port=8076]
+
+
+QActor led context ctxRaspberry {
+	[#
+		val name = "LedActor"	
+	#]
+	
+	State off initial{
+		println("\t$name: OFF")
+	}
+	Transition t0 whenEvent robotMoving -> blink
+	
+	State on {
+		println("\t$name: ON")
+	}
+	Transition t3 whenEvent robotMoving -> blink
+	
+	State blink {
+		println("\t$name: BLINK!")
+	}
+	Transition t1 whenEvent robotAtHome -> off
+				  whenEvent robotStopped -> on
+	
+}
+
+QActor sonar context ctxRaspberry {
+	[#
+		val name = "SonarActor"	
+	#]
+	
+	State s0 initial {
+		println("\t$name: ")
+	}
+	
+}
+
