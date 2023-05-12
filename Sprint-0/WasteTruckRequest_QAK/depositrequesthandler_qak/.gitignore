@@ -22,3 +22,6 @@ package-lock.json
 docker/
 /.metadata/
 /src-gen/
+
+/.gradle
+build2022.gradle
