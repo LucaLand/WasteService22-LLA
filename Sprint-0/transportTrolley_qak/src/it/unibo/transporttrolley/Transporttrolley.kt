@@ -32,17 +32,17 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("pickup") { //this:State
 					action { //it:State
-						println("	 $name: pickupRequest received! (Messaggio)")
-						if( checkMsgContent( Term.createTerm("pickupReq(ID,type)"), Term.createTerm("pickupReq(ID,type)"), 
+						if( checkMsgContent( Term.createTerm("pickupReq(ID,T)"), Term.createTerm("pickupReq(ID,T)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 	
 												val ID = payloadArg(0)
 												materialType = payloadArg(1)
-								println("	 $name: pickupRequest received! (Messaggio222)")
+								println("	 $name: pickupRequest($ID) received!")
+								println("$name in ${currentState.stateName} | $currentMsg")
+								delay(10000) 
+								println("	 $name: PickupOK!")
+								answer("pickupReq", "pickupOk", "pickupOk($ID)"   )  
 						}
-						delay(10000) 
-						println("	 $name: PickupOK!")
-						answer("pickupReq", "pickupOk", "pickupOk(1)"   )  
 					}
 					 transition( edgeName="goto",targetState="depositPlastic", cond=doswitchGuarded({ materialType == "plastic"  
 					}) )

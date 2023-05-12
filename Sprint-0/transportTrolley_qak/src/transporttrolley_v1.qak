@@ -1,14 +1,12 @@
 System transporttrolley
 
-Request pickupReq : pickupReq(ID, type)	//Richiesta di pickup di un relativo materiale
-Reply pickupOk : pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
+	Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
+	Reply pickupOk : pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
 
 
-//Context ctxwasteserviceRH ip[host="127.0.0.1" port=8072] 	//Utilizziamo due contesti diversi per i due attori solo a scopo di testing per tenere i file indipendenti
-															//I due attori funzionano in realtà nello stesso contesto WasteService 
-Context ctxwasteservice ip[host="localhost" port=8073]
+Context ctxwasteservice ip[host="localhost" port=8072]
 
-//ExternalQActor depositrequesthandler context ctxwasteserviceRH
+
 
 QActor transporttrolley context ctxwasteservice {
 	[#
@@ -30,22 +28,18 @@ QActor transporttrolley context ctxwasteservice {
 	
 	
 	State pickup {
-		//printCurrentMessage
-		println("\t $name: pickupRequest received! (Messaggio)")
-		
-		onMsg(pickupReq : pickupReq(ID, type)){
+		onMsg(pickupReq : pickupReq(ID, T)){
 			[# 	
 				val ID = payloadArg(0)
 				materialType = payloadArg(1)
 			#]
-			println("\t $name: pickupRequest received! (Messaggio222)")
+			println("\t $name: pickupRequest($ID) received!")
+			delay 10000
+			println("\t $name: PickupOK!")
+			replyTo pickupReq with pickupOk : pickupOk($ID)
 		}
-		
-		delay 10000
-		println("\t $name: PickupOK!")
-		replyTo pickupReq with pickupOk : pickupOk(1)
 	}
-	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
+	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass //Se non è "plastic" va a depositare "Glass" essendo solo due i tipi di carico
 	
 	
 	State depositPlastic {
