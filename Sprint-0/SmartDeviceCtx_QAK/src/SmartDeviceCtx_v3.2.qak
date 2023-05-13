@@ -3,7 +3,8 @@ System smartdevice
 	Reply loadaccept : loadaccept(ID)
 	Reply loadrejecetd : loadrejecetd(ID)
 	
-	Dispatch pickupOk : pickupOk(ID)
+//	Removed V3.2
+//	Dispatch pickupOk : pickupOk(ID)
 	
 	
 Context ctxwasteservice ip[host="127.0.0.1" port=8072]
@@ -14,10 +15,16 @@ ExternalQActor depositrequesthandler context ctxwasteservice
 
 
 QActor smartdevice context ctxsmartdevice{
-	[# var request_ID = 0 #]
+	[#
+		val name = "SmartDevice"
+		val version = "V3.2"
+		
+		var request_ID = 0 
+		#
+	]
 	
 	State s0 initial{
-		println("SmartDevice Started!")
+		println("\t $name: Started! $version")
 	}
 	Goto idle
 	
@@ -30,20 +37,21 @@ QActor smartdevice context ctxsmartdevice{
 	
 	State truckArrived {
 		println("Truck Arrived!")
-		println("Sending request -$request_ID- :")
+		println("Sending request -$request_ID-")
 		[# val ID = request_ID #]
 		
 		request depositrequesthandler -m wasteDeposit : wasteDeposit($ID , 0, 10)
 	}
-	Transition t1 	whenTime  10000 -> truckArrived
-					whenReply loadaccept -> waitPickUp
+	Transition t1 	whenTime  20000 -> truckArrived				//(Req) Avendo lo scarico un tempo limitato possiamo presumere che se passa troppo tempo si sia persa la richiesta e la reinviamo. Abbiamo anche un meccanismo a ID per evitare richieste duplicate
+					whenReply loadaccept -> truckGoAway
 					whenReply loadrejecetd -> truckGoAway
 					
-					
-	State waitPickUp {
-		println("Load Accepted -$request_ID- : waiting pickUp")
-	}
-	Transition t2 whenMsg pickupOk -> truckGoAway
+//	Removed V3.2	
+//		
+//	State waitPickUp {
+//		println("Load Accepted -$request_ID- : waiting pickUp")
+//	}
+//	Transition t2 whenMsg pickupOk -> truckGoAway
 	
 	State truckGoAway {
 		printCurrentMessage
@@ -51,11 +59,11 @@ QActor smartdevice context ctxsmartdevice{
 			println("Carico -${payloadArg(0)}- Rifiutato!")
 		}
 		
-		onMsg(pickupOk : pickupOk(ID)){
+		onMsg(loadaccept : loadaccept(ID)){
 			println("Scarico -${payloadArg(0)}- Completato!")
 		}
 		
 		println("Il Truck può andare!")
 	}
-	Transition t3 whenTime 3000 -> idle
+	Transition t3 whenTime 3000 -> idle  //Un po' ti attesa per simulare il via del camion
 }

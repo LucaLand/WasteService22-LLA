@@ -14,17 +14,19 @@ class Depositrequesthandler ( name: String, scope: CoroutineScope  ) : ActorBasi
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
-		 	var accepted = false; 
+		 	
 				val name = "RequestHandler"
+				val version = "V3.2"
 				
 				//Only one Request at time
+				var accepted = false; 
 				var ID = ""
 				var T = ""
 				var L = ""
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("	 $name: Started!")
+						println("	 $name: Started! $version")
 					}
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )
 				}	 
@@ -59,7 +61,6 @@ class Depositrequesthandler ( name: String, scope: CoroutineScope  ) : ActorBasi
 				}	 
 				state("requestAccepted") { //this:State
 					action { //it:State
-						answer("wasteDeposit", "loadaccept", "loadaccept($ID)"   )  
 						println("	 $name: Request -$ID- Accepted!")
 					}
 					 transition( edgeName="goto",targetState="pickingUp", cond=doswitch() )
@@ -83,7 +84,7 @@ class Depositrequesthandler ( name: String, scope: CoroutineScope  ) : ActorBasi
 						if( checkMsgContent( Term.createTerm("pickupOk(ID)"), Term.createTerm("pickupOk(ID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("	 $name: PickupOK received! Finished ${payloadArg(0)}")
-								forward("pickupOk", "pickupOk($ID)" ,"smartdevice" ) 
+								answer("wasteDeposit", "loadaccept", "loadaccept($ID)"   )  
 						}
 					}
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )

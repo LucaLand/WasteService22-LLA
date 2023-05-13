@@ -1,11 +1,12 @@
-System wasteservice
+System wasteservice  //V3.2
 
 //Request Handler
 	Request wasteDeposit : wasteDeposit(ID, Type, TruckLoad)
 	Reply loadaccept : loadaccept(ID)
 	Reply loadrejecetd : loadrejecetd(ID)
 	
-	Dispatch pickupOk : pickupOk(ID)
+//	Removed V3.2
+//	Dispatch pickupOk : pickupOk(ID)
 	
 //Transport Trolley
 	Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
@@ -16,36 +17,39 @@ System wasteservice
 	Event robotMoving : robotMoving(E)
 	Event robotStopped : robotStopped(E)
 	
+//	Removed V3.2
+//Context ctxsmartdevice ip[host="127.0.0.1" port=8074]
 
-Context ctxsmartdevice ip[host="127.0.0.1" port=8074]
 Context ctxRaspberry ip[host="127.0.0.1" port=8076]
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 
-ExternalQActor smartdevice context ctxsmartdevice
+//ExternalQActor smartdevice context ctxsmartdevice
 ExternalQActor led context ctxRaspberry
 
 
 
 //Reuqest Handler Actor V3.0 (v1+TT)
 QActor depositrequesthandler context ctxwasteservice{
-	[# 	var accepted = false; 
+	[# 	
 		val name = "RequestHandler"
+		val version = "V3.2"
 		
 		//Only one Request at time
+		var accepted = false; 
 		var ID = ""
 		var T = ""
 		var L = ""
 	#]
 	State s0 initial {
-		println("\t $name: Started!")
+		println("\t $name: Started! $version")
 	}
 	Goto waiting
 	
 	State waiting{
 		println("\t $name: ready and waiting for deposit request...")
 	}
-	Transition t0 whenRequest wasteDeposit -> requestHandling //Usare la guardia per farlon andare in due stati separati (accettata/rifiutata)
+	Transition t0 whenRequest wasteDeposit -> requestHandling
 	
 	State requestHandling {
 		println("\t $name: Deposit Request arrived!")
@@ -67,7 +71,7 @@ QActor depositrequesthandler context ctxwasteservice{
 	Goto requestAccepted if[# accepted == true #] else requestRejected 
 	
 	State requestAccepted {
-		replyTo wasteDeposit with loadaccept : loadaccept($ID)
+		//replyTo wasteDeposit with loadaccept : loadaccept($ID)  -- Moved Reply after Robot PickupOk (v3.2)
 		println("\t $name: Request -$ID- Accepted!")
 	}
 	Goto pickingUp
@@ -88,28 +92,31 @@ QActor depositrequesthandler context ctxwasteservice{
 	State pickupOk {
 		onMsg(pickupOk : pickupOk(ID)){
 			println("\t $name: PickupOK received! Finished ${payloadArg(0)}")
-			forward smartdevice -m pickupOk : pickupOk($ID)
+			//forward smartdevice -m pickupOk : pickupOk($ID)	// Removed V3.2
+			replyTo wasteDeposit with loadaccept : loadaccept($ID)  //Moved here (V3.2)
 		}
 	}
 	Goto waiting
 }
 
-//Transport Trolley V1 + Led
+//Transport Trolley V3.2
 QActor transporttrolley context ctxwasteservice {
 	[#
 		val name = "TransportTrolley"
+		val version = "V3.2"
+		
 		var materialType = ""	
 	#]
 	
 	
 	State s0 initial{
-		println("\t $name: Started!")
+		println("\t $name: Started! $version")
 	}
 	Goto waiting
 	
 	
 	State waiting { //AtHome
-		println("\t $name: TransportTrolley at Home!")		//We presume it starts in its home position
+		println("\t $name: TransportTrolley at Home!")			//We presume it starts in its home position
 		emit robotAtHome : robotAtHome(1)
 		println("\t $name: ready and waiting for pickupRequest!")
 	}

@@ -16,18 +16,21 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		
 				val name = "TransportTrolley"
+				val version = "V3.2"
+				
 				var materialType = ""	
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("	 $name: Started!")
+						println("	 $name: Started! $version")
 					}
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )
 				}	 
 				state("waiting") { //this:State
 					action { //it:State
-						println("	 $name: ready and waiting for pickupRequest!")
+						println("	 $name: TransportTrolley at Home!")
 						emit("robotAtHome", "robotAtHome(1)" ) 
+						println("	 $name: ready and waiting for pickupRequest!")
 					}
 					 transition(edgeName="t02",targetState="pickup",cond=whenRequest("pickupReq"))
 				}	 

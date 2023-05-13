@@ -14,11 +14,15 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 		return "s0"
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
-		 var request_ID = 0  
+		
+				val name = "SmartDevice"
+				val version = "V3.2"
+				
+				var request_ID = 0 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("SmartDevice Started!")
+						println("	 $name: Started! $version")
 					}
 					 transition( edgeName="goto",targetState="idle", cond=doswitch() )
 				}	 
@@ -34,21 +38,15 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				state("truckArrived") { //this:State
 					action { //it:State
 						println("Truck Arrived!")
-						println("Sending request -$request_ID- :")
+						println("Sending request -$request_ID-")
 						 val ID = request_ID  
 						request("wasteDeposit", "wasteDeposit($ID,0,10)" ,"depositrequesthandler" )  
 						stateTimer = TimerActor("timer_truckArrived", 
-							scope, context!!, "local_tout_smartdevice_truckArrived", 10000.toLong() )
+							scope, context!!, "local_tout_smartdevice_truckArrived", 20000.toLong() )
 					}
 					 transition(edgeName="t11",targetState="truckArrived",cond=whenTimeout("local_tout_smartdevice_truckArrived"))   
-					transition(edgeName="t12",targetState="waitPickUp",cond=whenReply("loadaccept"))
+					transition(edgeName="t12",targetState="truckGoAway",cond=whenReply("loadaccept"))
 					transition(edgeName="t13",targetState="truckGoAway",cond=whenReply("loadrejecetd"))
-				}	 
-				state("waitPickUp") { //this:State
-					action { //it:State
-						println("Load Accepted -$request_ID- : waiting pickUp")
-					}
-					 transition(edgeName="t24",targetState="truckGoAway",cond=whenDispatch("pickupOk"))
 				}	 
 				state("truckGoAway") { //this:State
 					action { //it:State
@@ -57,7 +55,7 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("Carico -${payloadArg(0)}- Rifiutato!")
 						}
-						if( checkMsgContent( Term.createTerm("pickupOk(ID)"), Term.createTerm("pickupOk(ID)"), 
+						if( checkMsgContent( Term.createTerm("loadaccept(ID)"), Term.createTerm("loadaccept(ID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("Scarico -${payloadArg(0)}- Completato!")
 						}
@@ -65,7 +63,7 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						stateTimer = TimerActor("timer_truckGoAway", 
 							scope, context!!, "local_tout_smartdevice_truckGoAway", 3000.toLong() )
 					}
-					 transition(edgeName="t35",targetState="idle",cond=whenTimeout("local_tout_smartdevice_truckGoAway"))   
+					 transition(edgeName="t34",targetState="idle",cond=whenTimeout("local_tout_smartdevice_truckGoAway"))   
 				}	 
 			}
 		}
