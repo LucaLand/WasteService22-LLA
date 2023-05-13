@@ -1,0 +1,157 @@
+System wasteservice
+
+//Request Handler
+	Request wasteDeposit : wasteDeposit(ID, Type, TruckLoad)
+	Reply loadaccept : loadaccept(ID)
+	Reply loadrejecetd : loadrejecetd(ID)
+	
+	Dispatch pickupOk : pickupOk(ID)
+	
+//Transport Trolley
+	Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
+	Reply pickupOk : pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
+	
+//Led Events
+	Event robotAtHome : robotAtHome(E)
+	Event robotMoving : robotMoving(E)
+	Event robotStopped : robotStopped(E)
+	
+
+Context ctxsmartdevice ip[host="127.0.0.1" port=8074]
+Context ctxRaspberry ip[host="127.0.0.1" port=8076]
+Context ctxwasteservice ip[host="localhost" port=8072]
+
+
+ExternalQActor smartdevice context ctxsmartdevice
+ExternalQActor led context ctxRaspberry
+
+
+
+//Reuqest Handler Actor V3.0 (v1+TT)
+QActor depositrequesthandler context ctxwasteservice{
+	[# 	var accepted = false; 
+		val name = "RequestHandler"
+		
+		//Only one Request at time
+		var ID = ""
+		var T = ""
+		var L = ""
+	#]
+	State s0 initial {
+		println("\t $name: Started!")
+	}
+	Goto waiting
+	
+	State waiting{
+		println("\t $name: ready and waiting for deposit request...")
+	}
+	Transition t0 whenRequest wasteDeposit -> requestHandling //Usare la guardia per farlon andare in due stati separati (accettata/rifiutata)
+	
+	State requestHandling {
+		println("\t $name: Deposit Request arrived!")
+		[# accepted = false #]
+
+		onMsg(wasteDeposit : wasteDeposit(ID, T, L)){
+			[# 	ID = payloadArg(0)
+				T = payloadArg(1)
+				L = payloadArg(2)
+			#]
+			println("Request: ($ID, $T, $L)")
+			if[# ID.toInt()%2 == 0 #]{			//If di esempio test per avere risposte alternate
+				[# accepted = true #]
+			}else{
+				[# accepted = false #]
+			}
+		}
+	}
+	Goto requestAccepted if[# accepted == true #] else requestRejected 
+	
+	State requestAccepted {
+		replyTo wasteDeposit with loadaccept : loadaccept($ID)
+		println("\t $name: Request -$ID- Accepted!")
+	}
+	Goto pickingUp
+	
+	State requestRejected {
+		replyTo wasteDeposit with loadrejecetd : loadrejecetd($ID)
+		println("\t $name: Request -$ID- Refused!")
+	}
+	Goto waiting
+	
+	State pickingUp {
+		println("\t $name: Requesting pickingUp...")
+		request transporttrolley -m pickupReq : pickupReq($ID, $T)
+		forward smartdevice -m pickupOk : pickupOk($ID)
+	}
+	Transition t1 whenReply pickupOk -> pickupOk
+	
+	//Neww Serve?
+	State pickupOk {
+		onMsg(pickupOk : pickupOk(ID)){
+			println("\t $name: PickupOK received! Finished ${payloadArg(0)}")
+			forward smartdevice -m pickupOk : pickupOk($ID)
+		}
+	}
+	Goto waiting
+}
+
+//Transport Trolley V1 + Led
+QActor transporttrolley context ctxwasteservice {
+	[#
+		val name = "TransportTrolley"
+		var materialType = ""	
+	#]
+	
+	
+	State s0 initial{
+		println("\t $name: Started!")
+	}
+	Goto waiting
+	
+	
+	State waiting { //AtHome
+		println("\t $name: ready and waiting for pickupRequest!")
+		emit robotAtHome : robotAtHome(1)
+	}
+	Transition t0 whenRequest pickupReq -> pickup
+	
+	
+	State pickup {
+		onMsg(pickupReq : pickupReq(ID, T)){
+			[# 	
+				val ID = payloadArg(0)
+				materialType = payloadArg(1)
+			#]
+			println("\t $name: pickupRequest($ID) received!")
+			emit robotMoving : robotMoving(2)
+			delay 10000
+			println("\t $name: PickupOK!")
+			replyTo pickupReq with pickupOk : pickupOk($ID)
+		}
+	}
+	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass //Se non è "plastic" va a depositare "Glass" essendo solo due i tipi di carico
+	
+	
+	State depositPlastic {
+		println("\t $name: Depositing plastic!")
+		delay 7000
+	}
+	Goto goHome
+	//Transition t1 whenRequest pickupReq -> pickup(from PB)
+	
+	
+	State depositGlass {
+		println("\t $name: Depositing glass!")
+		delay 7000
+	}
+	Goto goHome
+	//Transition t2 whenRequest pickupReq -> pickup(form GB)
+	
+	
+	State goHome {
+		println("\t $name: Finished Deposit - Going home")
+		delay 7000
+	}
+	Goto waiting
+	
+}
