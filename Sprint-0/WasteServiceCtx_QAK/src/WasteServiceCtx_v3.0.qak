@@ -81,7 +81,6 @@ QActor depositrequesthandler context ctxwasteservice{
 	State pickingUp {
 		println("\t $name: Requesting pickingUp...")
 		request transporttrolley -m pickupReq : pickupReq($ID, $T)
-		forward smartdevice -m pickupOk : pickupOk($ID)
 	}
 	Transition t1 whenReply pickupOk -> pickupOk
 	

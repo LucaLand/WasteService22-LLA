@@ -75,7 +75,6 @@ class Depositrequesthandler ( name: String, scope: CoroutineScope  ) : ActorBasi
 					action { //it:State
 						println("	 $name: Requesting pickingUp...")
 						request("pickupReq", "pickupReq($ID,$T)" ,"transporttrolley" )  
-						forward("pickupOk", "pickupOk($ID)" ,"smartdevice" ) 
 					}
 					 transition(edgeName="t11",targetState="pickupOk",cond=whenReply("pickupOk"))
 				}	 
