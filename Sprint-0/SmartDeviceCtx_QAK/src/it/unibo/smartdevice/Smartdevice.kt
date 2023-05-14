@@ -31,7 +31,7 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						println("Smart Device Waiting for Truck...")
 						 request_ID ++  
 						stateTimer = TimerActor("timer_idle", 
-							scope, context!!, "local_tout_smartdevice_idle", 10000.toLong() )
+							scope, context!!, "local_tout_smartdevice_idle", 1000.toLong() )
 					}
 					 transition(edgeName="t00",targetState="truckArrived",cond=whenTimeout("local_tout_smartdevice_idle"))   
 				}	 
@@ -40,7 +40,12 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						println("Truck Arrived!")
 						println("Sending request -$request_ID-")
 						 val ID = request_ID  
-						request("wasteDeposit", "wasteDeposit($ID,0,10)" ,"depositrequesthandler" )  
+						if(  ID.toInt()%2 == 0  
+						 ){request("wasteDeposit", "wasteDeposit($ID,plastic,10)" ,"depositrequesthandler" )  
+						}
+						else
+						 {request("wasteDeposit", "wasteDeposit($ID,glass,8)" ,"depositrequesthandler" )  
+						 }
 						stateTimer = TimerActor("timer_truckArrived", 
 							scope, context!!, "local_tout_smartdevice_truckArrived", 20000.toLong() )
 					}
@@ -61,7 +66,7 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						}
 						println("Il Truck può andare!")
 						stateTimer = TimerActor("timer_truckGoAway", 
-							scope, context!!, "local_tout_smartdevice_truckGoAway", 3000.toLong() )
+							scope, context!!, "local_tout_smartdevice_truckGoAway", 1000.toLong() )
 					}
 					 transition(edgeName="t34",targetState="idle",cond=whenTimeout("local_tout_smartdevice_truckGoAway"))   
 				}	 

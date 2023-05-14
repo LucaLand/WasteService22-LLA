@@ -16,9 +16,10 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		
 				val name = "TransportTrolley"
-				val version = "V3.2"
+				val version = "V3.3"
 				
-				var materialType = ""	
+				var materialType = ""
+				var pos = "H"		//Added V3.3 - pos : "H, I, PB, GB" Presuming starts from Home	
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -28,6 +29,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("waiting") { //this:State
 					action { //it:State
+						 pos = "H"  
 						println("	 $name: TransportTrolley at Home!")
 						emit("robotAtHome", "robotAtHome(1)" ) 
 						println("	 $name: ready and waiting for pickupRequest!")
@@ -42,8 +44,10 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 												val ID = payloadArg(0)
 												materialType = payloadArg(1)
 								println("	 $name: pickupRequest($ID) received!")
+								println("	 $name: Robot going from $pos to Indoor")
 								emit("robotMoving", "robotMoving(2)" ) 
 								delay(10000) 
+								 pos = "I"  
 								println("	 $name: PickupOK!")
 								answer("pickupReq", "pickupOk", "pickupOk($ID)"   )  
 						}
@@ -57,15 +61,23 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					action { //it:State
 						println("	 $name: Depositing plastic!")
 						delay(7000) 
+						 pos = "PB"  
+						stateTimer = TimerActor("timer_depositPlastic", 
+							scope, context!!, "local_tout_transporttrolley_depositPlastic", 100.toLong() )
 					}
-					 transition( edgeName="goto",targetState="goHome", cond=doswitch() )
+					 transition(edgeName="t13",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositPlastic"))   
+					transition(edgeName="t14",targetState="pickup",cond=whenRequest("pickupReq"))
 				}	 
 				state("depositGlass") { //this:State
 					action { //it:State
 						println("	 $name: Depositing glass!")
 						delay(7000) 
+						 pos = "GB"  
+						stateTimer = TimerActor("timer_depositGlass", 
+							scope, context!!, "local_tout_transporttrolley_depositGlass", 100.toLong() )
 					}
-					 transition( edgeName="goto",targetState="goHome", cond=doswitch() )
+					 transition(edgeName="t25",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositGlass"))   
+					transition(edgeName="t26",targetState="pickup",cond=whenRequest("pickupReq"))
 				}	 
 				state("goHome") { //this:State
 					action { //it:State

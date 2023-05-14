@@ -1,0 +1,68 @@
+System smartdevice
+	
+	Request wasteDeposit : wasteDeposit(ID, Type, TruckLoad)
+	Reply loadaccept : loadaccept(ID)
+	Reply loadrejecetd : loadrejecetd(ID)
+	
+	
+Context ctxwasteservice ip[host="127.0.0.1" port=8072]
+Context ctxsmartdevice ip[host="localhost" port=8074]
+
+
+ExternalQActor depositrequesthandler context ctxwasteservice
+
+
+//SmartDevice V3.3
+QActor smartdevice context ctxsmartdevice{
+	[#
+		val name = "SmartDevice"
+		val version = "V3.2"
+		
+		var request_ID = 0 
+		#
+	]
+	
+	State s0 initial{
+		println("\t $name: Started! $version")
+	}
+	Goto idle
+	
+	
+	State idle {
+		println("Smart Device Waiting for Truck...")
+		[# request_ID ++ #]
+	}
+	Transition t0 whenTime 1000 -> truckArrived  //Changed V3.3 - testing multiple requests
+
+	
+	State truckArrived {
+		println("Truck Arrived!")
+		println("Sending request -$request_ID-")
+		[# val ID = request_ID #]
+		if[# ID.toInt()%2 == 0 #]{
+			request depositrequesthandler -m wasteDeposit : wasteDeposit($ID , plastic, 10)
+		} else {
+			request depositrequesthandler -m wasteDeposit : wasteDeposit($ID , glass, 8)
+		}
+		
+		
+	}
+	Transition t1 	whenTime  20000 -> truckArrived				//(Req) Avendo lo scarico un tempo limitato possiamo presumere che se passa troppo tempo si sia persa la richiesta e la reinviamo. Abbiamo anche un meccanismo a ID per evitare richieste duplicate
+					whenReply loadaccept -> truckGoAway
+					whenReply loadrejecetd -> truckGoAway
+			
+	
+	State truckGoAway {
+		printCurrentMessage
+		onMsg(loadrejecetd : loadrejecetd(ID)){
+			println("Carico -${payloadArg(0)}- Rifiutato!")
+		}
+		
+		onMsg(loadaccept : loadaccept(ID)){
+			println("Scarico -${payloadArg(0)}- Completato!")
+		}
+		
+		println("Il Truck può andare!")
+	}
+	Transition t3 whenTime 1000 -> idle  //Un po' di attesa per simulare il via del camion
+}
