@@ -255,7 +255,7 @@
 		<ul>
 		</br>
 		<li>Un <b>QA-System</b> è una collezione di entità attive (QActors) ognuna eseguita in un nodo computazionale (<b>Context</b>).</li>
-		<li>QActors interagiscono usando messaggi di diversi tipi come <b>Dispatch</b> e <b>Request</b> ed <b>Eventi</b>.</li>
+		<li>QActors interagiscono usando messaggi di diversi tipi come <b>Dispatch</b>,<b>Request</b> ed <b>Eventi</b>.</li>
 		<li>Ogni contesto presenta un insime di QActors che possono interagire con componenti (attori o "alieni") che lavorano in nodi differenti, ciò avviene tramite l'utilizzo di appositi protocolli, in particolare 
 		    <b><i>TCP</i></b> e <b><i>CoAP</i></b> lavorano sulla porta specificata dal Context, mentre l'<b><i>MQTT</i></b> utilizza il broker specificato nella dichiarazione <i>mqttBroker</i>.</li>
         </ul>
@@ -263,7 +263,7 @@
 
     <h2>QActor software factory</h2>
     <div class="remark">
-	     Il mapping tra le azioni di comunicazione di alto livello e uno spicifico protocollo avvine tramite la <b>QActor-infrastructure</b> con l'aiuto dell'<b>Eclipse QActor software factory</b>.
+	     Il mapping tra le azioni di comunicazione di alto livello e uno specifico protocollo avvine tramite la <b>QActor-infrastructure</b> con l'aiuto dell'<b>Eclipse QActor software factory</b>.
 		 </br>
 		 </br>
 		  <img src="./img/qakSoftwareFactory.png" style="width: 40%" alt="qakSoftwareFactory">
@@ -274,17 +274,15 @@
 	<div class="remark">
 	Nel metamodello QActor:
 	<ul>
-	</br>
 	<li>Un <b>messaggio</b> è inteso come un'informazione inviata in maniera asincrona da un mittente ad uno specifico destinatario.</br>
-	    Per trasmissione asincrona intedniamo che i messaggi posso essere "bufferizzati" dall'infrastruttura, mentre la trasmissione "non bufferizzata" è detta sincrona.</li>
+	    Per trasmissione asincrona intendiamo che i messaggi posso essere "bufferizzati" dall'infrastruttura, mentre la trasmissione "non bufferizzata" è detta sincrona.</li>
 	<li>Un <b>evento</b> è inteso come un'informazione emessa da un mittente senza uno specifico destinatario.</li>
 	</ul>
 	</br>
 	I metodi che un apllication designer può utilizzare per inviare messaggi sono:
         <ul>
-            </br>
             <li><b>Forward</b> per un Dispatch.</li>
-            <li><b>Request,replyTo,askFor</b> per una Request.</li>
+            <li><b>Request, replyTo, askFor</b> per una Request.</li>
             <li><b>Emit</b> per un Event.</li>
         </ul>
 	 </div>
