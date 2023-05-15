@@ -100,35 +100,24 @@
         <p>Non avendo a disposizione un <r>DDR Robot</r> fisico e considerando i tempi, i costi di realizzazione del robot e la necessità di effettuare test
             del <i>Software</i>, viene messo a disposizione, dalla nostra <i>Software House</i>, un simulatore virtuale del <r>DDR Robot</r>: il <i><a target="_blank" href="http://htmlpreview.github.io/?https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/userDocs/wenv.html">"Wenv22-VirtualRobot</a></i>.</p>
         <p>Questo simula in ambiente virtuale, le caratteristiche principali e i comportamenti del <r>DDR</r> permettendo il testing e la simulazione della nostra architettura come su un <r>DDR</r> fisico.</p>
-        <p>Essendo il <i><b>Wenv22</b></i> un simulatore di un <r>DDR</r> fisico, anche nelle sue interaizoni, d'ora in poi ci riferiremo semplicemente
+        <p>Essendo il <i><b>Wenv22</b></i> un simulatore di un <r>DDR</r> fisico, anche nelle sue interazioni, d'ora in poi ci riferiremo semplicemente
             al <r>DDR</r> senza specificare se <i>Simulato</i> o <i>Fisico</i>, in quanto l'interazione non cambia.</p>
-<!--        <k>Spiegare perché utilizziamo il VirtualRobot fornito dall'azienda e quali sono i vantaggi (temporali)</k><br> -->
-<!--        <k><ul>-->
-<!--            FORMALIZZAZIONE:-->
-<!--            <li>Il <r>DDR Robot</r> è il robot fisico che muoviamo simulandolo con il Wenv22 e utilizzando il software fornito per il movimento (BasicRobot)</li>-->
-<!--            <li>Il <r>TransportTrolley</r> è invece l'astrazione Software nel nostro sistema che invia i messaggi al BasicRobot/Wenv22/DDRR -> Il <r>TransportTrolley</r> muove il <r>DDR Robot</r> virtuale</li>-->
-<!--            <li>Il DDR riceve i messaggi di comando</li>-->
-<!--        </ul></k>-->
+
         <p>Il <r>DDR</r> verrà dunque inteso come un <u>componente fisico del sistema con il quale la nostra architettura <i>Software</i> interagirà</u>.</p>
-        <p>Facendo riferimento ai componenti già in nostro possesso, la gestione del <r>DDR</r> avverrà attraverso il componente <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c>.</p>
-        <p>Dunque nella nostra archietettura inseriremo il componente <c>BasicRobot22</c> con il quale interagiremo per il controllo del <r>DDR</r>.
-             Astraiamo dunque il <r>DDR</r> tramite il <c>BasicRobot22</c></p>
-        <k>? Possiamo rappresentare il DDR come il BasicRobot22 (non credo, sarebbe sbagliato)?</k>
+        <p>Facendo riferimento ai componenti implemntati nella nostra <i>Software House</i>, la gestione del <r>DDR</r> potrà avvenire attraverso il componente <c><a target="_blank" href="https://github.com/anatali/issLab2022/tree/main/unibo.basicrobot22">BasicRobot22</a></c>.</p>
+        <p>Dunque nella nostra archietettura inseriremo il componente <c>BasicRobot22</c> con il quale interagiremo per il controllo del <r>DDR</r>.</p>
+        </br>
         <p>Definiamo in breve il <c>BasicRobot22</c>:</p>
         <ul>
             <li>Esegue comandi-base di spostamento, con argomento:<pre><code> MOVE = w | s | l | r | h </code></pre> </li>
             <li>Permette l'esecuzione di <i>step</i>, rispondendo con <b>stepdone</b> o <b>stepfail</b></li>
             <li>È in grado di utilizzare diversi tipi di robot (virtuali e reali) costruiti ciascuno con una propria tecnologia</li>
             <li>È in grado di percepire e gestire informazioni provenienti dall’ambiente</li>
-            <li>È in grado di utilizzare diversi tipi di robot (virtuali e reali) costruiti ciascuno con una propria tecnologia(<b>RIPETITIVO DA TOGLIERE</b>)</li>
         </ul>
-        <p>Nel seguente documente la documentaizone completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c></p>
+        <p>Nel seguente file la documentazione completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c></p>
 <!--        <k>- Link al BasicRobot22</k>-->
 <!--        <k>Studiare BasicRobot 22 e scrivere una piccola parte di come formalizziamo il <r>DDR</r> attraveros il <c>BasicRobot</c></k>-->
-        <br>
-        <k>Inserire Schema con attore e messaggi + formalizzare i messaggi inviati tra i due (Transport trolley al DDR)</k>
 
-<br>
         <h3>Transport Trolley (<r2>TT</r2>)</h3>
         <p>Fisicamente è formalizzato come un quadrato di dimensione RD.</p>
 
@@ -150,18 +139,15 @@ QActor transporttrolley context ctxwasteservice {
 		var materialType = ""	
 	#]
 
-
 	State s0 initial{
 	<b>...</b>
 	}
 	Goto waiting
 
-
 	State waiting {
 	<b>...</b>
 	}
 	Transition t0 whenRequest pickupReq -> pickup
-
 
 	State pickup {
 	<b>...</b>
