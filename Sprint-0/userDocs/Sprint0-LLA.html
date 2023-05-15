@@ -30,7 +30,7 @@
 
 <!----------------------- REQUIREMENT ANALYSIS --------------------------->
 
-<h2>Introduzione - QActor Metalanguage (QAK)</h2>
+<h2>QActor Metalanguage (QAK)</h2>
 <div class="remark">
 <!--<h3>Da fare:</h3> -->
 <!--<ul>-->
@@ -38,10 +38,11 @@
 <!--<li><k>FARE UN DOCUIMENTO DI RIASSUNTO PER IL DDR E IL WENV22?</k></li>-->
 <!--</ul>-->
 <!--<h3>Introduzione - QActorl Metalanguage (Qak)</h3>-->
-<p>Nella seguente analisi dei requisiti è risultato necessario l'utilizzo di un modello di formalizzazione che permettesse la definizione di eventi, scambio di messaggi e componenti distribuiti.
-La volontà d'isolamento dei componenti e i vantaggi dell'interazioni asincrone e basate su messaggi,
-siccome i linguaggi popolari come Java o altri esempi non consentono l'astrazione di questi concetti in maniera semplice e intuitiva, si farà riferimento al linguaggio e metamodello <r>QAK</r> basato su un paradigma ad attori.
-Il <r>QAK</r> permette la definizione in poche semplici istruzioni di attori e macchine a stati finiti con una semantica a scambio di messaggi. In allegato la documentazione che lo riguarda <a target="_blank" href="./QAK.html">QAK-Document</a></p>
+    <p> Nella seguente analisi dei requisiti è risultato necessario l'utilizzo di un modello di formalizzazione che permettesse la definizione di eventi, sintassi a scambio di messaggi e architetture a componenti distribuiti. </p>
+    <p> Si farà riferimento al linguaggio e metamodello QAK, basato sul paradigma ad attori, per realizzare e definire il modello dell'architettura secondo le esigenze d'isolamento dei componenti, sfruttando i vantaggi dell'interazioni asincrone a scambio di messaggi
+        in quanto i linguaggi popolari come Java o simili non consentono l'astrazione di questi concetti in maniera semplice e intuitiva.</p>
+    <p>Il <r>QAK</r> permette la definizione in poche semplici istruzioni di attori come macchine a stati finiti che interagiscono secondo semantiche a scambio di messaggi.</p>
+    <p>In allegato la documentazione che lo riguarda <a target="_blank" href="./QAK.html">QAK-Document</a></p>
 </div>
 <h2>Requirement analysis</h2>
     <div class="remark">
@@ -56,10 +57,8 @@ Il <r>QAK</r> permette la definizione in poche semplici istruzioni di attori e m
         </ul>
         <p>Le misure della <r>ServiceArea</r> si suppongono note, in quanto il committente specifica la possibilità di misurazione della stanza.</p>
         <p>Dunque nel seguente documento si farà riferimento alle misure della stanza come note denominandole "X" e "Y", rispettivamente per il lato orizzontale e verticale della <r>SA</r>.</p>
-        <p class="remark">Nel caso comunque non fosse possibile reperire le misure sarà possibile utilizzare il Software fornito dalla nostra <i>SoftwareHouse</i> per la misurazione della stanza con l'utilizzo del solo <r>DDR Robot</r>
-            Si riporta il documento: <a target="_blank" href="">basicRobot22/BoundaryWalker</a>.
-        <p>
-        <k>INSERIRE RIFERIMENTO CalcolatorePerimetro</k>
+        <p class="remark">Nel caso comunque non fosse possibile reperire le misure sarà possibile utilizzare il Software fornito dalla nostra <i>Software House</i> per la misurazione della stanza con l'utilizzo del solo <r>DDR Robot</r>.</p>
+        <p>Si riporta il riferimento al documento del progetto: <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/Applicazioni22.html#id4">unibo.mapperQak22</a>.</p>
         <pre><code>
     Rectangle (x, y)
         x: Lunghezza
@@ -97,9 +96,9 @@ Il <r>QAK</r> permette la definizione in poche semplici istruzioni di attori e m
 <br>
     <!------------------------ ------------------------>
         <h3>DDR Robot</h3>
-        <p>Come <r>DDR Robot</r> si intende un <i>Differential Drive Robot</i> la quale documentazione è disponibile nel documento seguente, fornito dalla nostra SoftwareHouse: <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html">VirtualRobot.html</a></p>
+        <p>Con <r>DDR Robot</r> si intende <i>Differential Drive Robot</i> la cui documentazione è disponibile nel documento seguente, fornito dalla nostra <i>Software House</i>: <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html">VirtualRobot.html</a></p>
         <p>Non avendo a disposizione un <r>DDR Robot</r> fisico e considerando i tempi, i costi di realizzazione del robot e la necessità di effettuare test
-            del <i>Software</i>, viene messo a disposizione, dalla nostra <i>SoftwareHouse</i>, un simulatore virtuale del <r>DDR Robot</r>: il <i><a target="_blank" href="">"Wenv22-VirtualRobot</a></i>.</p>
+            del <i>Software</i>, viene messo a disposizione, dalla nostra <i>Software House</i>, un simulatore virtuale del <r>DDR Robot</r>: il <i><a target="_blank" href="http://htmlpreview.github.io/?https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/userDocs/wenv.html">"Wenv22-VirtualRobot</a></i>.</p>
         <p>Questo simula in ambiente virtuale, le caratteristiche principali e i comportamenti del <r>DDR</r> permettendo il testing e la simulazione della nostra architettura come su un <r>DDR</r> fisico.</p>
         <p>Essendo il <i><b>Wenv22</b></i> un simulatore di un <r>DDR</r> fisico, anche nelle sue interaizoni, d'ora in poi ci riferiremo semplicemente
             al <r>DDR</r> senza specificare se <i>Simulato</i> o <i>Fisico</i>, in quanto l'interazione non cambia.</p>
