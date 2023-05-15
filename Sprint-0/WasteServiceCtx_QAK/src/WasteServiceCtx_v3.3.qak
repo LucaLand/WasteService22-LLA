@@ -63,12 +63,7 @@ QActor depositrequesthandler context ctxwasteservice{
 			}
 		}
 	}
-	Goto requestAccepted if[# accepted == true #] else requestRejected 
-	
-	State requestAccepted {
-		println("\t $name: Request -$ID- Accepted!")
-	}
-	Goto pickingUp
+	Goto pickingUp if[# accepted == true #] else requestRejected 
 	
 	State requestRejected {
 		replyTo wasteDeposit with loadrejecetd : loadrejecetd($ID)
@@ -77,6 +72,7 @@ QActor depositrequesthandler context ctxwasteservice{
 	Goto waiting
 	
 	State pickingUp {
+		println("\t $name: Request -$ID- Accepted!")
 		println("\t $name: Requesting pickingUp...")
 		request transporttrolley -m pickupReq : pickupReq($ID, $T)
 	}

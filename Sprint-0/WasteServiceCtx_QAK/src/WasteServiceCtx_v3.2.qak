@@ -68,13 +68,7 @@ QActor depositrequesthandler context ctxwasteservice{
 			}
 		}
 	}
-	Goto requestAccepted if[# accepted == true #] else requestRejected 
-	
-	State requestAccepted {
-		//replyTo wasteDeposit with loadaccept : loadaccept($ID)  -- Moved Reply after Robot PickupOk (v3.2)
-		println("\t $name: Request -$ID- Accepted!")
-	}
-	Goto pickingUp
+	Goto pickingUp if[# accepted == true #] else requestRejected 
 	
 	State requestRejected {
 		replyTo wasteDeposit with loadrejecetd : loadrejecetd($ID)
