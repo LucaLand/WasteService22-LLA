@@ -8,7 +8,7 @@
 
 
 <head>
-    <title>Iss2023</title>
+    <title>Wenv Introduction - LLA</title>
     <link href="defaultStyle.css" rel="stylesheet">
 </head>
 
@@ -17,10 +17,9 @@
 
 <h1>WEnv</h1>
     <div class="remark body">
-        <p>La seguente documentazione descrive l'implementazione dell'ambiente virtuale WEnv attraverso la libreria JavaScript three.js,disponibile nel progetto it.unibo.virtualRobot2020.</p>
-        <p>Per attivare WEnv, è necessario installare Node.js e seguire alcuni passaggi di installazione.</p>
-        <p>Il WEnv mostra una scena MASTER che consente l'uso dei comandi da tastiera w, a, s, d, h.</p>
-        <p>WEnv può essere attivato anche utilizzando un'immagine Docker, disponibile nel progetto <a href="file:///C:/Users/LucaD/Desktop/ISS-23-LLA-Local/docs_prof/html/VirtualRobot.html#wenv-come-immagine-docker" target="blank">WEnv</a>.</p>
+        <p>La seguente documentazione descrive l'implementazione dell'ambiente virtuale WEnv attraverso la libreria JavaScript three.js, disponibile nel progetto <a target="_blank" href="https://github.com/anatali/issLab2022/tree/main/it.unibo.virtualRobot2020">it.unibo.virtualRobot2020.</a></p>
+        <p>Per attivare WEnv, è necessario installare Node.js e seguire alcuni passaggi d'installazione. Il WEnv mostra una scena MASTER che consente l'uso dei comandi da tastiera (<code>w, a, s, d, h</code>)
+            e può essere attivato anche utilizzando un'immagine Docker, disponibile nel progetto <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html#wenv-come-immagine-docker" target="blank">WEnv</a>.</p>
         <p>La scena del WEnv è costruita a partire dalla descrizione contenuta nel file "sceneConfig.js", modificabile in modo semplice e intuitivo.</p>
     </div>
 
@@ -31,25 +30,23 @@
         <pre><code>
     {"robotmove":"MOVE", "time":T}
 
-    MOVE ::= "turnLeft" | "turnRight" |
-             "moveForward" | "moveBackward" | "alarm"
+    MOVE ::= "turnLeft" | "turnRight" | "moveForward" | "moveBackward" | "alarm"
     T    ::= naturalNum
         </code></pre>
 
         <p>Il significato dei seguenti valori indicano al robot l'operazione da seguire e il tempo di esecuzione.</p>
-        <p>Il server WEnv restituisce i seguenti messaggi:</p>
-
+        <p>Il server WEnv restituisce il seguente messaggio:</p>
         <pre><code>
     {"endmove":"RESULT", "move":MOVE}
         </code></pre>
 
-        <p>Il significato dei valori di RESULT è il seguente:</p>
+        <p>Il significato dei valori di <code>RESULT</code> è il seguente:</p>
         <ul>
         <li>"true" quando la mossa completata con successo</li>
         <li>"false" quando la mossa fallisce/il robot virtuale ha incontrato un ostacolo</li>
         </ul>
 
-        <p>dove MOVE può assumere i valori</p>
+        <p>E <code>MOVE</code> può assumere i valori</p>
         <ul>
             <li>"turnLeft"</li>
             <li>"turnRight"</li>
@@ -64,20 +61,20 @@
 <h2>Sensori virtuali e messaggi di stato</h2>
     <div class="remark body">
         <p>I messaggi di stato includono dati relativi ai sensori di distanza e ai sensori di impatto posti davanti e dietro al robot, quando questi rilevano un ostacolo.<br>
-            Inoltre se si stabilisce una connessione WS può ricevere informazioni su variazioni dello stato del ‘mondo’.</p>
+            Inoltre se si stabilisce una connessione <i>WebSocket</i> può ricevere informazioni su variazioni dello stato dell'ambiente.</p>
     </div>
 
 
 <h2>Esempi di uso di WEnv</h2>
     <div class="remark body">
-        <p>Il progetto <a href="https://github.com/anatali/issLab2022/tree/main/unibo.wenvUsage22" target="blank">unibo.wenvUsage22</a> include anche altri esempi di programmi Java che mostrano come interagire con il WEnv utilizzando WebSocket.</p>
+        <p>Il progetto <a target="blank" href="https://github.com/anatali/issLab2022/tree/main/unibo.wenvUsage22">unibo.wenvUsage22</a> include anche altri esempi di programmi Java che mostrano come interagire con il WEnv utilizzando WebSocket.</p>
         <p>Il WEnv offre inoltre alcune funzionalità di controllo remoto, come la possibilità di visualizzare lo stato del mondo virtuale e di impostare alcuni parametri di configurazione.<br>
             In generale, il WEnv offre un'interfaccia di programmazione flessibile e potente per controllare un robot virtuale in un ambiente simulato.</p>
     </div>
 
 <h2>Documentazione Completa</h2>
     <div class="remark body">
-        <p>Documentazione: <a href="file:///C:/Users/LucaD/Desktop/ISS-23-LLA-Local/docs_prof/html/VirtualRobot.html#wenv" target="blank">WEnv</a>, Progetto: <a href="https://github.com/anatali/issLab2022/tree/main/it.unibo.virtualRobot2020" target="blank">it.unibo.virtualRobot2020</a>.</p>
+        <p>Documentazione: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html" target="blank">WEnv</a>, Progetto: <a href="https://github.com/anatali/issLab2022/tree/main/it.unibo.virtualRobot2020" target="blank">it.unibo.virtualRobot2020</a>.</p>
     </div>
 
 </div>
