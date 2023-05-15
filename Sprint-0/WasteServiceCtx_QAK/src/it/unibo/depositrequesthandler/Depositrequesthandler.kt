@@ -54,16 +54,10 @@ class Depositrequesthandler ( name: String, scope: CoroutineScope  ) : ActorBasi
 								 }
 						}
 					}
-					 transition( edgeName="goto",targetState="requestAccepted", cond=doswitchGuarded({ accepted == true  
+					 transition( edgeName="goto",targetState="pickingUp", cond=doswitchGuarded({ accepted == true  
 					}) )
 					transition( edgeName="goto",targetState="requestRejected", cond=doswitchGuarded({! ( accepted == true  
 					) }) )
-				}	 
-				state("requestAccepted") { //this:State
-					action { //it:State
-						println("	 $name: Request -$ID- Accepted!")
-					}
-					 transition( edgeName="goto",targetState="pickingUp", cond=doswitch() )
 				}	 
 				state("requestRejected") { //this:State
 					action { //it:State
@@ -74,6 +68,7 @@ class Depositrequesthandler ( name: String, scope: CoroutineScope  ) : ActorBasi
 				}	 
 				state("pickingUp") { //this:State
 					action { //it:State
+						println("	 $name: Request -$ID- Accepted!")
 						println("	 $name: Requesting pickingUp...")
 						request("pickupReq", "pickupReq($ID,$T)" ,"transporttrolley" )  
 					}
