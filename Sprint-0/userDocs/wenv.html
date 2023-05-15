@@ -10,245 +10,22 @@
 <head>
     <title>Iss2023</title>
     <link href="defaultStyle.css" rel="stylesheet">
-    <style>
-        body {
-            margin-left: 30px;
-            margin-right: 30px;
-            font-size: 0.85em;
-        }
-
-        p {
-            font-family: Tahoma,serif;
-            font-size: 1.2em;
-        }
-		
-		ul {
-            font-family: Tahoma,serif;
-            font-size: 1.2em;
-        }
-
-        a, a:visited, a:active, a:link, a:hover {
-            text-decoration: underline;
-            color: #545454;
-            background-color: transparent;
-            font-size: 93%;
-        }
-
-        a:hover {
-            background-color: #cccccc;
-        }
-
-        hr {
-            clear: both;
-            height: 1px;
-            color: #242424;
-            background-color: transparent;
-        }
-
-        h1, h2, h3 {
-            color: #242424;
-            clear: left;
-            font: 100% Tahoma, Helvetica, Arial, sans-serif;
-            margin-bottom: 0.5em;
-            border-radius: 10px;
-            padding: 5px;
-        }
-
-        #top {
-            width: 100%;
-        }
-
-
-        #i {
-            color: #ff1010;
-        }
-
-        tt {
-            font-family: "Arial",serif;
-            font-size: 90%;
-            color: #006600;
-        }
-
-        em {
-            font-family: "Arial",serif;
-            font-size: 80%;
-            font-weight: bold;
-            border-style: solid;
-            border-color: #abe876;
-            color: #1632cc;
-        }
-
-        bc {
-            font-family: "Arial",serif;
-            font-size: 90%;
-            font-weight: bold;
-            color: #990000;
-            background-color: #fcf8c7;
-        }
-
-        ks {
-            font-family: "Arial",serif;
-            font-weight: bold;
-            color: #0000CD;
-            font-size: 90%;
-        }
-
-        kc {
-            font-family: "Arial",serif;
-            font-weight: bold;
-            color: #008000;
-            font-size: 90%;
-        }
-
-        pre {
-            font-family: "Consolas", co,serif;
-            font-size: 15px;
-            background-color: #f5f5f5;
-            border: 2px solid silver;
-            padding: 1px;
-        }
-
-        m {
-            font-family: "Helvetica",serif;
-            line-height: 100%;
-            font-size: 75%;
-        }
-
-        div.body {
-            font-size: 1.3em;
-        }
-
-        k {
-            color: #990000;
-            font-weight: bold;
-            font-size: 90%;
-            display: block;
-        }
-
-        h1 {
-            font-size: 150%;
-            background-color: #b2c0ff;
-            padding: 10px;
-        }
-
-        h2 {
-            background-color: #9ed8ff;
-            font-size: 130%;
-        }
-
-        h3 {
-            /*background-color: #e6ccff;*/
-            background-color: lightblue;
-            font-size: 100%;
-            /*color: white;*/
-            /*font-weight: bold;*/
-        }
-
-        h4 {
-            background-color: #ccffcc;
-            font-size: 100%;
-            width: 95%;
-            border-radius: 5px;
-            padding: 2px;
-        }
-
-        h5 {
-            background-color: #d5ffb0;
-            font-size: 100%;
-        }
-
-        div.req {
-            background-color: #d9ffb3;
-            font-size: 18px;
-            width: 700px;
-            border: 3px solid green;
-            padding: 15px;
-            margin: 10px;
-        }
-
-        div.remark {
-            background-color: #E3F2FD;
-            border: 2px solid #d5f2ed;
-            padding: 15px;
-            margin: 10px;
-            border-radius: 25px;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-
-        ol, ul, li {
-            margin: 0;
-            margin-left: 10px;
-            padding: 0;
-            padding-bottom: 5px;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-        }
-
-        img {
-            border: 3px solid #d5f2ed;
-            background-color: white;
-            padding: 5px;
-            width: 60%;
-            margin: auto;
-            display: block;
-        }
-
-        a, a:visited, a:active, a:link, a:hover {
-            text-decoration: underline;
-            color: #545454;
-            background-color: transparent;
-        }
-
-        div.wrapdesc {
-            width: 90%;
-            margin: auto;
-        }
-
-        div.imagedesc {
-            width: 85%;
-            margin: auto;
-        }
-
-        def {
-            display: block;
-            margin: 1px 10px;
-        }
-
-        dt {
-            font-style: italic;
-            font-size: 20pt;
-            margin: 10px 0;
-        }
-
-        r {
-            font-style: italic;
-            font-weight: bold;
-            color: blue;
-        }
-    </style>
 </head>
 
 <body>
     <!----------------------- WEnv --------------------------->
 
 <h1>WEnv</h1>
-
-<div class="remark">
-    <p>La seguente documentazione descrive l'implementazione dell'ambiente virtuale WEnv attraverso la libreria JavaScript three.js,disponibile nel progetto it.unibo.virtualRobot2020.</p>
-    <p>Per attivare WEnv, è necessario installare Node.js e seguire alcuni passaggi di installazione.</p>
-    <p>Il WEnv mostra una scena MASTER che consente l'uso dei comandi da tastiera w, a, s, d, h.</p>
-    <p>WEnv può essere attivato anche utilizzando un'immagine Docker, disponibile nel progetto <a href="file:///C:/Users/LucaD/Desktop/ISS-23-LLA-Local/docs_prof/html/VirtualRobot.html#wenv-come-immagine-docker" target="blank">WEnv</a>.</p>
-    <p>La scena del WEnv è costruita a partire dalla descrizione contenuta nel file "sceneConfig.js", modificabile in modo semplice e intuitivo.</p>
-</div>
+    <div class="remark body">
+        <p>La seguente documentazione descrive l'implementazione dell'ambiente virtuale WEnv attraverso la libreria JavaScript three.js,disponibile nel progetto it.unibo.virtualRobot2020.</p>
+        <p>Per attivare WEnv, è necessario installare Node.js e seguire alcuni passaggi di installazione.</p>
+        <p>Il WEnv mostra una scena MASTER che consente l'uso dei comandi da tastiera w, a, s, d, h.</p>
+        <p>WEnv può essere attivato anche utilizzando un'immagine Docker, disponibile nel progetto <a href="file:///C:/Users/LucaD/Desktop/ISS-23-LLA-Local/docs_prof/html/VirtualRobot.html#wenv-come-immagine-docker" target="blank">WEnv</a>.</p>
+        <p>La scena del WEnv è costruita a partire dalla descrizione contenuta nel file "sceneConfig.js", modificabile in modo semplice e intuitivo.</p>
+    </div>
 
 <h2>Comandi-base per il robot in cril</h2>
-    <div class="remark">
+    <div class="remark body">
         La documentazione descrive inoltre il linguaggio CRIL (Concrete-Robot Interaction Language) che può essere utilizzato per impartire comandi di movimento a un robot virtuale.
         Questi comandi sono espressi come campi di una stringa JSON e possono essere inviati a un server tramite messaggi HTTP POST o messaggi WebSocket.
         <pre><code>
@@ -285,23 +62,25 @@
 
 
 <h2>Sensori virtuali e messaggi di stato</h2>
-    <div class="remark">
+    <div class="remark body">
         <p>I messaggi di stato includono dati relativi ai sensori di distanza e ai sensori di impatto posti davanti e dietro al robot, quando questi rilevano un ostacolo.<br>
             Inoltre se si stabilisce una connessione WS può ricevere informazioni su variazioni dello stato del ‘mondo’.</p>
     </div>
 
 
 <h2>Esempi di uso di WEnv</h2>
-    <div class="remark">
+    <div class="remark body">
         <p>Il progetto <a href="https://github.com/anatali/issLab2022/tree/main/unibo.wenvUsage22" target="blank">unibo.wenvUsage22</a> include anche altri esempi di programmi Java che mostrano come interagire con il WEnv utilizzando WebSocket.</p>
         <p>Il WEnv offre inoltre alcune funzionalità di controllo remoto, come la possibilità di visualizzare lo stato del mondo virtuale e di impostare alcuni parametri di configurazione.<br>
             In generale, il WEnv offre un'interfaccia di programmazione flessibile e potente per controllare un robot virtuale in un ambiente simulato.</p>
     </div>
 
 <h2>Documentazione Completa</h2>
-    <div class="remark">
+    <div class="remark body">
         <p>Documentazione: <a href="file:///C:/Users/LucaD/Desktop/ISS-23-LLA-Local/docs_prof/html/VirtualRobot.html#wenv" target="blank">WEnv</a>, Progetto: <a href="https://github.com/anatali/issLab2022/tree/main/it.unibo.virtualRobot2020" target="blank">it.unibo.virtualRobot2020</a>.</p>
     </div>
+
+</div>
 
     <div style="background-color:rgba(86, 56, 253, 0.9); width:100%; height: 28vw; text-align:left; color:white;">
         <p style="text-align: center; font-size: 12pt;">Studenti: Luca Landolfi, Antonio Franzese, Luca De Risi</p>

@@ -84,7 +84,7 @@ kc {
 
 pre {
     font-family: "Consolas", co,serif;
-    font-size: 15px;
+    font-size: 13px;
     background-color: #f5f5f5;
     border: 2px solid silver;
     padding: 1px;
@@ -207,6 +207,17 @@ dt {
 
 r {
     font-style: italic;
-    font-weight: bold;
+    /*font-weight: bold;*/
     color: blue;
+}
+
+r2 {
+    /*font-style: italic;*/
+    /*font-weight: bold;*/
+    color: blue;
+}
+
+c {
+    font-style: italic;
+    color: grey;
 }
