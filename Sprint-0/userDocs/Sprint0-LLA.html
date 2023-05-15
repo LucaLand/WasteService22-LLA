@@ -543,6 +543,33 @@ QActor depositrequesthandler context ctxwasteservice{
             ricevere il segnale in input ed emetterà un evento per il comportamento del led.
         </p>
         <k>INSERIRE I LINK dei componenti software del Sonar</k>
+		
+	<pre><code>
+QActor led context ctxRaspberry {
+	[#
+		val name = "LedActor"	
+	#]
+	
+	State off initial{
+	<b>...</b>
+	}
+	Transition t0 whenEvent robotMoving -> blink
+	
+	State on {
+	<b>...</b>
+	}
+	Transition t3 whenEvent robotMoving -> blink
+	
+	State blink {
+	<b>...</b>
+	}
+	Transition t1 whenEvent robotAtHome -> off
+				  whenEvent robotStopped -> on
+	
+	}
+	</code></pre>
+	
+	<p><a target="_blank" href="../RaspberryCtx_QAK\src\it\unibo\led/Led.kt"> Metamodello QAK Led</a></p><br>
 
         <br>
     <!------------------------ ------------------------>
@@ -568,9 +595,27 @@ QActor depositrequesthandler context ctxwasteservice{
     Send    (deactivateSonar)   :	-
                 :	-
     </code></pre>
+	
+	<pre><code>
+QActor sonar context ctxRaspberry {
+	[#
+		val name = "SonarActor"	
+	#]
 
-<br>
+	State s0 initial {
+	<b>...</b>
+	}
+
+	}
+	</code></pre>
+
+<p>Sonar Qak già implementato ----> credo che sia già stato fatto qui Nel package unibo.actor22.events della directory test del progetto unibo.actor22, riportiamo la classe SonarActor22 
+che definisce il Sonar come un attore proattivo e reattivo.
+<p><a target="_blank" href="C:/Users/LucaD/Desktop/ISS-Final-Proj-main/docs_prof/html/SonarObservable.html?highlight=sonar#il-sonar-come-attore-che-emette-eventi"> Metamodello QAK Sonar</a></p><br>
+</p>
+
     <!------------------------ ------------------------>
+
         <h3>DLimit</h3>
         <p> Distanza limite relativa al <r>Sonar</r> espressa in numero decimale.</p>
         <pre><code>
