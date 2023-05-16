@@ -497,12 +497,11 @@ QActor led context ctxRaspberry {
 
 <p>Sonar Qak già implementato ----> credo che sia già stato fatto qui Nel package unibo.actor22.events della directory test del progetto unibo.actor22, riportiamo la classe SonarActor22 
 che definisce il Sonar come un attore proattivo e reattivo.
-<p><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/SonarObservable.html#il-sonar-come-attore-che-emette-eventi"> Metamodello QAK Sonar</a></p><br>
-</p>
-
+<p><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/SonarObservable.html#il-sonar-come-attore-che-emette-eventi"> Documentazione SonarActor22</a></p>
+<p><a href="https://github.com/anatali/issLab2022/blob/main/unibo.sonarqak22/src/sonarqak22.qak">Metamodello QAK SonarQak22</a></p>
     <!------------------------ ------------------------>
 
-        <h3>DLimit</h3>
+        <h4>DLimit</h4>
         <p> Distanza limite relativa al <r>Sonar</r> espressa in numero decimale.</p>
         <pre><code>
     val DLIMIT	:	Float
@@ -512,14 +511,10 @@ che definisce il Sonar come un attore proattivo e reattivo.
             Definiamo la costante <b>DLIMIT</b>:</p>
 
         <ul>Più precisamente, quello che ci si aspetta quando la distanza diventa ≤ DLIMT, è che:
-            <li>Se il robot si sta muovendo esso si ferma. Riprenderà il moto solo quando la distanza torna > DLIMIT
-            </li>
-            <li>Ogni altra operazione del robot deve terminare. Una volta terminata si rimane in attesa finchè la
-                distanza
-                non ridiventa > DLIMIT
-            </li>
+            <li>Se il robot si sta muovendo esso si ferma. Riprenderà il moto solo quando la distanza torna <code>> DLIMIT</code></li>
+            <li>Ogni altra operazione del robot deve terminare. Una volta terminata si rimane in attesa finché la
+                distanza non ritorna <code>> DLIMIT</code></li>
         </ul>
-
 
         <ul>Il blocco del trolley in conseguenza di un ‘allarme’ individuato dal Sonar dovrebbe avvenire ‘il prima
             possibile’.
@@ -532,53 +527,55 @@ che definisce il Sonar come un attore proattivo e reattivo.
 <br>
 
         <h3>Gestione tempo di raccolta/deposito del materiale dal truck</h3>
-        <dd>Il commitente precisa che il tempo di raccolta del materiale del truck è sempre limitato e prevedibile,
-            mentre il tempo necessario per il deposito potrebbe essere anche alquanto lungo.
-
-        </dd>
+        <p>Il commitente precisa che il tempo di raccolta del materiale del truck è sempre limitato e prevedibile,
+            mentre il tempo necessario per il deposito potrebbe essere anche alquanto lungo.</p>
         <p>Significa che:</p>
         <ul>
             <li>Avremo un <code><i>PickingTime</i></code> definito</li>
             <pre><code>var pickingTime : int (seconds)</code></pre>
         </ul>
-
-        <p>Considerazioni:Volendo gestire le azioni dei materiali attraverso messaggi, una volta arrivata la conferma dell’azione si continuerà indipendentemente dal tempo.</p>
+        <n> Potrà essere usato per gestire il reinvio di richieste da parte dello SmartDevice allo scadere di un Timeout. Come già implementato nel modello eseguibile <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/SmartDeviceCtx_QAK/src/SmartDeviceCtx_v3.3.qak">SmartDeviceCtx_v3.3</a>
+            <br>
+            Per quanto riguarda invece lo scarico, avendo un modello a scambio di messaggi con interazioni ad eventi non risulta un problema.
+        </n>
 
 <br>
     <!------------------------ ------------------------>
 
 
         <h3>WasteServiceStatusGUI</h3>
-		</br>
-        <dd>Pannello di controllo che permette al ServiceManager di monitorare:
+		<br>
+        <p>Pannello di controllo che permette al ServiceManager di monitorare:
             <ul>
-                <lI>La <b>Position</b> del <b>Transport trolley</b>: <code><i>TTPosition</i></code></lI>
-                <lI><b>StateTransportTrolley</b>,ossia lo stato attuale del Transport trolley: <code><i>TrasportTrolleyState</i></code></lI>
-                <lI>Il peso dei rifiuti contenuti in <b>PLASTICBOX</b> e <b>GLASSBOX</b>: <code><i>CurrentPB, CurrentGB</i></code></lI>
-                <lI>Lo stato del <b>LED</b>: <code><i>LedState</i></code></lI>
+                <li>La <b>posizione</b> del <r>Transport trolley</r>: intesa come una delle 4 posizione definite nella service Area (home, indoor, plasticBox, glassBox).</li>
+        <li>Lo <b>stato</b> del <r>Transport Trolley</r>: ovvero se è in movimento, se è bloccato, se fermo o sta scaricando o caricando.</li>
+                <li>Lo stato corrente dei due contenitori <b>PLASTICBOX</b> e <b>GLASSBOX</b>: ovvero il livello di riempimento corrente.</li>
+                <li>Lo stato del <b>LED</b>: acceso, spento on in <i>blinking</i></li>
             </ul>
-            <code>
-                <pre>   enum class StateTransportTrolley { REST, MOVING, PICKINGUP, DROPPINGOUT, HALT } </pre>
-                <pre>
-            Position :
-            TTState  :
-            CurrentPB, CurrentGB :
-            LedState:</pre>
-            </code>
-        </dd>
+            <pre><code>
+    enum class TransportTrolleyState { REST, MOVING, PICKINGUP, DROPPINGOUT, HALT, BLOCKED }
+    enum class TTPosition { home, indoor, plasticbox, glassbox}
+    var CurrentPB, CurrentGB : float
+    enum class LedState { on, off, blink }
+            </code></pre>
+    </p>
+
+        <p>Il <r>WasteServiceStatusGUI</r> è inteso come un sistema composto da:</p>
+        <ul>
+            <li>Una <b>Interfaccia Grafica Web</b> che permetta la visualizzazione di tutte queste info.</li>
+            <li>Un <b>Attore <i>osservatore</i></b> che osservi le variabili condivise e aggiorni i valori dell'<i>Interfaccia Grafica Web</i> </li>
+        </ul>
 
 <br>
 
     <!------------------------ ------------------------>
-
-
-        <h3>WasteService: General Architecture</h3>
 
     </div>
 
     <h2>Logical Architecture</h2>
 
 
+    <img src="" alt="General Logical Architecture">
     <!-- USEFUL
     <table style="width:100%" border="1">
     <tr>
