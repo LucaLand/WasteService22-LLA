@@ -32,12 +32,6 @@
 
 <h2>QActor Metalanguage (QAK)</h2>
 <div class="remark">
-<!--<h3>Da fare:</h3> -->
-<!--<ul>-->
-<!--<li><k><del>INTRODUZIONE AL QAK</del> (+ FARE DOCUMENTO) <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/QakIntro.html">Documento QAK</a></k></li>-->
-<!--<li><k>FARE UN DOCUIMENTO DI RIASSUNTO PER IL DDR E IL WENV22?</k></li>-->
-<!--</ul>-->
-<!--<h3>Introduzione - QActorl Metalanguage (Qak)</h3>-->
     <p> Nella seguente analisi dei requisiti è risultato necessario l'utilizzo di un modello di formalizzazione che permettesse la definizione di eventi, sintassi a scambio di messaggi e architetture a componenti distribuiti. </p>
     <p> Si farà riferimento al linguaggio e metamodello QAK, basato sul paradigma ad attori, per realizzare e definire il modello dell'architettura secondo le esigenze d'isolamento dei componenti, sfruttando i vantaggi dell'interazioni asincrone a scambio di messaggi
         in quanto i linguaggi popolari come Java o simili non consentono l'astrazione di questi concetti in maniera semplice e intuitiva.</p>
@@ -106,7 +100,7 @@
         <p>Il <r>DDR</r> verrà dunque inteso come un <u>componente fisico del sistema con il quale la nostra architettura <i>Software</i> interagirà</u>.</p>
         <p>Facendo riferimento ai componenti implemntati nella nostra <i>Software House</i>, la gestione del <r>DDR</r> potrà avvenire attraverso il componente <c><a target="_blank" href="https://github.com/anatali/issLab2022/tree/main/unibo.basicrobot22">BasicRobot22</a></c>.</p>
         <p>Dunque nella nostra archietettura inseriremo il componente <c>BasicRobot22</c> con il quale interagiremo per il controllo del <r>DDR</r>.</p>
-        </br>
+        <h4>BasicRobot22</h4>
         <p>Definiamo in breve il <c>BasicRobot22</c>:</p>
         <ul>
             <li>Esegue comandi-base di spostamento, con argomento:<pre><code> MOVE = w | s | l | r | h </code></pre> </li>
@@ -115,12 +109,78 @@
             <li>È in grado di percepire e gestire informazioni provenienti dall’ambiente</li>
         </ul>
         <p>Nel seguente file la documentazione completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c></p>
-<!--        <k>- Link al BasicRobot22</k>-->
-<!--        <k>Studiare BasicRobot 22 e scrivere una piccola parte di come formalizziamo il <r>DDR</r> attraveros il <c>BasicRobot</c></k>-->
+        <!------------------------ ------------------------>
 
-        <h3>Transport Trolley (<r2>TT</r2>)</h3>
-        <p>Fisicamente è formalizzato come un quadrato di dimensione RD.</p>
+        <h4>Gestione delle collisioni</h4>
+        <p>La gestione delle collisioni avviene attraverso un <i><b><u>sonar on-board</u></b></i> presente sul DDR.</p>
+        <p>Significa che il DDR sarà predisposto di un rarard frontale e utilizzabile rilevare ostacoli/muri davanti a lui.</p>
+        <n>Il nostro software <c>BasicRobot22</c> già presuppone la presenza di un <i>sonar on-board</i> e gestisce le collisioni.</n>
 
+        <!------------------------ ------------------------>
+
+
+
+
+<h3>Deposit Action</h3>
+        <p>La <r>Deposit Action</r> è definita come una sequenza di posizioni in cui il <r>DDR</r> deve deve raggiungere:</p>
+        <ol>
+            <li>Indoor</li>
+            <li>PlasticBox/GlassBox</li>
+            <li>Home</li>
+        </ol>
+
+        <p>La <r>Deposit Action</r> può essere dunque definita come una sequenza di percorsi effettuati dal <r>DDR</r>:</p>
+        <ul>
+            <li>Home -> Indoor</li>
+            <li>Indoor -> PlasticBox/GlassBox</li>
+            <li>PlasticBox/GlassBox -> Home</li>
+        </ul>
+
+        <pre><code>
+    Enum TTRoutes = {HI, IP, IG, PH, GH}
+        </code></pre>
+        <img src="img/ServiceAreaPosition-Routes.png" alt="">
+
+        <p>Da requisiti va considerato inoltre che il <i>WasteService</i> potrebbe ricevere un nuova richiesta mentre sta ancora eseguendo la <r>Deposit Action</r> precedente e che il truck va liberato nel minor tempo possibile,
+            dunque il percorso può evolvere come segue:</p>
+        <ul>
+            <li>Home/PB/GB -> Indoor</li>
+            <li>Indoor -> PlasticBox/GlassBox</li>
+            <li>PlasticBox/GlassBox -> Indoor/Home</li>
+        </ul>
+
+        <pre><code>
+    Enum TTRoutes = {HI, IP, IG, PH, GH, <r>PI, GI</r>}
+        </code></pre>
+        <img src="img/ServiceAreaPosition-Routes2.png" alt="">
+
+
+        <p>Date le seguenti ulteriori informazioni:</p>
+        <ul>
+            <li><r>Service Aera</r> è rettangolare e priva di ostacoli</li>
+            <li>Il <r>DDR Robot</r> è dotato di un sonar on-board utilizzabile per le collisioni</li>
+            <li>Il Software per il movimento del nostro <r>DDR Robot</r> permette la rotazione di 90°</li>
+        </ul>
+        <p>Il percorso ottimale utilizzabile è quello fatto percorrendo il perimetro della stanza, dunque si riporta la sua formalizzazione:</p>
+
+        <pre><code>
+    Enum TTRoutes = {HI, IP, PI, PH, PG, GP, GH}
+        </code></pre>
+        <img src="img/ServiceAreaPosition-Routes3.png" alt="">
+
+
+        <!------------------------ ------------------------>
+
+
+
+
+
+
+
+<h3>Transport Trolley (<r2>TT</r2>)</h3>
+    <p>Il <r>TransportTrolley</r> è l'entità <i>Software</i> si occupa di far eseguire la <r>Deposit Action</r> al <r>DDR</r> inviandogli i comandi di movimento.</p>
+
+    <p>Fisicamente è formalizzato come un quadrato di dimensione RD.</p>
         <pre><code>
     val RD : float
         </code></pre>
@@ -130,8 +190,8 @@
         </code></pre>
         <img src="./img/Quadrato-TransportTrolley.png" alt="Quadrato di lato RD" style="width: 15%">
 
-        <k>Formalizzazione a stati finiti</k>
-		
+    <p>La sua formalizzazione <i>Software</i> può esssere rappresentata come un automa a stati finiti, definito come segue tramite il linguaggio QAK:</p>
+    <h4>Formalizzazione a stati finiti</h4>
 	<pre><code>
 QActor transporttrolley context ctxwasteservice {
 	[#
@@ -140,20 +200,17 @@ QActor transporttrolley context ctxwasteservice {
 	#]
 
 	State s0 initial{
-	<b>...</b>
+	    ...
 	}
 	Goto waiting
 
 	State waiting {
-	<b>...</b>
+	    ...
 	}
 	Transition t0 whenRequest pickupReq -> pickup
 
 	State pickup {
-	<b>...</b>
-		}
-		
-	<b>...</b>
+        ...
 	}
 	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
 
@@ -161,29 +218,82 @@ QActor transporttrolley context ctxwasteservice {
 	<b>...</b>
 	}
 	Goto goHome
-	//Transition t1 whenRequest pickupReq -> pickup(from PB)
 
 	State depositGlass {
-	<b>...</b>
+        ...
 	}
 	Goto goHome
-	//Transition t2 whenRequest pickupReq -> pickup(form GB)
 
 	State goHome {
-	<b>...</b>
+        ...
 	}
 	Goto waiting
 
 	}
+}
+	</code></pre>
+    <img src="" alt="TransportTrolleyModelDiagram">
+	
+	<p><a target="_blank" href="../transportTrolley_qak\src\it\unibo\transporttrolley/Transporttrolley.kt"> Metamodello QAK transporttrolley</a></p><br>
 
 
-//RequestHandlerActor 1-TT 
+        <!------------------------ ------------------------>
+
+<h3>WasteTruck</h3>
+        <p> Entità che si presenta in INDOOR e richiede lo scarico del materiale che trasporta attraverso l’uso di uno
+            <r>Smart Device</r>.</p>
+        <p>E' un entità esterna al sistema ma che interagisce con il nostro <r>WasteService</r> per lo scarico dei rifiuti.</p>
+        <p>L'interazione tra il <r>Waste Truck</r> e il <r>WasteService</r> è fondamentale per i requisiti forniti, per cui:</p>
+        <ul>
+            <li>Si formalizza l'interazione con una interazione Request/Response -> <r>WasteTruckRequest</r></li>
+            <li>Si rappresenta il <r>Waste Truck</r> identificandolo con lo <i>SmartDevice</i> con un attore simulato che invia richieste al <r>WS</r></li>
+        </ul>
+
+        <!------------------------ ------------------------>
+
+        <h3>WasteTruckRequest</h3>
+        <p>WasteTruck sends a <a NAME=#wasteTruckRequest>WasteTruckRequest</a></p>
+        <pre><code>
+    var wasteTruckRequest: obj{
+        wasteType: enum{plastic, glass};
+        wasteLoad: float;
+    }
+        </code></pre>
+
+        Il <r>WasteService</r> e il <r>WasteTruck</r> sono in comunicazione tramite lo <r>Smart Device</r>.
+        Lo <r>Smart Device</r> effettuerà una <i>request</i> di deposito di materiale specificando il tipo di materiale e attenderà la risposta del <b>WasteService</b>.<br>
+        <ul>
+            <li>requestAccepted: richiesta accettata (quando è possibile gestirla/capacità Box non piena)</li>
+            <li>requestRejected: richiesta rifiutata (quando non è possibile gestirla/capacità Box piena)</li>
+        </ul>
+
+    <p>Formalizziamo l'interazione con i seguenti messaggi:</p>
+        <pre><code>
+	Request wasteDeposit	: 	wasteDeposit(ID, TYPE, TRUCKLOAD)
+	Reply loadaccept	: 	loadaccept(ID)
+	Reply loadrejecetd	: 	loadrejecetd(ID)
+
+	Dispatch pickupOk 	: 	pickupOk(ID)
+	</code></pre>
+        <p>Lista di comandi o messaggi utilizzati nel sistema per gestire la raccolta dei rifiuti. Ecco una breve spiegazione di ciascun comando:</p>
+        <ul>
+            <li>Request <code>wasteDeposit</code>: comando che indica la richiesta di un deposito di rifiuti. I parametri inclusi nella richiesta sono l'ID del deposito, il tipo di rifiuti e il carico del camion.</li>
+            <li>Reply <code>loadaccept</code>: risposta positiva alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID della richiesta di deposito.</li>
+            <li>Reply <code>loadrejecetd</code>: risposta negativa alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID della richiesta di deposito.</li>
+            <li>Dispatch <code>pickupOk</code>: comando che indica il completamento della raccolta dei rifiuti dal <r>Waste Truck</r>. L'ID incluso nella risposta corrisponde all'ID del deposito da cui i rifiuti sono stati prelevati.</li>
+        </ul>
+        <p>Il parametro <code>ID</code> è stato inserito per poter gestire richieste duplicate ed eventuali errori, rendendo più robusto il sistema</p>
+        <h4>Formalizzazione a stati finiti (QAK)</h4>
+        <p>Si introducono dunque due componenti <i>Software</i>:</p>
+        <ul>
+            <li>Il <code>DepositRequestHandler</code>: attore che gestisce le richieste in entrata al sistema dallo <r>Smart Device</r></li>
+            <li>Lo <code>SmartDevice</code>: attore che simula l'interazione dello <r>Smart Device</r> con il nostro <code>DepositRequestHandler</code></li>
+        </ul>
+        <h5>DepositRequestHandler Actor</h5>
+        <pre><code>
 QActor depositrequesthandler context ctxwasteservice{
-	[# 	var accepted = false; 
+	[# 	var accepted = false;
 		val name = "RequestHandler"
-		
-		var T = ""
-		var ID = 0
 	#]
 	State s0 initial {
 	<b>...</b>
@@ -193,13 +303,12 @@ QActor depositrequesthandler context ctxwasteservice{
 	State waiting{
 	<b>...</b>
 	}
-	Transition t0 whenTime 7000 -> requestHandling
+	Transition t0 whenRequest wasteDeposit -> requestHandling
 
 	State requestHandling {
 	<b>...</b>
-	<b>...</b>
 	}
-	Goto requestAccepted if[# accepted == true #] else requestRejected 
+	Goto requestAccepted if[# accepted == true #] else requestRejected
 
 	State requestAccepted {
 	<b>...</b>
@@ -214,72 +323,124 @@ QActor depositrequesthandler context ctxwasteservice{
 	State pickingUp {
 	<b>...</b>
 	}
-	Transition t1 whenReply pickupOk -> waiting
+	Goto waiting
+}
+</code></pre>
+        <p><a target="_blank" href="../WasteTruckRequest_QAK/depositrequesthandler_qak/src/it/unibo/depositrequesthandler/Depositrequesthandler.kt"> Metamodello QAK depositrequesthandler</a></p>
 
-	State pickupOk {
+        <h5>Smart Device</h5>
+        <p>Lo Smart Device viene utilizzato dal driver per approcciare all'INDOOR mandando una richiesta per depositare il carico specificando il tipo di materiale e il TruckLoad.
+            La richiesta da inviare è stata formalizzata precedentemente nel paragrafo relativo alla <a href=#wasteTruckRequest>WasteTruckRequest</a>.
+        <pre><code>
+QActor smartdevice context ctxsmartdevice{
+	[# var request_ID = 0 #]
+
+	State s0 initial{
+	<b>...</b>
+	}
+	Goto idle
+
+	State idle {
+	<b>...</b>
+	}
+	Transition t0 whenTime 10000 -> truckArrived
+
+	State truckArrived {
+	<b>...</b>
+	}
+	Transition t1 	whenTime  10000 -> truckArrived
+					whenReply loadaccept -> waitPickUp
+					whenReply loadrejecetd -> truckGoAway
+
+	State waitPickUp {
+	<b>...</b>
+	}
+	Transition t2 whenMsg pickupOk -> truckGoAway
+
+	State truckGoAway {
 	<b>...</b>
 		}
+	Transition t3 whenTime 3000 -> idle
+}
+</code></pre>
+
+        <p><a target="_blank" href="../WasteTruckRequest_QAK\smartdevice_qak\src\it\unibo\smartdevice/Smartdevice.kt"> Metamodello QAK smartdevice</a></p>
+
+    <h4>Modello dell'interazione</h4>
+        </br><img src="./img/WasteTruckRequest-1.1t.png" alt="WasteTruckRequestProtocol">
+        <k>Togliere l'ok</k>
+        <p>Il committente ha specificato che sarebbe meglio mandare via il truck il prima possibile, per questo motivo
+            va confermato il pickup del trolley allo <r>Smart Device</r> non appena il <r>DDR</r> ha terminato lo scarico.</p>
+
+    <h4>Revisione V3.2</h4>
+        <p>Non essendo specificati altri comportamenti per il <r>Waste Truck</r> non risulta necessario l'invio di entrambi i messaggi <code>loadaccept</code> e <code>pickupOk</code>. La formalizzazione dei messaggi e dell'interazione Request/Response evolve come segue:</p>
+        <pre><code>
+	Request wasteDeposit	: 	wasteDeposit(ID, TYPE, TRUCKLOAD)
+	Reply loadaccept	: 	loadaccept(ID)
+	Reply loadrejecetd	: 	loadrejecetd(ID)
+	    </code></pre>
+        <p>Viene modificato il significato della <code>loadaccept</code> come segue:</p>
+                <ul><li>La <code>loadaccept</code> verrà inviata direttamente al completamento dello scarico dei rifiuti da parte del <r>DDR</r> svincolando direttamente il <r>Waste Truck</r></li></ul>
+        <p>Ciò aggiunge il vantaggio alla nostra architettura di non aver bisogno avere conoscere del contesto dello <r>SmartDevice</r> nel <r>DepositRequestHandler</r> in quanto dovrà solo effettuare la reply delle richieste.</p>
+
+        <pre><code>
+QActor depositrequesthandler context ctxwasteservice{
+	[#
+		...
+	#]
+	State s0 initial {
+		...
 	}
-	</code></pre>
-	
-	<p><a target="_blank" href="../transportTrolley_qak\src\it\unibo\transporttrolley/Transporttrolley.kt"> Metamodello QAK transporttrolley</a></p><br>
+	Goto waiting
 
-	<!------------------------ ------------------------>
+	State waiting{
+		...
+	}
+	Transition t0 whenRequest wasteDeposit -> requestHandling
 
-        <h3>Deposit Action</h3>
-        <p>La <i>Deposit Action</i> è definita come una sequenza di posizioni in cui il <r>TT</r> deve deve raggiungere:</p>
-        <ol>
-            <li>Indoor</li>
-            <li>PlasticBox/GlassBox</li>
-            <li>Home</li>
-        </ol>
+	State requestHandling {
+		...
+	}
+	Goto pickingUp if[# accepted == true #] else requestRejected
 
-        <p>La <i>Deposit Action</i> è definita dunque come una sequenza di percorsi del <i>TransportTrolley</i>:</p>
-        <ul>
-            <li>Home -> Indoor</li>
-            <li>Indoor -> PlasticBox/GlassBox</li>
-            <li>PlasticBox/GlassBox -> Home</li>
-        </ul>
+	State requestRejected {
+		//Si svincola il Truck
+	}
+	Goto waiting
 
+	State pickingUp {
+		request transporttrolley -m pickupReq : pickupReq($ID, $T)
+	}
+	Transition t1 whenReply pickupOk -> pickupOk
+
+	State pickupOk {
+		onMsg(pickupOk : pickupOk(ID)){
+			replyTo wasteDeposit with loadaccept : loadaccept($ID)  //Moved here (V3.2)
+		}
+	}
+	Goto waiting
+}
+</code></pre>
+        <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/WasteServiceCtx_QAK/src/WasteServiceCtx_v3.2.qak"> Metamodello QAK DepositRequestHandler</a></p>
+
+        <img src="" alt="DepositRequest V3.2 - New interaction model">
+        <img src="" alt="Qak Architecture">
+
+
+        <h4>Modellazione <r>Transport Trolley</r> - <r>DepositRequestHandler</r> (V3.3)</h4>
+        <p>Avendo ora introdotto il componente <r>DepositRequestHandler</r> descriviamo una interazione esemplificativa con il <r>TransportTrolley</r></p>
         <pre><code>
-    Enum TTRoutes = {HI, IP, IG, PH, GH}
+    Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
+    Reply pickupOk : pickupOk(ID)		//Risposta di fine pickup, relativa ad una richiesta
         </code></pre>
-        <img src="img/ServiceAreaPosition-Routes.png" alt="">
 
-        <p>Visto il requisito <i><b>"Il WasteSerice potrebbe ricevere un nuova richiesta mentre sta ancora eseguendo la deposit action di quella precedente."</b></i>.
-            Volendo far tornare indietro il robot per eseguire il prossimo scarico il prima possibile,
-            il percorso può evolvere con queste aggiunte:</p>
-        <p></p>
-        <k>E' SPIEGATO BENE?</k>
-        <ul>
-            <li>Home/PB/GB -> Indoor</li>
-            <li>Indoor -> PlasticBox/GlassBox</li>
-            <li>PlasticBox/GlassBox -> Indoor/Home</li>
-        </ul>
+    <img src="" alt="WasteService Arch. V3.3">
 
-        <pre><code>
-    Enum TTRoutes = {HI, IP, IG, PH, GH, <r>PI, GI</r>}
-        </code></pre>
-        <img src="img/ServiceAreaPosition-Routes2.png" alt="">
+    <p>A seguire il riferimento al metamodello eseguibile del contesto: <a target="_blank" href="">WasteServiceCtx_v3.3.qak</a></p>
 
-
-        <p>Date le seguenti informazioni:</p>
-        <ul>
-            <li><r>Service Aera</r> è rettangolare e priva di ostacoli</li>
-            <li>Il <r>TT</r> è dotato di un sonar on-board utilizzabile per le collisioni</li>
-            <li>Il Software per il movimento del nostro <r>DDR Robot</r> permette la rotazione 90°</li>
-        </ul>
-        <p>Il percorso ottimale utilizzabile è quello fatto percorrendo il perimetro della stanza. Con la seguente formalizzazione.</p>
-
-        <k>SPIEGARE MEGLIO il perché</k>
-
-        <pre><code>
-    Enum TTRoutes = {HI, IP, PI, PH, PG, GP, GH}
-        </code></pre>
-        <img src="img/ServiceAreaPosition-Routes3.png" alt="">
-
-<br>
-    <!------------------------ ------------------------>
+    <h4>Modello di interazione Aggiornato</h4>
+        <img src="" alt="WasteService Interaction. V3.3">
+  <!------------------------ ------------------------>
 
         <h3>Led</h3>
         <p>Strumento connesso in output al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
@@ -296,8 +457,6 @@ QActor depositrequesthandler context ctxwasteservice{
             L’interazione tra <b>WasteService</b> e <b>Raspberry</b> avviene mediante un attore che si occuperà di
             ricevere il segnale in input ed emetterà un evento per il comportamento del led.
         </p>
-        <k>INSERIRE I LINK dei componenti software del Sonar</k>
-		
 	<pre><code>
 QActor led context ctxRaspberry {
 	[#
@@ -325,7 +484,6 @@ QActor led context ctxRaspberry {
 	
 	<p><a target="_blank" href="../RaspberryCtx_QAK\src\it\unibo\led/Led.kt"> Metamodello QAK Led</a></p><br>
 
-        <br>
     <!------------------------ ------------------------>
 
         <h3>Sonar</h3>
@@ -335,33 +493,6 @@ QActor led context ctxRaspberry {
             it.unibo.radarSystem22.domain,
             unibo.sonarqak22</b>.</p>
         <p>Un attore emetterà eventi a seconda della distanza rilevata dal sonar e manda comandi al sonar.</p>
-
-        <k>------------------------</k>
-
-        <ul>QUALI SONO GLI EVENTI?
-            <li> (activateSonar)??</li>
-            <li> (deactivateSonar)??</li>
-            <li> ()??</li>
-        </ul>
-
-        <pre><code>
-    Send    (activateSonar)		: 	-
-    Send    (deactivateSonar)   :	-
-                :	-
-    </code></pre>
-	
-	<pre><code>
-QActor sonar context ctxRaspberry {
-	[#
-		val name = "SonarActor"	
-	#]
-
-	State s0 initial {
-	<b>...</b>
-	}
-
-	}
-	</code></pre>
 
 <p>Sonar Qak già implementato ----> credo che sia già stato fatto qui Nel package unibo.actor22.events della directory test del progetto unibo.actor22, riportiamo la classe SonarActor22 
 che definisce il Sonar come un attore proattivo e reattivo.
@@ -398,151 +529,6 @@ che definisce il Sonar come un attore proattivo e reattivo.
         <br>
 
 <br>
-    <!------------------------ ------------------------>
-
-        <h3>WasteTruck(WT)</h3>
-        <p> Entità che si presenta in INDOOR e richiede lo scarico del materiale che trasporta attraverso l’uso di uno
-            smart device.</p>
-        <p>E' un entità esterna al sistema ma che scambia messaggi con il nostro <r>WasteService</r> per lo scarico dei rifiuti. Questo attraverso uno <i>SmartDevice</i></p>
-        <p>L'interazione tra il <r>WT</r> e il <r>WS</r> è fondamentale per i requisiti forniti, per cui:</p>
-        <ul>
-            <li>Si formalizza l'interazione con una interazione Request/Response -> <r>WasteTruckRequest</r></li>
-            <li>Si rappresenta il <r>WT</r> identificandolo con lo <i>SmartDevice</i> con un attore simulato che invia richieste</li>
-        </ul>
-
-    <!------------------------ ------------------------>
-
-
-        <h3>WasteTruckRequest</h3>
-        <p>WasteTruck sends a <a NAME=#wasteTruckRequest>WasteTruckRequest</a></p>
-        <pre><code>
-    var wasteTruckRequest: obj{
-        wasteType: enum{plastic, glass};
-        wasteLoad: float;
-    }
-        </code></pre>
-
-        Il <b>WasteService</b> e il <b>WasteTruck</b> sono in comunicazione tramite lo <b>Smart Device</b>.
-            Il conducente del <b>WasteTruck</b> effettuerà una request di deposito di materiale specificando il tipo di materiale e attenderà la risposta del <b>WasteService</b>.<br>
-			<ul>
-            <li>requestAccepted: richiesta accettata (quando è possibile gestirla/capacità Box non piena)</li>
-            <li>requestRejected: richiesta rifiutata (quando non è possibile gestirla/capacità Box piena)</li>
-			</ul>
-			
-	<pre>
-	<code>
-	Request wasteDeposit	: 	wasteDeposit(ID, Type, TruckLoad)
-	Reply loadaccept	: 	loadaccept(ID)
-	Reply loadrejecetd	: 	loadrejecetd(ID)
-	
-	Dispatch pickupOk 	: 	pickupOk(ID)
-	</code>
-	</pre>
-	<p>Lista di comandi o messaggi utilizzati nel sistema per gestire la raccolta dei rifiuti. Ecco una breve spiegazione di ciascun comando:<br>
-<ul>
-<li>Request wasteDeposit: wasteDeposit(ID, Type, TruckLoad)": Questo comando indica che il mittente sta richiedendo un deposito di rifiuti. I parametri inclusi nella richiesta sono l'ID del deposito, il tipo di rifiuti e il carico del camion.</li><br>
-<li>Reply loadaccept: loadaccept(ID)": Questa è una risposta positiva alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID del deposito richiesto.</li><br>
-<li>Reply loadrejecetd: loadrejecetd(ID)": Questa è una risposta negativa alla richiesta di deposito dei rifiuti. Anche in questo caso, l'ID incluso nella risposta corrisponde all'ID del deposito richiesto.</li><br>
-<li>Dispatch pickupOk: pickupOk(ID)": Questo comando indica che la raccolta dei rifiuti dal deposito è stata effettuata con successo. L'ID incluso nella risposta corrisponde all'ID del deposito da cui i rifiuti sono stati prelevati.</li><br>
-</ul>
-In sostanza, questi comandi vengono utilizzati per gestire il processo di raccolta dei rifiuti. Quando un utente richiede un deposito di rifiuti, il sistema può accettare o rifiutare la richiesta e, in caso di accettazione, notificare l'utente quando la raccolta dei rifiuti è stata effettuata con successo.</p>
-<pre><code>
-QActor depositrequesthandler context ctxwasteservice{
-	[# 	var accepted = false; 
-		val name = "RequestHandler"
-	#]
-	State s0 initial {
-	<b>...</b>
-	}
-	Goto waiting
-	
-	State waiting{
-	<b>...</b>
-	}
-	Transition t0 whenRequest wasteDeposit -> requestHandling
-	
-	State requestHandling {
-	<b>...</b>
-	}
-	Goto requestAccepted if[# accepted == true #] else requestRejected 
-	
-	State requestAccepted {
-	<b>...</b>
-	}
-	Goto pickingUp
-	
-	State requestRejected {
-	<b>...</b>
-	}
-	Goto waiting
-	
-	State pickingUp {
-	<b>...</b>
-	}
-	Goto waiting
-}
-</code></pre>
-
- <p><a target="_blank" href="../WasteTruckRequest_QAK/depositrequesthandler_qak/src/it/unibo/depositrequesthandler/Depositrequesthandler.kt"> Metamodello QAK depositrequesthandler</a></p>
-			<br>
-
-        <p>L’azione conseguente al meccanismo di Request/Reply è esterno al sistema.</p>
-
-           <dd>Il committente ha specificato che sarebbe meglio mandare via il truck il prima possibile, per questo motivo
-            va confermato il pickup del trolley al Waste truck driver attraverso due azioni:
-            <ul><br>
-                <lI><b>PickingUp</b>: muovi il trolley fino a INDOOR e raccogli il materiale</lI>
-                <lI><b>DroppingOut</b>: muovi il trolley fino a uno dei due container e deposita il materiale</lI>
-            </ul>
-
-        <img src="./img/WasteTruckRequest-1.1t.png" alt="WasteTruckRequestProtocol">
-
-<br>
-    <!------------------------ ------------------------>
-
-        <h3>Smart Device</h3>
-        Il <b>WasteService</b> e il <b>WasteTruck</b> sono in comunicazione tramite lo <b>Smart Device</b>.
-
-		<p>Lo Smart Device viene utilizzato dal driver per approcciare all'INDOOR mandando una richiesta per depositare il carico specificando il tipo di materiale e il TruckLoad.
-		La richiesta da inviare è stata formalizzata precedentemente nel paragrafo relativo alla <a href=#wasteTruckRequest>WasteTruckRequest</a>.
-		<pre><code>
-QActor smartdevice context ctxsmartdevice{
-	[# var request_ID = 0 #]
-	
-	State s0 initial{
-	<b>...</b>
-	}
-	Goto idle
-	
-	State idle {
-	<b>...</b>
-	}
-	Transition t0 whenTime 10000 -> truckArrived
-	
-	State truckArrived {
-	<b>...</b>
-	}
-	Transition t1 	whenTime  10000 -> truckArrived
-					whenReply loadaccept -> waitPickUp
-					whenReply loadrejecetd -> truckGoAway
-							
-	State waitPickUp {
-	<b>...</b>
-	}
-	Transition t2 whenMsg pickupOk -> truckGoAway
-	
-	State truckGoAway {
-	<b>...</b>
-		}
-	Transition t3 whenTime 3000 -> idle
-}
-</code></pre>
-
-	 <p><a target="_blank" href="../WasteTruckRequest_QAK\smartdevice_qak\src\it\unibo\smartdevice/Smartdevice.kt"> Metamodello QAK smartdevice</a></p>
-	
-		<br>
-    <!------------------------ ------------------------>
-
 
         <h3>Gestione tempo di raccolta/deposito del materiale dal truck</h3>
         <dd>Il commitente precisa che il tempo di raccolta del materiale del truck è sempre limitato e prevedibile,
@@ -581,26 +567,13 @@ QActor smartdevice context ctxsmartdevice{
         </dd>
 
 <br>
-    <!------------------------ ------------------------>
 
-
-        <h3>Gestione delle collisioni</h3>
-        <dd>La gestione delle collisioni avviene attraverso un <i><b><u>sonar on-board</u></b></i> presente sul DDR.</dd>
-        <p>Significa che il DDR avrà un rarard e possiamo usarlo per girare nella stanza e comprendere la posizione</p>
-
-        <dt><b>Sonar and a LED connected to a RaspnerryPi</b></dt>
-
-
-<br>
     <!------------------------ ------------------------>
 
 
         <h3>WasteService: General Architecture</h3>
 
     </div>
-
-    <h2>User Stories (?Facoltative)</h2>
-
 
     <h2>Logical Architecture</h2>
 

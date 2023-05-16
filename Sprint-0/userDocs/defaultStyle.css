@@ -221,3 +221,12 @@ c {
     font-style: italic;
     color: grey;
 }
+
+n {
+    box-sizing: border-box;
+    display: block;
+    background-color: rgba(142, 226, 255, 0.35);
+    border-radius: 10px;
+    padding: 5px;
+    font-size: 0.85em;
+}
