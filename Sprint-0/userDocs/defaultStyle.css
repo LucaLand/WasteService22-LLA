@@ -48,7 +48,13 @@ h1, h2, h3 {
 tt {
     font-family: "Arial",serif;
     font-size: 90%;
-    color: #006600;
+    /*color: #00c5a2;*/
+    /*Container*/
+    display: block;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: rgba(134, 211, 222, 0.45);
+    border: solid rgba(0, 119, 255, 0.47) 1px;
 }
 
 em {
