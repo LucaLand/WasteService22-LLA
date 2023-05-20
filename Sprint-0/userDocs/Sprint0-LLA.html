@@ -223,8 +223,9 @@
         </code></pre>
         <img src="./img/Quadrato-TransportTrolley.png" alt="Quadrato di lato RD" style="width: 15%">
 
-    <p>La sua formalizzazione <i>Software</i> può essere rappresentata come un automa a stati finiti, definito come segue tramite il linguaggio QAK:</p>
     <h4>Formalizzazione a stati finiti</h4>
+        <p>La sua formalizzazione <i>Software</i> può essere rappresentata come un automa a stati finiti, definito come segue tramite il linguaggio QAK:</p>
+
 <pre><code>
 QActor transporttrolley context ctxwasteservice {
 	[#
@@ -245,7 +246,7 @@ QActor transporttrolley context ctxwasteservice {
 	} Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
 
 	State depositPlastic {
-	    <b>...</b>
+            ...
 	} Goto goHome
 
 	State depositGlass {
@@ -254,17 +255,14 @@ QActor transporttrolley context ctxwasteservice {
 
 	State goHome {
             ...
-	}
-
-	Goto waiting
-            ...
-	}
+	} Goto waiting
 }
 </code></pre>
-    <img src="" alt="TransportTrolleyModelDiagram">
-	
-	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/other_QAK/transporttrolley_v1.qak"> Metamodello QAK transporttrolley</a></p><br>
+        <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley_0.qak"> Metamodello QAK transporttrolley</a></p><br>
+        <img src="./img/TransportTrolley.png" alt="TransportTrolleyModelDiagram" style="width: 220px">
 
+    <h4>Architecture Evolution</h4>
+        <img src="./img/Logical_Architecture_v1.png" alt="General Architecture">
 
         <!------------------------ ------------------------>
 
