@@ -110,8 +110,7 @@
             <li>Avremo un <code><i>PickingTime</i></code> definito</li>
             <pre><code>var pickingTime : int (seconds)</code></pre>
         </ul>
-        <n> Potrà essere usato per gestire il reinvio di richieste da parte dello SmartDevice allo scadere di un Timeout. Come già implementato nel modello eseguibile <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/SmartDeviceCtx_QAK/src/SmartDeviceCtx_v3.3.qak">SmartDeviceCtx_v3.3</a>
-            <br>
+        <n> Potrà essere usato per gestire il reinvio di richieste da parte dello SmartDevice allo scadere di un Timeout.<br>
             Per quanto riguarda invece lo scarico, avendo un modello a scambio di messaggi con interazioni ad eventi non risulta un problema.
         </n>
 
@@ -119,31 +118,37 @@
 
     <!------------------------ ------------------------>
         <h3>DDR Robot</h3>
-        <p>Con <r>DDR Robot</r> si intende <i>Differential Drive Robot</i> la cui documentazione è disponibile nel documento seguente, fornito dalla nostra <i>Software House</i>: <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html">VirtualRobot.html</a></p>
+        <p>Con <r>DDR Robot</r> si intende <i>Differential Drive Robot</i> la cui documentazione è disponibile nel documento seguente, fornito dalla nostra <i>Software House</i>: <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html#differential-drive-robot">Differential Drive Robot</a></p>
         <p>Non avendo a disposizione un <r>DDR Robot</r> fisico e considerando i tempi, i costi di realizzazione del robot e la necessità di effettuare test
             del <i>Software</i>, viene messo a disposizione, dalla nostra <i>Software House</i>, un simulatore virtuale del <r>DDR Robot</r>: il <i><a target="_blank" href="http://htmlpreview.github.io/?https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/userDocs/wenv.html">"Wenv22-VirtualRobot</a></i>.</p>
         <p>Questo simula in ambiente virtuale, le caratteristiche principali e i comportamenti del <r>DDR</r> permettendo il testing e la simulazione della nostra architettura come su un <r>DDR</r> fisico.</p>
         <p>Essendo il <i><b>Wenv22</b></i> un simulatore di un <r>DDR</r> fisico, anche nelle sue interazioni, d'ora in poi ci riferiremo semplicemente
             al <r>DDR</r> senza specificare se <i>Simulato</i> o <i>Fisico</i>, in quanto l'interazione non cambia.</p>
 
+
         <p>Il <r>DDR</r> verrà dunque inteso come un <u>componente fisico del sistema con il quale la nostra architettura <i>Software</i> interagirà</u>.</p>
         <p>Facendo riferimento ai componenti implemntati nella nostra <i>Software House</i>, la gestione del <r>DDR</r> potrà avvenire attraverso il componente <c><a target="_blank" href="https://github.com/anatali/issLab2022/tree/main/unibo.basicrobot22">BasicRobot22</a></c>.</p>
         <p>Dunque nella nostra archietettura inseriremo il componente <c>BasicRobot22</c> con il quale interagiremo per il controllo del <r>DDR</r>.</p>
+
+
         <h4>BasicRobot22</h4>
-        <p>Definiamo in breve il <c>BasicRobot22</c>:</p>
+        <p>Definiamo in breve il <c><a target="_blank" href="https://github.com/anatali/issLab2022/tree/main/unibo.basicrobot22">BasicRobot22</a></c>:</p>
         <ul>
             <li>Esegue comandi-base di spostamento, con argomento:<pre><code> MOVE = w | s | l | r | h </code></pre> </li>
             <li>Permette l'esecuzione di <i>step</i>, rispondendo con <b>stepdone</b> o <b>stepfail</b></li>
             <li>È in grado di utilizzare diversi tipi di robot (virtuali e reali) costruiti ciascuno con una propria tecnologia</li>
             <li>È in grado di percepire e gestire informazioni provenienti dall’ambiente</li>
         </ul>
-        <p>Nel seguente file la documentazione completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c></p>
+        <img src="./img/basicrobot22-image0.png" alt="basicrobot22" style="width: 250px">
+        <p>Nel seguente file la documentazione completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c>.
+        E un suo modello eseguibile <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">basicrobot.qak</a></p>
+
         <!------------------------ ------------------------>
 
         <h4>Gestione delle collisioni</h4>
-        <p>La gestione delle collisioni avviene attraverso un <i><b><u>sonar on-board</u></b></i> presente sul DDR.</p>
-        <p>Significa che il DDR sarà predisposto di un rarard frontale e utilizzabile rilevare ostacoli/muri davanti a lui.</p>
-        <n>Il nostro software <c>BasicRobot22</c> già presuppone la presenza di un <i>sonar on-board</i> e gestisce le collisioni.</n>
+            <p>La gestione delle collisioni avviene attraverso un <i><b><u>sonar on-board</u></b></i> presente sul DDR.</p>
+            <p>Significa che il DDR sarà predisposto di un rarar frontale e utilizzabile rilevare ostacoli/muri davanti a lui.</p>
+            <n>Il nostro software <c>BasicRobot22</c> già presuppone la presenza di un <i>sonar on-board</i> e gestisce le collisioni.</n>
 
         <!------------------------ ------------------------>
 
@@ -220,7 +225,7 @@
 
     <p>La sua formalizzazione <i>Software</i> può essere rappresentata come un automa a stati finiti, definito come segue tramite il linguaggio QAK:</p>
     <h4>Formalizzazione a stati finiti</h4>
-	<pre><code>
+<pre><code>
 QActor transporttrolley context ctxwasteservice {
 	[#
 		val name = "TransportTrolley"
@@ -229,37 +234,33 @@ QActor transporttrolley context ctxwasteservice {
 
 	State s0 initial{
 	    ...
-	}
-	Goto waiting
+	} Goto waiting
 
 	State waiting {
 	    ...
-	}
-	Transition t0 whenRequest pickupReq -> pickup
+	} Transition t0 whenRequest pickupReq -> pickup
 
 	State pickup {
-        ...
-	}
-	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
+            ...
+	} Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
 
 	State depositPlastic {
-	<b>...</b>
-	}
-	Goto goHome
+	    <b>...</b>
+	} Goto goHome
 
 	State depositGlass {
-        ...
-	}
-	Goto goHome
+            ...
+	} Goto goHome
 
 	State goHome {
-        ...
+            ...
 	}
-	Goto waiting
 
+	Goto waiting
+            ...
 	}
 }
-	</code></pre>
+</code></pre>
     <img src="" alt="TransportTrolleyModelDiagram">
 	
 	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/other_QAK/transporttrolley_v1.qak"> Metamodello QAK transporttrolley</a></p><br>
