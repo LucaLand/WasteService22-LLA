@@ -268,12 +268,13 @@ QActor transporttrolley context ctxwasteservice {
 
 <h3>WasteTruck</h3>
         <p> Entità che si presenta in INDOOR e richiede lo scarico del materiale che trasporta attraverso l’uso di uno
-            <r>Smart Device</r>.</p>
-        <p>E' un entità esterna al sistema ma che interagisce con il nostro <r>WasteService</r> per lo scarico dei rifiuti.</p>
-        <p>L'interazione tra il <r>Waste Truck</r> e il <r>WasteService</r> è fondamentale per i requisiti forniti, per cui:</p>
+            <r>Smart Device</r>, ovvero l'entità sofwtare che si occupa della sua interazione con il sistema.</p>
+        <p>Il <r>Waste Truck</r> è un entità esterna al sistema ma che interagisce con il nostro <r>WasteService</r> per lo scarico dei rifiuti.</p>
+        <p>Lo <r>Smart Device</r> non va implementato, ma l'interazione tra lo <r>Smart Device</r> e il <r>WasteService</r> è fondamentale per i requisiti forniti, per cui:</p>
         <ul>
-            <li>Si formalizza l'interazione con una interazione Request/Response -> <r>WasteTruckRequest</r></li>
-            <li>Si rappresenta il <r>Waste Truck</r> identificandolo con lo <i>SmartDevice</i> con un attore simulato che invia richieste al <r>WS</r></li>
+            <li>Si formalizza l'interazione con una interazione Request/Response</li>
+            <li>Il <r>Waste Truck</r> richiederà lo scarico di rifiuti tramite una <r>DepositRequest</r></li>
+            <li>Lo <i>Smart Device</i> verrà rappresentato e simulato con un attore che invia richieste al <r>WS</r></li>
         </ul>
 
         <!------------------------ ------------------------>
@@ -281,7 +282,7 @@ QActor transporttrolley context ctxwasteservice {
         <h3>WasteTruckRequest</h3>
 
         <p>Il <r>WasteService</r> e il <r>WasteTruck</r> sono in comunicazione tramite lo <r>Smart Device</r>.
-        Lo <r>Smart Device</r> effettuerà una <i>request</i> di deposito di materiale specificando il tipo di materiale e attenderà la risposta del <b>WasteService</b>.</p>
+            Lo <r>Smart Device</r> effettuerà una <i>request</i> (<r>DepositRequest</r>) di deposito di materiale specificando il tipo di materiale e attenderà la risposta del <b>WasteService</b>.</p>
         <ul>
             <li><code>loadaccepted</code>: richiesta accettata (quando è possibile gestirla/capacità Box non piena)</li>
             <li><code>loadrejecetd</code>: richiesta rifiutata (quando non è possibile gestirla/capacità Box piena)</li>
@@ -301,7 +302,7 @@ QActor transporttrolley context ctxwasteservice {
     </code></pre>
         <p>Spiegazione di ciascun messaggio:</p>
         <ul>
-            <li>Request <code>wasteDeposit</code>: comando che indica la richiesta di un deposito di rifiuti. I parametri inclusi nella richiesta sono l'ID del deposito, il tipo di rifiuti e il carico del camion.</li>
+            <li>Request <code>depositRequest</code>: comando che indica la richiesta di un deposito di rifiuti. I parametri inclusi nella richiesta sono l'ID del deposito, il tipo di rifiuti e il carico del camion.</li>
             <li>Reply <code>loadaccept</code>: risposta positiva alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID della richiesta di deposito.</li>
             <li>Reply <code>loadrejecetd</code>: risposta negativa alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID della richiesta di deposito.</li>
         </ul>
@@ -325,7 +326,7 @@ QActor transporttrolley context ctxwasteservice {
 
         <h5>WasteService</h5>
         <pre><code>
-QActor WasteService context ctxwasteservice{
+QActor wasteservice context ctxwasteservice{
 	State s0 initial {
 		...
 	} Goto waiting
@@ -339,15 +340,15 @@ QActor WasteService context ctxwasteservice{
 	} Goto pickingUp if[# accepted == true #] else requestRejected
 
 	State requestRejected {
-		//Si svincola il Truck
+		//Si svincola il Truck (reply loadrejecetd)
 	} Goto waiting
 
 	State pickingUp {
-		request transporttrolley -m pickupReq : pickupReq($ID, $T)
+		//Si chiede il pickup al Transport Trolley
 	} Transition t1 whenReply pickupOk -> pickupOk
 
 	State pickupOk {
-		replyTo wasteDeposit with loadaccept : loadaccept($ID)  //Moved here (V3.2)
+		//Si svincola il truck (reply loadaccept)
 	} Goto waiting
 }
 </code></pre>
@@ -390,9 +391,7 @@ QActor smartdevice context ctxsmartdevice{
         <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/SmartDeviceCtx_QAK/src/SmartDeviceCtx_v3.2.qak"> Metamodello QAK SmartDevice V3.2</a></p>
 
     <h4>Modello dell'interazione</h4>
-
         <img src="./img/WasteTruckRequest-V3.2.png" alt="DepositRequest V3.2 - New interaction model">
-        <img src="" alt="Qak Architecture">
 
 
     <h4>Modellazione <r>Transport Trolley</r></h4>
@@ -401,17 +400,20 @@ QActor smartdevice context ctxsmartdevice{
     Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
     Reply pickupOk : pickupOk(ID)		//Risposta di fine pickup, relativa ad una richiesta
         </code></pre>
+        <img src="./img/WasteService_TransportTrolley_Int.png" alt="WasteService interaction with TransportTrolley">
+        <p>A seguire il riferimento al metamodello eseguibile del contesto: <a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/WasteServiceCtx_QAK/src/WasteServiceCtx_v3.3.qak">WasteServiceCtx_v3.3.qak</a></p>
 
-    <img src="" alt="WasteService Arch. V3.3">
+    <h4>Architettura</h4>
+        <img src="./img/Logical_Architecture_v2.png" alt="" style="width: 80vw">
 
-    <p>A seguire il riferimento al metamodello eseguibile del contesto: <a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/WasteServiceCtx_QAK/src/WasteServiceCtx_v3.3.qak">WasteServiceCtx_v3.3.qak</a></p>
 
-    <h4>Modello dell'interazione (+TT)</h4>
-        <p>DepositRequest accettata:</p>
-        <img src="./img/WasteTruckRequest-V3.3-complete.png" alt="WasteService Interaction. V3.3">
+    <h4>Modello dell'interazione - Use cases</h4>
+        <ul><li>DepositRequest accettata</li></ul>
+        <img src="./img/WasteTruckRequest-complete-accept.png" alt="WasteService Interaction. V3.3" style="width: 70vw">
+        <br>
 
-        <p>DepositRequest rifiutata</p>
-        <img src="./img/WasteTruckRequest-V3.2-Reject-complete.png" alt="WasteService Interaction. V3.3">
+        <ul><li>DepositRequest Rifiutata</li></ul>
+        <img src="./img/WasteTruckRequest-complete-reject.png" alt="WasteService Interaction. V3.3" style="width: 70vw">
 
   <!------------------------ ------------------------>
 
