@@ -435,30 +435,30 @@ QActor smartdevice context ctxsmartdevice{
         </p>
 	<pre><code>
 QActor led context ctxRaspberry {
-	[#
-		val name = "LedActor"	
-	#]
-	
-	State off initial{
-	<b>...</b>
+	State s0 initial {
+		println("\t $name: Started! $version")
+	}
+	Goto off
+
+	State off {
+		println("\t$name: OFF")
 	}
 	Transition t0 whenEvent robotMoving -> blink
-	
+
 	State on {
-	<b>...</b>
+		println("\t$name: ON")
 	}
 	Transition t3 whenEvent robotMoving -> blink
-	
+
 	State blink {
-	<b>...</b>
+		println("\t$name: BLINK!")
 	}
 	Transition t1 whenEvent robotAtHome -> off
 				  whenEvent robotStopped -> on
-	
-	}
+}
 	</code></pre>
 	
-	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/RaspberryCtx_QAK/src/ctxRaspberry_v3.0.qak"> Metamodello QAK Led</a></p><br>
+	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/Led.qak"> Metamodello QAK Led</a></p><br>
 
     <!------------------------ ------------------------>
 
