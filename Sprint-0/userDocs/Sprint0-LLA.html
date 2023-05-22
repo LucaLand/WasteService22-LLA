@@ -418,6 +418,14 @@ QActor smartdevice context ctxsmartdevice{
 
   <!------------------------ ------------------------>
 
+        <h3>Raspberry</h3>
+        <p>Il committente specifica la presenza di due compomenti istallate su un nuovo contesto esterno al contesto del <r>WasteService</r>, ovvero un <c>Raspberry</c>.</p>
+        <p>Viene quindi definito un nuovo contesto <c>ctxraspbaerry</c> contentente le due componenti specificate dal committente: </p>
+        <ul>
+            <li>Un <r>Led</r></li>
+            <li>Un <r>Sonar</r></li>
+        </ul>
+
         <h3>Led</h3>
         <p>Strumento connesso in output al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
         <ul>Individuiamo e definiamo TRE modalità:
@@ -459,6 +467,7 @@ QActor led context ctxRaspberry {
 	</code></pre>
 	
 	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/Led.qak"> Metamodello QAK Led</a></p><br>
+    <img src="img/LedActor.png" alt="Led Actor" style="width: 200px">
 
     <!------------------------ ------------------------>
 
@@ -499,6 +508,8 @@ che definisce il Sonar come un attore proattivo e reattivo.
         </ul>
         <br>
 
+        <img src="img/Raspberry_Architecture.png" alt="Led Actor" style="width: 300px">
+
     <!------------------------ ------------------------>
 
 
@@ -525,27 +536,28 @@ che definisce il Sonar come un attore proattivo e reattivo.
             <li>Un <b>Attore <i>osservatore</i></b> che osservi le variabili condivise e aggiorni i valori dell'<i>Interfaccia Grafica Web</i> </li>
         </ul>
 
+        <img src="img/WasteServiceGui_Arch.png" alt="WasteServiceGui Architecture image" style="width: 350px">
 <br>
 
     <!------------------------ ------------------------>
 
     </div>
 
-    <h2>Logical Architecture</h2>
-
-    <img src="" alt="General Logical Architecture">
+    <div class="remark">
+        <h2>Logical Architecture</h2>
+        <img src="img/Logical_Architecture_complete.png" alt="General Logical Architecture">
 	
 	
-    <p>Riepilogo di cosa è requisito e cosa no, e di cosa è già stato sviluppato e cosa no</p>
-    <ul>
-        <li>Lo <i>smartdevice</i> è già stato sviluppato (o comunque è parte dei test), le richieste/risposte (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) sono requisito.</li>
-        <li>Il <i>basicrobot</i> è già stato sviluppato, le interazioni con il robot definite in termini di operazioni di message-passing (<i>cmdbase</i>, <i>cmdstep</i>, <i>situated</i>) sono quindi predefinite.</li>
-        <li>Il <i>wasteservice</i> è da sviluppare, l'interfaccia che espone verso l'esterno (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) è requisito, mentre l'interazione verso componenti interni (comandi da mandare al TT e aggiornare la capacità dei contenitori) per il momento non è stata considerata.</li>
-        <li>Il <i>transporttrolley</i> è da sviluppare, e sarà oggetto di analisi del prossimo sprint. Inoltre è ancora incerta la collocazione di questo componente (IN QUALE CONTESTO LO COLLOCHIAMO?).</li>
-        <li>Il <i>sonar</i> e il <i>led</i> sono da sviluppare: è disponibile software che dovrà essere analizzato prima di essere eventualmente utilizzato/adattato, VALUTARE SE LE INTERAZIONI SONO UN REQUISITO O GI&Agrave SONO IMPLEMENTATE.</li>
-        <li>Il <i>wasteservicestatusgui</i> è da analizzare/sviluppare, e sarà oggetto degli sprint successivi (al momento è incerta la collocazione e/o l'esistenza sotto forma di attore del componente). Le interazioni (TUTTE LE INFO PASSATE ALLA GUI) sono da valutare e al momento restano vaghe (SONO REQUISITO?).</li>
-    </ul>
-
+        <p>Riepilogo di cosa è requisito e cosa no, e di cosa è già stato sviluppato e cosa no</p>
+        <ul>
+            <li>Lo <i>smartdevice</i> è già stato sviluppato (o comunque è parte dei test), le richieste/risposte (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) sono requisito.</li>
+            <li>Il <i>basicrobot</i> è già stato sviluppato, le interazioni con il robot definite in termini di operazioni di message-passing (<i>cmdbase</i>, <i>cmdstep</i>, <i>situated</i>) sono quindi predefinite.</li>
+            <li>Il <i>wasteservice</i> è da sviluppare, l'interfaccia che espone verso l'esterno (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) è requisito, mentre l'interazione verso componenti interni (comandi da mandare al TT e aggiornare la capacità dei contenitori) per il momento non è stata considerata.</li>
+            <li>Il <i>transporttrolley</i> è da sviluppare, e sarà oggetto di analisi del prossimo sprint. Inoltre è ancora incerta la collocazione di questo componente (IN QUALE CONTESTO LO COLLOCHIAMO?).</li>
+            <li>Il <i>sonar</i> e il <i>led</i> sono da sviluppare: è disponibile software che dovrà essere analizzato prima di essere eventualmente utilizzato/adattato, VALUTARE SE LE INTERAZIONI SONO UN REQUISITO O GI&Agrave SONO IMPLEMENTATE.</li>
+            <li>Il <i>wasteservicestatusgui</i> è da analizzare/sviluppare, e sarà oggetto degli sprint successivi (al momento è incerta la collocazione e/o l'esistenza sotto forma di attore del componente). Le interazioni (TUTTE LE INFO PASSATE ALLA GUI) sono da valutare e al momento restano vaghe (SONO REQUISITO?).</li>
+        </ul>
+    </div>
 
 <h2>Work Plan</h2>
 <div class="remark">
