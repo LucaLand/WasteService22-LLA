@@ -13,7 +13,7 @@ System raspberry
 Context ctxRaspberry ip[host="localhost" port=8076]
 	
 
-QActor led context ctxRaspberry {
+QActor ledactor context ctxRaspberry {
 	[#
 		val name = "LedActor"
 		val version = "V4.0"

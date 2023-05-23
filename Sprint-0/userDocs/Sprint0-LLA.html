@@ -437,12 +437,9 @@ QActor smartdevice context ctxsmartdevice{
     enum LedState = {LedOff, LedOn, LedBlink};
         </code></pre>
 
-        <p>Il committente fornisce già del software relativo al led in <b>it.unibo.radarSystem22.domain</b>, e in <b>unibo.ledqak22</b>.
-            L’interazione tra <b>WasteService</b> e <b>Raspberry</b> avviene mediante un attore che si occuperà di
-            ricevere il segnale in input ed emetterà un evento per il comportamento del led.
-        </p>
+        <p>L’interazione tra <b>WasteService</b> e <b>Raspberry</b> avviene mediante un attore che si occuperà di ricevere il segnale in input ed emetterà un evento per il comportamento del led.</p>
 	<pre><code>
-QActor led context ctxRaspberry {
+QActor ledactor context ctxRaspberry {
 	State s0 initial {
 		println("\t $name: Started! $version")
 	}
@@ -466,7 +463,7 @@ QActor led context ctxRaspberry {
 }
 	</code></pre>
 	
-	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/Led.qak"> Metamodello QAK Led</a></p><br>
+	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/LedActor.qak"> Metamodello QAK LedActor</a></p><br>
     <img src="img/LedActor.png" alt="Led Actor" style="width: 200px">
 
     <!------------------------ ------------------------>
@@ -479,7 +476,7 @@ QActor led context ctxRaspberry {
             unibo.sonarqak22</b>.</p>
         <p>Un attore emetterà eventi a seconda della distanza rilevata dal sonar e manda comandi al sonar.</p>
 
-<p>Sonar Qak già implementato ----> credo che sia già stato fatto qui Nel package unibo.actor22.events della directory test del progetto unibo.actor22, riportiamo la classe SonarActor22 
+<p>Sonar Qak già implementato fornito nel package unibo.actor22.events della directory test del progetto unibo.actor22, riportiamo la classe SonarActor22
 che definisce il Sonar come un attore proattivo e reattivo.
 <p><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/SonarObservable.html#il-sonar-come-attore-che-emette-eventi"> Documentazione SonarActor22</a></p>
 <p><a href="https://github.com/anatali/issLab2022/blob/main/unibo.sonarqak22/src/sonarqak22.qak">Metamodello QAK SonarQak22</a></p>
@@ -548,27 +545,38 @@ che definisce il Sonar come un attore proattivo e reattivo.
         <img src="img/Logical_Architecture_complete.png" alt="General Logical Architecture">
 	
 	
-        <p>Riepilogo di cosa è requisito e cosa no, e di cosa è già stato sviluppato e cosa no</p>
+        <h3>Riepilogo</h3>
+        <p>Componenti dell'architettura del sistema:</p>
         <ul>
-            <li>Lo <i>smartdevice</i> è già stato sviluppato (o comunque è parte dei test), le richieste/risposte (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) sono requisito.</li>
-            <li>Il <i>basicrobot</i> è già stato sviluppato, le interazioni con il robot definite in termini di operazioni di message-passing (<i>cmdbase</i>, <i>cmdstep</i>, <i>situated</i>) sono quindi predefinite.</li>
-            <li>Il <i>wasteservice</i> è da sviluppare, l'interfaccia che espone verso l'esterno (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) è requisito, mentre l'interazione verso componenti interni (comandi da mandare al TT e aggiornare la capacità dei contenitori) per il momento non è stata considerata.</li>
-            <li>Il <i>transporttrolley</i> è da sviluppare, e sarà oggetto di analisi del prossimo sprint. Inoltre è ancora incerta la collocazione di questo componente (IN QUALE CONTESTO LO COLLOCHIAMO?).</li>
-            <li>Il <i>sonar</i> e il <i>led</i> sono da sviluppare: è disponibile software che dovrà essere analizzato prima di essere eventualmente utilizzato/adattato, VALUTARE SE LE INTERAZIONI SONO UN REQUISITO O GI&Agrave SONO IMPLEMENTATE.</li>
-            <li>Il <i>wasteservicestatusgui</i> è da analizzare/sviluppare, e sarà oggetto degli sprint successivi (al momento è incerta la collocazione e/o l'esistenza sotto forma di attore del componente). Le interazioni (TUTTE LE INFO PASSATE ALLA GUI) sono da valutare e al momento restano vaghe (SONO REQUISITO?).</li>
+            <li><c>ctxWasteService</c>: contesto del core del nostro progetto</li>
+                <ul>
+                    <li><r>WasteService</r>: componente (Attore) Software da sviluppare che riceve le richieste dello <r>SmartDevice</r></li>
+                    <li><r>TransportTrolley: componente (Attore) Software da sviluppare che rappresenta e si occupa di comandare il <r>DDR Robot</r>, comunicando con il <r>BasicRobot22</r></r></li>
+                </ul>
+            <li><r>DDR Robot</r>: Entità fisica o virtuale di un <i>Differential Drive Robot</i></li>
+                <ul>
+                    <li><r>BasicRobot22</r>: componente (Attore) Software implementato dalla nostra <i>Software House</i> per il comando di un <r>DDR Robot</r> generico</li>
+                </ul>
+            <li><c>ctxRaspberry</c>: contesto sul Raspberry sul quale sono presenti i due componenti il <i>Led</i> e il <i>Sonar</i></li>
+                <ul>
+                    <li><r>LedActor</r>: Componente Software, rappresentato come un Attore, per la gestione del <i>Led</i> fisico</li>
+                    <li><r>SonarActor22</r>: componente Software per la gestione del Sonar, con un implementazione disponibile nella nostra <i>Software House</i></li>
+                </ul>
+            <li><r>WasteServiceGui</r>: componente Software da sviluppare che visualizzi e aggiorni un <i>Interfaccia Grafica</i> per la visualizzazione di informazioni sul sistema</li>
+            <li><r>SmartDevice</r>: componente esterno al sistema, <u>non da implementare</u>, che permette la comunicazione delle richieste del <r>Waste Truck</r> al <r>WasteService</r>.
+                Verrà rappresentato come un Agente Software (Attore) per la simulazione dell'arrivo di <i>richieste di deposito</i> al nostro sistema.</li>
         </ul>
     </div>
 
 <h2>Work Plan</h2>
 <div class="remark">
-    <p>Il primo sprint si occuperà della business logic dell'applicazione, quindi degli aspetti principali della logica di smistamento e della navigazione verso le aree designate.</p>
-    <p>Successivamente si provvederà ad integrare <b>LED</b> e <b>Sonar</b>.</p>
+    <p>Il Primo Sprint si occuperà della <i>Core Business Logic</i> dell'applicazione, quindi degli aspetti principali della logica di smistamento e della navigazione verso le aree designate,
+        con l'implementazione del <r>WasteService</r> e del <r>TransportTrolley</r></p>
+    <p>Successivamente si provvederà ad integrare <r>LedActor</r> e <r>SonarActor</r> del contesto del <c>Raspberry</c>.</p>
     <p>Infine ci si occuperà della <b>WasteServiceStatusGUI</b>.</p>
 </div>
 <br/><br/> 	
 </div>  
-
-
 
     <!-- USEFUL
     <table style="width:100%" border="1">
@@ -594,3 +602,12 @@ che definisce il Sonar come un attore proattivo e reattivo.
 </div>
 </body>
 </html>
+
+<!--
+            <li>Lo <i>smartdevice</i> è già stato sviluppato (o comunque è parte dei test), le richieste/risposte (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) sono requisito.</li>
+            <li>Il <i>basicrobot</i> è già stato sviluppato, le interazioni con il robot definite in termini di operazioni di message-passing (<i>cmdbase</i>, <i>cmdstep</i>, <i>situated</i>) sono quindi predefinite.</li>
+            <li>Il <i>wasteservice</i> è da sviluppare, l'interfaccia che espone verso l'esterno (<i>depositrequest</i>, <i>loadaccept</i>, <i>loadrejected</i>) è requisito, mentre l'interazione verso componenti interni (comandi da mandare al TT e aggiornare la capacità dei contenitori) per il momento non è stata considerata.</li>
+            <li>Il <i>transporttrolley</i> è da sviluppare, e sarà oggetto di analisi del prossimo sprint. Inoltre è ancora incerta la collocazione di questo componente (IN QUALE CONTESTO LO COLLOCHIAMO?).</li>
+            <li>Il <i>sonar</i> e il <i>led</i> sono da sviluppare: è disponibile software che dovrà essere analizzato prima di essere eventualmente utilizzato/adattato, VALUTARE SE LE INTERAZIONI SONO UN REQUISITO O GI&Agrave SONO IMPLEMENTATE.</li>
+            <li>Il <i>wasteservicestatusgui</i> è da analizzare/sviluppare, e sarà oggetto degli sprint successivi (al momento è incerta la collocazione e/o l'esistenza sotto forma di attore del componente). Le interazioni (TUTTE LE INFO PASSATE ALLA GUI) sono da valutare e al momento restano vaghe (SONO REQUISITO?).</li>
+        -->
