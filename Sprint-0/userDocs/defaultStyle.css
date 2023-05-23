@@ -236,3 +236,8 @@ n {
     padding: 5px;
     font-size: 0.85em;
 }
+
+q {
+    color: darkred;
+    font-weight: bold;
+}
