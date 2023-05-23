@@ -228,11 +228,6 @@
 
 <pre><code>
 QActor transporttrolley context ctxwasteservice {
-	[#
-		val name = "TransportTrolley"
-		var materialType = ""	
-	#]
-
 	State s0 initial{
 	    ...
 	} Goto waiting
@@ -258,6 +253,21 @@ QActor transporttrolley context ctxwasteservice {
 	} Goto waiting
 }
 </code></pre>
+
+        <tt>Visto il requisito riguardante la possibilità di gestione di richieste anche durante l'esecuzione di un deposito e il voler liberare il camion il prima possibile, si evidenziano le seguenti transazioni necessarie:
+                <pre><code>
+                    State depositPlastic {...}
+                    <del>Goto goHome</del>
+                    <b>Transition t2	whenTime 200 -> goHome
+                                        whenRequest pickupReq -> pickup</b>
+                </code></pre>
+                <pre><code>
+                    State depositGlass {...}
+                    <del>Goto goHome</del>
+                    <b>Transition t2	whenTime 200 -> goHome
+                                        whenRequest pickupReq -> pickup</b>
+                </code></pre>
+        </tt>
         <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak"> Metamodello QAK TransportTrolley</a></p><br>
         <img src="./img/TransportTrolley.png" alt="TransportTrolleyModelDiagram" style="width: 220px">
 
