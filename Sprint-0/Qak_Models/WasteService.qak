@@ -16,29 +16,29 @@ Context ctxwasteservice ip[host="loaclhost" port=8072]
 
 
 QActor wasteservice context ctxwasteservice{
-	[# 	
-		val name = "RequestHandler"
+	[#
+		val name = "WasteService"
 		val version = "0"
-		
+
 		//Only one Request at time
-		var accepted = false; 
-		var ID = ""
+		var accepted = false;
+		var ID = "0"
 		var T = ""
 		var L = ""
 	#]
-	
+
 	State s0 initial {
-		println("\t $name: Started! $version")
+		println("\t $name: Started! $version") color green
 	}
 	Goto waiting
-	
+
 	State waiting{
-		println("\t $name: ready and waiting for deposit request...")
+		println("\t $name: ready and waiting for deposit request...") color green
 	}
 	Transition t0 whenRequest depositRequest -> requestHandling
-	
+
 	State requestHandling {
-		println("\t $name: Deposit Request arrived!")
+		println("\t $name: Deposit Request arrived!") color green
 		[# accepted = false #]
 
 		onMsg(depositRequest : depositRequest(ID, T, L)){
@@ -46,7 +46,7 @@ QActor wasteservice context ctxwasteservice{
 				T = payloadArg(1)
 				L = payloadArg(2)
 			#]
-			println("Request: ($ID, $T, $L)")
+			println("Request: ($ID, $T, $L)") color green
 			if[# ID.toInt()%2 == 0 #]{			//If di esempio test per avere risposte alternate
 				[# accepted = true #]
 			}else{
@@ -54,24 +54,24 @@ QActor wasteservice context ctxwasteservice{
 			}
 		}
 	}
-	Goto pickingUp if[# accepted == true #] else requestRejected 
-	
+	Goto pickingUp if[# accepted == true #] else requestRejected
+
 	State requestRejected {
 		replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
-		println("\t $name: Request -$ID- Refused!")
+		println("\t $name: Request -$ID- Refused!") color green
 	}
 	Goto waiting
-	
+
 	State pickingUp {
-		println("\t $name: Request -$ID- Accepted!")
-		println("\t $name: Requesting pickingUp...")
+		println("\t $name: Request -$ID- Accepted!") color green
+		println("\t $name: Requesting pickingUp...") color green
 		//request transporttrolley -m pickupReq : pickupReq($ID, $T)
 	}
 	Transition t1 whenReply pickupOk -> pickupOk
-	
+
 	State pickupOk {
 		onMsg(pickupOk : pickupOk(ID)){
-			println("\t $name: PickupOK received! Finished ${payloadArg(0)}")
+			println("\t $name: PickupOK received! Finished ${payloadArg(0)}") color green
 			replyTo depositRequest with loadaccept : loadaccept($ID)
 		}
 	}
