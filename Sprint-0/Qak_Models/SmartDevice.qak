@@ -14,53 +14,54 @@ Context ctxsmartdevice ip[host="localhost" port=8074]
 QActor smartdevice context ctxsmartdevice{
 	[#
 		val name = "SmartDevice"
-		val version = "V3.2"
-		
-		var request_ID = 0 
+		val version = "V1.0"
+
+		var request_ID = 0
 		#
 	]
-	
+
 	State s0 initial{
-		println("\t $name: Started! $version")
+		println("\t $name: Started! $version") color yellow
 	}
 	Goto idle
-	
-	
+
+
 	State idle {
-		println("Smart Device Waiting for Truck...")
+		println("\t $name: Waiting for Truck...") color yellow
 		[# request_ID ++ #]
 	}
 	Transition t0 whenTime 1000 -> truckArrived  //Changed V3.3 - testing multiple requests
 
-	
+
 	State truckArrived {
-		println("Truck Arrived!")
-		println("Sending request -$request_ID-")
 		[# val ID = request_ID #]
+		if[# ID.toInt()%3 == 0 #]{
+			delay 10000
+		}
+		println("\t $name: Truck Arrived!")
+		println("\t $name: Sending request -$request_ID-") color yellow
+
 		if[# ID.toInt()%2 == 0 #]{
 			//request wasteservice -m depositRequest : depositRequest($ID , plastic, 10)
 		} else {
 			//request wasteservice -m depositRequest : depositRequest($ID , glass, 8)
 		}
-		
-		
 	}
 	Transition t1 	whenTime  20000 -> truckArrived				//(Req) Avendo lo scarico un tempo limitato possiamo presumere che se passa troppo tempo si sia persa la richiesta e la reinviamo. Abbiamo anche un meccanismo a ID per evitare richieste duplicate
 					whenReply loadaccept -> truckGoAway
 					whenReply loadrejecetd -> truckGoAway
-			
-	
+
+
 	State truckGoAway {
-		printCurrentMessage
 		onMsg(loadrejecetd : loadrejecetd(ID)){
-			println("Carico -${payloadArg(0)}- Rifiutato!")
+			println("\t $name: Carico - ${payloadArg(0)} - Rifiutato!") color yellow
 		}
-		
+
 		onMsg(loadaccept : loadaccept(ID)){
-			println("Scarico -${payloadArg(0)}- Completato!")
+			println("\t $name: Scarico - ${payloadArg(0)} - Completato!") color yellow
 		}
-		
-		println("Il Truck può andare!")
+
+		println("\t $name: Il Truck può andare!") color yellow
 	}
 	Transition t3 whenTime 1000 -> idle  //Un po' di attesa per simulare il via del camion
 }
