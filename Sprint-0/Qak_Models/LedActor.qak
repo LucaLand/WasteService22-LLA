@@ -1,13 +1,8 @@
-System raspberry
+System ledactor
 
 
-	
-//Event robotStateEvent : robotStateEvent(STATE)  //STATE = athome, moving, stopped
-	
-//Modelliamo l'interazione con 3 eventi in modo da poter gestire le diverse transazioni tra stati
-	Event robotAtHome : robotAtHome(E)
-	Event robotMoving : robotMoving(E)
-	Event robotStopped : robotStopped(E)
+//Modelliamo con un solo evento di cambio stato e come payload lo stato del robot
+    Event robotStateEvent : robotStateEvent(STATE)  //STATE = athome, moving, stopped
 	
 	
 Context ctxRaspberry ip[host="localhost" port=8076]
@@ -16,30 +11,38 @@ Context ctxRaspberry ip[host="localhost" port=8076]
 QActor ledactor context ctxRaspberry {
 	[#
 		val name = "LedActor"
-		val version = "V4.0"
-		
-		var ledState = ""
+		val version = "V1.0"
+
+		var ledState = "off"
 	#]
-	
+
 	State s0 initial {
-		println("\t $name: Started! $version")
+		println("\t $name: Started! $version") color red
 	}
-	Goto off
-	
-	State off {
-		println("\t$name: OFF")
+	Goto handleRobotStateEvent
+
+
+	State handleRobotStateEvent {
+		onMsg(robotStateEvent : robotStateEvent(STATE)){
+			println("\t $name: Handling RobotStateEvent change!") color red
+			[#
+				val robotState = payloadArg(0)
+			#]
+
+			if[# robotState == "atHome" #]{
+				[# ledState = "off" #]
+			}
+			if[# robotState == "moving" #]{
+				[# ledState = "blinking..." #]
+			}
+			if[# robotState == "stopped" #]{
+				[# ledState = "on" #]
+			}
+		}
+
+		println("\t $name: Led state- $ledState") color red
 	}
-	Transition t0 whenEvent robotMoving -> blink
-	
-	State on {
-		println("\t$name: ON")
-	}
-	Transition t3 whenEvent robotMoving -> blink
-	
-	State blink {
-		println("\t$name: BLINK!")
-	}
-	Transition t1 whenEvent robotAtHome -> off
-				  whenEvent robotStopped -> on
+	Transition t0 	whenTime 5000 -> handleRobotStateEvent
+					whenEvent robotStateEvent -> handleRobotStateEvent
 	
 }
