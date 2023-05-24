@@ -441,22 +441,17 @@ QActor smartdevice context ctxsmartdevice{
 
         <h3>Led</h3>
         <p>Strumento connesso in output al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
-        <ul>Individuiamo e definiamo TRE modalità:
-            <li>LedOff: quando il TT è in HOME</li>
-            <li>LedOn: quando il TT è fermo</li>
-            <li>LedBlink: quando il TT è in movimento, o sta scaricando/caricando materiale</li>
+        <p>Rappresentato nel sistema come l'attore <i>QAK</i> <r>LedActor</r>.</p>
+        <p>Entità software che si occuperà di gestire lo stato del <r>Led</r> reagendo ai cambi di stato del <r>TransportTrolley</r>.</p>
+
+        <ul>Individuiamo e definiamo TRE modalità di funzionamento del <b>Led</b> corrispondenti ai 3 stati del <r>TransportTrolley</r>:
+            <li><code>LedOff</code> : <code>atHome</code> (Quando la sua posizione è Home)</li>
+            <li><code>LedOn</code>: <code>stopped</code> (Quando bloccato dal <b>Sonar</b>)</li>
+            <li><code>LedBlink</code>: <code>moving</code> (quando il <r>TT</r> è in movimento, o sta scaricando/caricando materiale)</li>
         </ul>
         <pre><code>
     enum LedState = {LedOff, LedOn, LedBlink};
         </code></pre>
-        <p>Rappresentato nel sistema come l'attore <i>QAK</i> <r>LedActor</r>.</p>
-        <p>Entità software che si occuperà di gestire lo stato del <r>Led</r> reagendo ai cambi di stato del <r>TransportTrolley</r>.</p>
-        <p>Il <r>TransportTrolley</r> può avere 3 stati:</p>
-        <ul>
-            <li><code>atHome</code></li>
-            <li><code>moving</code></li>
-            <li><code>stopped</code></li>
-        </ul>
         <pre><code>
     enum robotState = {atHome, moving, Stopped};
         </code></pre>
