@@ -46,7 +46,10 @@
     <p> Si farà riferimento al linguaggio e metamodello QAK, basato sul paradigma ad attori, per realizzare e definire il modello dell'architettura secondo le esigenze d'isolamento dei componenti, sfruttando i vantaggi dell'interazioni asincrone a scambio di messaggi
         in quanto i linguaggi popolari come Java o simili non consentono l'astrazione di questi concetti in maniera semplice e intuitiva.</p>
     <p>Il <r>QAK</r> permette la definizione in poche semplici istruzioni di attori come macchine a stati finiti che interagiscono secondo semantiche a scambio di messaggi.</p>
-    <p>In allegato la documentazione che lo riguarda <a target="_blank" href="./QAK.html">QAK-Document</a></p>
+
+    <n>In allegato la documentazione che lo riguarda <a target="_blank" href="./QAK.html">QAK-Document</a></n>
+    <br>
+    <n>Legenda delle figure: <a href="img/Legenda.png">Legenda.png</a></n>
 </div>
 <A NAME="Requirements"></A>
 <h2>Requirement analysis</h2>
@@ -446,30 +449,39 @@ QActor smartdevice context ctxsmartdevice{
         <pre><code>
     enum LedState = {LedOff, LedOn, LedBlink};
         </code></pre>
+        <p>Rappresentato nel sistema come l'attore <i>QAK</i> <r>LedActor</r>.</p>
+        <p>Entità software che si occuperà di gestire lo stato del <r>Led</r> reagendo ai cambi di stato del <r>TransportTrolley</r>.</p>
+        <p>Il <r>TransportTrolley</r> può avere 3 stati:</p>
+        <ul>
+            <li><code>atHome</code></li>
+            <li><code>moving</code></li>
+            <li><code>stopped</code></li>
+        </ul>
+        <pre><code>
+    enum robotState = {atHome, moving, Stopped};
+        </code></pre>
 
-        <p>L’interazione tra <b>WasteService</b> e <b>Raspberry</b> avviene mediante un attore che si occuperà di ricevere il segnale in input ed emetterà un evento per il comportamento del led.</p>
+        <p>Il <r>TransportTrolley</r> emetterà dunque un evento, che verrà ricevuto e gestito dal <r>LedActor</r></p>
+        <pre><code>
+    Event robotStateEvent : robotStateEvent(STATE)		//STATE : atHome, moving, stopped
+        </code></pre>
+
+        <p>Metamodello QAK del <r>LedActor</r>:</p>
 	<pre><code>
-QActor ledactor context ctxRaspberry {
+QActor ledactor context ctxraspberry {
 	State s0 initial {
-		println("\t $name: Started! $version")
+		println("\t $name: Started! $version") color red
 	}
-	Goto off
+	Goto handleRobotStateEvent
 
-	State off {
-		println("\t$name: OFF")
+	State handleRobotStateEvent {
+            ...
+            ...
+		println("\t $name: Led state- $ledState") color red
 	}
-	Transition t0 whenEvent robotMoving -> blink
+	Transition t0 	whenTime 5000 -> handleRobotStateEvent
+			whenEvent robotStateEvent -> handleRobotStateEvent
 
-	State on {
-		println("\t$name: ON")
-	}
-	Transition t3 whenEvent robotMoving -> blink
-
-	State blink {
-		println("\t$name: BLINK!")
-	}
-	Transition t1 whenEvent robotAtHome -> off
-				  whenEvent robotStopped -> on
 }
 	</code></pre>
 	
