@@ -7,78 +7,103 @@ System transporttrolley
 	
 	//To BasicRobot22
 	Dispatch cmd : cmd(MOVE)
+
+	//To Led
+	Event robotStateEvent : robotStateEvent(STATE)		//STATE : atHome, moving, stopped
 	
 
 Context ctxwasteservice ip[host="loaclhost" port=8072]
 
 
 
-QActor transporttrolleyactor context ctxwasteservice {
+QActor transporttrolley context ctxwasteservice {
 	[#
 		val name = "TransportTrolley"
-		
-		var pos = "home" 		//pos : home, indoor, plasticbox, glassbox
+		val version = "V1.0"
+
+		var ID = ""
+		var materialType = ""
+		var pos = "" 		//pos : home, indoor, plasticbox, glassbox
 	#]
 
 	State s0 initial{
-		println("\t $name: Started! $version")
-	} 
+		println("\t $name: Started! $version") color blue
+	}
 	Goto waiting
 
 	State waiting {
 		[# pos = "home" #]
-		println("\t $name: TransportTrolley at Home!")			//We presume it starts in its home position
-		println("\t $name: ready and waiting for pickupRequest!")
-	} 
+		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
+		//emit robotStateEvent : robotStateEvent(atHome)
+
+		println("\t $name: ready and waiting for pickupRequest!") color blue
+	}
 	Transition t0 whenRequest pickupReq -> pickup
 
 	State pickup {
-		println("\t $name: pickupRequest($ID) received!")
-		
-		//Sending messages to BasicRobot22
-		println("\t $name: Sending cmd(MOVES) to BasicRobot22")
-		println("\t $name: Robot going from $pos to Indoor")
-		
-		delay 10000
-		
-		[# pos = "indoor" #]
-		
-		//Sending pikcup finished
-		println("\t $name: PickupOK!")
-		replyTo pickupReq with pickupOk : pickupOk($ID)
-	} 
+
+		onMsg(pickupReq : pickupReq(ID, T)){
+			[# 	ID = payloadArg(0)
+				materialType = payloadArg(1)
+			#]
+			println("\t $name: pickupRequest($ID) received!") color blue
+
+
+			//Sending messages to BasicRobot22
+			println("\t $name: Sending cmd(MOVES) to BasicRobot22") color blue
+			println("\t $name: Robot going from $pos to Indoor") color blue
+			//forward basicrobotexample -m cmd:cmd(Pickup)
+
+			//Robot Moving
+			//emit robotStateEvent : robotStateEvent(moving)
+
+			delay 10000
+
+			[# pos = "indoor" #]
+
+			//Sending pikcup finished
+			println("\t $name: PickupOK!") color blue
+			replyTo pickupReq with pickupOk : pickupOk($ID)
+		}
+	}
 	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
 
 	State depositPlastic {
-		println("\t $name: Going to PlasticBox!")
-		
+		println("\t $name: Going to PlasticBox!") color blue
+
 		//Sending cmd(MOVES) to BasicRobot22
+		//forward basicrobotexample -m cmd:cmd(DepositPlastic)
+
 		delay 3000
 		[# pos = "plasticbox" #]
-		
+
 		//Depositing
-		println("\t $name: Depositing Plastic!")
+		println("\t $name: Depositing Plastic!") color blue
 		delay 6000
-	} 
+	}
 	Transition t1	whenTime 100 -> goHome
 					whenRequest pickupReq -> pickup
 
 	State depositGlass {
-     	println("\t $name: Going to GlassBox!")
-     	
+     	println("\t $name: Going to GlassBox!") color blue
+
+
 		//Sending cmd(MOVES) to BasicRobot22
+		//forward basicrobotexample -m cmd:cmd(DepositGlass)
+
 		delay 5000
 		[# pos = "glassbox" #]
-		
+
 		//Depositing
-		println("\t $name: Depositing Glass!")
+		println("\t $name: Depositing Glass!") color blue
 		delay 6000
-	} 
+	}
 	Transition t2	whenTime 200 -> goHome
 					whenRequest pickupReq -> pickup
 
 	State goHome {
-     	println("\t $name: Finished Deposit - Going home")
+     	println("\t $name: Finished Deposit - Going home") color blue
+     	//forward basicrobotexample -m cmd:cmd(GoHome)
 		delay 7000
 	}
 	Goto waiting
