@@ -18,6 +18,8 @@ System logicalarchitecture
 	//LedActor
 	Event robotStateEvent : robotStateEvent(STATE)		//STATE : atHome, moving, stopped
 
+	//COAPUPDATE
+	Dispatch coapUpdate : coapUpdate(ACTOR, VALUE)
 
 
 //Context ctxwasteservice ip[host="localhost" port=8076]
@@ -48,6 +50,7 @@ QActor transporttrolley context ctxgeneral {
 
 	State waiting {
 		[# pos = "home" #]
+		updateResource [# pos #]
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
 		emit robotStateEvent : robotStateEvent(atHome)
 		
@@ -75,6 +78,7 @@ QActor transporttrolley context ctxgeneral {
 			delay 10000
 			
 			[# pos = "indoor" #]
+			updateResource [# pos #]
 			
 			//Sending pikcup finished
 			println("\t $name: PickupOK!") color blue
@@ -91,6 +95,7 @@ QActor transporttrolley context ctxgeneral {
 		
 		delay 3000
 		[# pos = "plasticbox" #]
+		updateResource [# pos #]
 		
 		//Depositing
 		println("\t $name: Depositing Plastic!") color blue
@@ -108,6 +113,7 @@ QActor transporttrolley context ctxgeneral {
 		
 		delay 5000
 		[# pos = "glassbox" #]
+		updateResource [# pos #]
 		
 		//Depositing
 		println("\t $name: Depositing Glass!") color blue
@@ -223,7 +229,7 @@ QActor smartdevice context ctxgeneral {
 		if[# ID.toInt()%3 == 0 #]{
 			delay 10000
 		}
-		println("\t $name: Truck Arrived!")
+		println("\t $name: Truck Arrived!") color yellow
 		println("\t $name: Sending request -$request_ID-") color yellow
 		
 		if[# ID.toInt()%2 == 0 #]{
@@ -281,7 +287,7 @@ QActor ledactor context ctxgeneral {
 				[# ledState = "off" #]
 			}
 			if[# robotState == "moving" #]{
-				[# ledState = "blinking..." #]
+				[# ledState = "blinking" #]
 			}
 			if[# robotState == "stopped" #]{
 				[# ledState = "on" #]
@@ -289,6 +295,7 @@ QActor ledactor context ctxgeneral {
 		}
 		
 		println("\t $name: Led state- $ledState") color red
+		updateResource [# ledState #]
 	}
 	Transition t0 	whenTime 5000 -> handleRobotStateEvent
 					whenEvent robotStateEvent -> handleRobotStateEvent
@@ -342,20 +349,60 @@ QActor basicrobotexample context ctxgeneral {
 
 //WasteServiceGui
 
-QActor wasteserviceguiobserveractor context ctxgeneral {
+QActor wasteserviceguiactor context ctxgeneral {
 	[#
 		val name = "WasteServiceGui"
 		val version = "V1.0"
+		val active = true
+		
+		var TTState = "null"
+		var pos = "null"
+		var Pb = "null"
+		var Gb = "null"
+		var ledState = "null"
 	#]
 	
 	State s0 initial {
 		println("\t $name: Started! $version")
+		observeResource transporttrolley
+		observeResource ledactor
+		println("\t $name: Observing and Registered to variables!")
 	}
-	Goto observing
+	Goto handleChanges if [# active #] else deactivated
 	
-	State observing {
-		println("\t $name: Observing and Updating variables!")
+	State handleChanges {
+		printCurrentMessage
+		discardMsg Off
+		
+		onMsg(coapUpdate : coapUpdate(ACTOR, VALUE)){
+			[# val actor = payloadArg(0) #]
+			
+			if[# actor == "transporttrolley" #]{
+				[# pos = payloadArg(1) #]
+			}
+			if[# actor == "ledactor" #]{
+				[# ledState = payloadArg(1) #]
+			}
+		}
+		
+		onMsg(robotStateEvent : robotStateEvent(STATE)){
+			[# TTState = payloadArg(0) #]
+		}
+		
+		println("\t $name: GUI STATE:")
+		println("\t\t\t TTState: $TTState")
+		println("\t\t\t Pos: $pos")
+		println("\t\t\t PB: $Pb - GB: $Gb")
+		println("\t\t\t LedState: $ledState")
+		
 	}
+	Transition t0 	whenMsg coapUpdate -> handleChanges
+					whenEvent robotStateEvent -> handleChanges
+					
+	State deactivated {
+		
+	}
+	//Goto handleChanges if [# active #] else deactivated
 	
 	
 }
