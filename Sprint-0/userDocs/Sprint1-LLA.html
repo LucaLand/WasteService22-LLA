@@ -72,6 +72,115 @@
 		<img class="centerimg" style="width: 450px;" src="img/LogicalArch_sprint1.png"/>
 		<p style="width: 100%; text-align: right;"><a href="img/Legenda.png">Legenda.png</a></p>
 		<br>
+		
+		
+		    <h3><b>Wasteservice</b></h3>
+
+    <h4>Quando rispondere allo <b>Smart device</b>?</h4>
+    <p>Siccome i requisiti aggiuntivi dicono che sarebbe bene mandare via il <b>Waste-truck</b> appena possibile, se una richiesta può essere soddisfatta il driver deve essere liberato subito dopo 
+	   il <b>Pickup</b> (inviando allo <b>Smart device</b> una <b>loadaccept</b>). 
+       Se invece la richiesta effettuata non può essere soddisfatta, è bene rispondere immediatamente con una <b>loadrejected</b> (qualunque cosa stia facendo il robot in quel momento).</p>
+
+    <h3><b>Transport trolley</b></h3>
+
+    <h4 id="DDR_robot_vs_Transport_trolley"><b>DDR robot</b> vs <b>Transport trolley</b>:</h4>
+    <ul>
+        <p>Possibile una separazione dei due concetti: </p>
+        <li>
+            Il termine "DDR - Differential Drive Robot" rappresenta la tecnologia con la quale il robot si muove. Il <b>DDR robot</b> è quindi una entità di basso livello che riceve comandi base 
+			come "avanti", "destra", "sinistra", "halt", ecc.. <br>
+         <p>Nel seguente file la documentazione completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c>.
+		    E un suo modello eseguibile <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">basicrobot.qak</a></p>, che infatti riceve comandi:
+            <code><pre>
+//MOVE =  w | a | s | d | h    | l | r
+Dispatch cmd           : cmd(MOVE)</pre>
+            </code>
+        </li>
+        <li>
+            Invece il <b>Transport trolley</b> è concepita come entità astratta di più alto livello che si occuperà di ricevere la destinazione generica<br>
+            <code><pre>
+//POSITION =  INDOOR | PLASTICBOX | GLASSBOX | HOME
+Request moveto         : moveto(POSITION)
+Reply   movetoanswer   : movetoanswer(RESULT)</pre>
+            </code>
+        </li>
+    </ul>
+    <p>IN CHE MODO COMUNICANO WASTE SERVICE e TT?? 
+	Noi sappiamo che sono nello stesso contesto.......COME LI GESTIAMO?</p>
+
+    <h4>Dove collocare <b>Transport trolley</b>:</h4>
+    Risulta concettualmente sensato porre <b>Transport trolley</b> nello stesso contesto di <i>basicrobot</i>.<br>
+    <b>Transport trolley</b> potrebbe infatti necessitare di cambiamenti nel caso in cui cambi il <b>DDR Robot</b> e la tecnologia di movimento usata. <br>
+    Si noti tuttavia che, qualora tale componente debba fare utilizzo di un planner (che effettua una ricerca nello spazio degli stati), allora si dovrebbe considerare la possibilità 
+    di porre tale attore su un nodo computazionale più potente, dove il consumo di potenza non è un problema (mentre si presume che il robot sia alimentato a batteria). <br>
+    Alla luce delle osservazioni sinora fatte, l'architettura logica attuale è la seguente:
+    <img class="centerimg" style="max-width: 500px;" src="docs/_images/logic_architecture_1.png"/>
+    <p style="width: 100%; text-align: right;"><a href="../docs_common/Legenda.html">Legenda</a></p>
+
+    <h4>Operazioni eseguite dal <b>Transport trolley</b>:</h4>
+    <p>Per questioni di flessibilità, sarebbe opportuno comandare al <b>Transport trolley</b> separatamente le operazioni di carico, scarico e movimento. <br>
+        In questo modo se dovesse cambiare il processo di smistamento basterà modificare la sequenza di comandi che vengono impartiti al <b>Transport trolley</b>, senza bisogno di 
+        modificare quest'ultimo. Inoltre si ritiene corretto far gestire al <b>Transport trolley</b> le operazioni di <b>Pickup</b> e <b>Dropout</b>, siccome un domani potrebbe esser 
+        necessario inviare comandi o segnali a HW presente sul robot per compiere queste azioni.</p>
+    <p>Le interazioni con il <b>Transport trolley</b> dovrebbero essere di tipo request-response sincrone bloccanti. 
+        Tuttavia, solo per il comando <i>moveto(POSITION)</i>, dovrà essere possibile comandare una nuova destinazione anche se quella precedente non era stata ancora raggiunta (annullando di fatto la <i>moveto</i> precedente)<br>
+        Questo perchè è possibile che arrivi un nuovo <b>Waste-truck</b> mentre il <b>Transport trolley</b> sta tornando ad <b>HOME</b>. In questo modo è possibile la gestione immediata 
+        della nuova richiesta senza aspettare che il <b>Transport trolley</b> raggiunga <b>HOME</b>.
+    </p>
+    <p>L'interfaccia del transporttrolley risulta quindi essere la seguente:</p>
+    <code><pre>
+        //POSITION = INDOOR | PLASTICBOX | GLASSBOX | HOME
+        //RESULT =  OK | ERROR
+        Request moveto         : moveto(POSITION)  //INDOOR | PLASTICBOX | GLASSBOX | HOME
+        Reply   movetoanswer   : movetoanswer(RESULT)
+        Request pickup         : pickup(_)
+        Reply   pickupanswer   : pickupanswer(RESULT)
+        Request dropout        : dropout(_)
+        Reply   dropoutanswer  : dropoutanswer(RESULT)</pre>
+    </code>
+    Si veda il file QAK <a href="./ProblemQakSprint1/src/problemAnalysis/TransportTrolley.qak">TransportTrolley.qak</a></b>. È anche disponibile un test per meglio specificarne il comportamento: <a href="./ProblemQakSprint1/test/testSprint1/TestTransporttrolley.kt">TestTransporttrolley.kt</a>.
+
+    <h4>Il problema della navigazione: <br>
+        <p>Uso di un sistema di coordinate  o  boundary walker che raggiunge gli angoli rilevando il contatto con i muri?</p>
+    </h4>
+    <p>La particolare collocazione delle zone <b>INDOOR</b>, <b>PLASTICBOX</b>, <b>GLASSBOX</b>, <b>HOME</b> e la presenza di un sonar o sensore di impatto sul robot rendono attuabile una 
+        soluzione che non richiede l'utilizzo di coordinate: 
+        il robot può infatti muoversi all'interno della <b>Service area</b> lungo le pareti, orientandosi semplicemente rilevando le collisioni con le pareti. <br>
+        In questa sezione analizziamo i punti a favore dell'utilizzo di un sistema a coordinate e uno senza coordinate:</p>
+    <br>
+
+    <p>I vantaggi nell'utilizzo di un sistema a coordinate:</p>
+    <ul>
+        <li>Maggiore flessibilità. Ad esempio nel caso in cui la posizione dei siti non sia più negli angoli, o il robot debba seguire un percorso ottimo, o se ci sono ostacoli nella <b>Service area</b>, ecc... .</li>
+        <li>Potenziale riuso di moduli che già abbiamo sviluppato (mapper, planner)</li>
+    </ul>
+    <p>I vantaggi nell'utilizzo di un sistema senza coordinate:</p>
+    <ul>
+        <li>Minor complessità, minor costo</li>
+        <li>Maggior velocità negli spostamenti, e maggior velocità di reazione a comandi di halt mentre ci si muove in avanti (non si deve aspettare di aver terminato uno step)</li>
+        <li>Possibile miglior reazione da parte di robot reali che non fanno uso di sistemi in feedback o altro hardware per controllare meglio i propri spostamenti: <br>
+            L'errore potrebbe aumentare ad ogni singolo step, mentre la prima soluzione (siccome utilizza un sensore di contatto con il muro) non soffre di questo problema</li>
+    </ul>
+    <br>
+    <p>Per scegliere in merito ad una decisione così importante, sono state analizzate diverse opzioni, che vengono descritte in </p>
+    <p style="width: 100%; text-align: center; padding: 1rem"> <a href="docs/grid_or_boundary_analysis.html"><mark>grid_or_boundary_analysis.html</mark></a> </p>
+    <p>Come riportato nel relativo documento, optiamo per l'utilizzo di una soluzione senza utilizzo di coordinate, facendo solamente uso di una FSM</p>
+
+    <div class="remark" style="background-color: #c3fbe8;">
+        <h3>Riassunto situazione attuale:</h3>
+        <h6>Architettura logica:</h6>
+        <img class="centerimg" style="max-width: 1000px;" src="ProblemQakSprint1/demosystemarchitecturearch.png"/>
+        <p style="width: 100%; text-align: right;"><a href="../docs_common/Legenda.html">Legenda</a></p>
+        <h6>QAK</h6>
+        <a href="ProblemQakSprint1/src/problemAnalysis/SystemAchitecture.qak">Modello del sistema QAK</a> <br>
+        <a href="ProblemQakSprint1/src/problemAnalysis/WasteService.qak">Primo metamodello QAK <i>wasteservice</i></a> <small>(= a sprint0)</small><br>
+        <a href="ProblemQakSprint1/src/problemAnalysis/TransportTrolley.qak">Primo metamodello QAK <i>transporttrolley</i></a> <br>
+        <h6><p>Testplan:</p></h6>
+        <p><a href="ProblemQakSprint1/test/testSprint1/TestWasteservice.kt">TestWasteservice.kt</a> <small>(= a sprint0)</small><br>
+            <a href="ProblemQakSprint1/test/testSprint1/TestTransporttrolley.kt">TestTransporttrolley.kt</a></p>
+    </div>
+
+</div>
 
 
 </body>
