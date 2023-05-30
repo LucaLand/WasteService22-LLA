@@ -52,9 +52,36 @@
     <n>Legenda delle figure: <a href="img/Legenda.png">Legenda.png</a></n>
 </div>
 <A NAME="Requirements"></A>
-<h2>Requirement analysis</h2>
+
+<h2>Analisi dei Requisiti</h2>
+    <h3>Componenti del sistema</h3>
     <div class="remark">
-		<h3>Service Area (<r2>SA</r2>)</h3>
+        <p>Nei requisiti si evidenziano sette componenti principali:</p>
+        <ul>
+            <li><b>WasteService</b></li>
+<!--            <li><b>DDR Robot</b></li>-->
+            <li><b>Transport Trolley</b></li>
+            <li><b>WasteServiceStatusGUI</b></li>
+            <li><b>Sonar</b></li>
+            <li><b>Led</b></li>
+<!--            <li><b>SmartDevice</b></li>-->
+        </ul>
+
+        <p>Il documento dei requisiti evidenzia anche alcuni dispositivi fisici del sistema:</p>
+        <ul>
+            <li><b>Raspberry</b>: contesto esterno sul quale sono montati <b>Led</b> e <b>Sonar</b></li>
+            <li><b>DDR Robot</b></li>
+            <li><b>Waste Truck</b></li>
+            <li><b>Smart Device</b></li>
+        </ul>
+
+        <h4>Modello Architetturale dei requisiti</h4>
+        <img src="img/General_Architecture_0.png" alt="General Architecture">
+    </div>
+
+<h3>Definizione delle variabili del sistema</h3>
+    <div class="remark">
+		<h4>Service Area (<r2>SA</r2>)</h4>
         <p>Area rettangolare priva di ostacoli, che viene formalizzata con la definizione di un rettangolo.</p>
         <p>Nella <r>Service Area</r> si identificano 4 posizioni:</p> <!--: Indoor, PlasitcBox, GlassBlox e Home.</p> -->
         <ul>
@@ -81,7 +108,7 @@
         <br>
 
     <!------------------------ ------------------------>
-        <h3>MaxGB, MaxPB</h3>
+        <h4>MaxGB, MaxPB</h4>
         <p><i>MaxGB</i> è la capacità massima relativa al GlassBox.</p>
         <p><i>MaxPB</i> è la capacità massima relativa al PlasticBox.</p>
 
@@ -101,11 +128,11 @@
     var contPB : Float
         </code></pre>
 
-<br>
+        <br>
 
 
         <!------------------------ ------------------------>
-        <h3>Gestione tempo di raccolta/deposito del materiale dal truck</h3>
+        <h4>Gestione tempo di raccolta/deposito del materiale dal truck</h4>
         <p>Il commitente precisa che il tempo di raccolta del materiale del truck è sempre limitato e prevedibile,
             mentre il tempo necessario per il deposito potrebbe essere anche alquanto lungo.</p>
         <p>Significa che:</p>
@@ -118,9 +145,52 @@
         </n>
 
 
+        <!------------------------ ------------------------>
 
+
+
+        <h3>Deposit Action</h3>
+        <p>La <r>Deposit Action</r> è definita come una sequenza di posizioni in cui il <r>DDR</r> deve deve raggiungere:</p>
+        <ol>
+            <li>Indoor</li>
+            <li>PlasticBox/GlassBox</li>
+            <li>Home</li>
+        </ol>
+
+        <p>La <r>Deposit Action</r> può essere dunque definita come una sequenza di percorsi effettuati dal <r>DDR</r>.</p>
+        <p>Da requisiti va considerato inoltre che il <i>WasteService</i> potrebbe ricevere un nuova richiesta mentre sta ancora eseguendo la <r>Deposit Action</r> precedente e che il truck va liberato nel minor tempo possibile,
+            dunque il percorso è definito come segue.</p>
+        <ul>
+            <li>Home/PB/GB -> Indoor</li>
+            <li>Indoor -> PlasticBox/GlassBox</li>
+            <li>PlasticBox/GlassBox -> Indoor/Home</li>
+        </ul>
+
+        <pre><code>
+    Enum TTRoutes = {HI, IP, IG, PH, GH, <r>PI, GI</r>}
+        </code></pre>
+        <img src="img/ServiceAreaPosition-Routes2.png" alt="">
+
+        <p>Date le seguenti ulteriori informazioni:</p>
+        <ul>
+            <li><r>Service Aera</r> è rettangolare e priva di ostacoli</li>
+            <li>Il <r>DDR Robot</r> è dotato di un sonar on-board utilizzabile per le collisioni</li>
+            <li>Il Software per il movimento del nostro <r>DDR Robot</r> permette la rotazione di 90°</li>
+        </ul>
+        <p>Il percorso ottimale utilizzabile è quello fatto percorrendo il perimetro della stanza, dunque si riporta la sua formalizzazione:</p>
+
+        <pre><code>
+    Enum TTRoutes = {HI, IP, PI, PH, PG, GP, GH}
+        </code></pre>
+        <img src="img/ServiceAreaPosition-Routes3.png" alt="">
+    </div>
+
+
+
+<h3>Definizione delle componenti del sistema</h3>
+    <div class="remark">
     <!------------------------ ------------------------>
-        <h3>DDR Robot</h3>
+        <h4>DDR Robot</h4>
         <p>Con <r>DDR Robot</r> si intende <i>Differential Drive Robot</i> la cui documentazione è disponibile nel documento seguente, fornito dalla nostra <i>Software House</i>: <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html#differential-drive-robot">Differential Drive Robot</a></p>
         <p>Non avendo a disposizione un <r>DDR Robot</r> fisico e considerando i tempi, i costi di realizzazione del robot e la necessità di effettuare test
             del <i>Software</i>, viene messo a disposizione, dalla nostra <i>Software House</i>, un simulatore virtuale del <r>DDR Robot</r>: il <i><a target="_blank" href="http://htmlpreview.github.io/?https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/userDocs/wenv.html">"Wenv22-VirtualRobot</a></i>.</p>
@@ -153,68 +223,15 @@
             <p>Significa che il DDR sarà predisposto di un rarar frontale e utilizzabile rilevare ostacoli/muri davanti a lui.</p>
             <n>Il nostro software <c>BasicRobot22</c> già presuppone la presenza di un <i>sonar on-board</i> e gestisce le collisioni.</n>
 
-        <!------------------------ ------------------------>
-
-
-
-<h3>Deposit Action</h3>
-        <p>La <r>Deposit Action</r> è definita come una sequenza di posizioni in cui il <r>DDR</r> deve deve raggiungere:</p>
-        <ol>
-            <li>Indoor</li>
-            <li>PlasticBox/GlassBox</li>
-            <li>Home</li>
-        </ol>
-
-        <p>La <r>Deposit Action</r> può essere dunque definita come una sequenza di percorsi effettuati dal <r>DDR</r>:</p>
-        <ul>
-            <li>Home -> Indoor</li>
-            <li>Indoor -> PlasticBox/GlassBox</li>
-            <li>PlasticBox/GlassBox -> Home</li>
-        </ul>
-
-        <pre><code>
-    Enum TTRoutes = {HI, IP, IG, PH, GH}
-        </code></pre>
-        <img src="img/ServiceAreaPosition-Routes.png" alt="">
-
-        <p>Da requisiti va considerato inoltre che il <i>WasteService</i> potrebbe ricevere un nuova richiesta mentre sta ancora eseguendo la <r>Deposit Action</r> precedente e che il truck va liberato nel minor tempo possibile,
-            dunque il percorso può evolvere come segue:</p>
-        <ul>
-            <li>Home/PB/GB -> Indoor</li>
-            <li>Indoor -> PlasticBox/GlassBox</li>
-            <li>PlasticBox/GlassBox -> Indoor/Home</li>
-        </ul>
-
-        <pre><code>
-    Enum TTRoutes = {HI, IP, IG, PH, GH, <r>PI, GI</r>}
-        </code></pre>
-        <img src="img/ServiceAreaPosition-Routes2.png" alt="">
-
-
-        <p>Date le seguenti ulteriori informazioni:</p>
-        <ul>
-            <li><r>Service Aera</r> è rettangolare e priva di ostacoli</li>
-            <li>Il <r>DDR Robot</r> è dotato di un sonar on-board utilizzabile per le collisioni</li>
-            <li>Il Software per il movimento del nostro <r>DDR Robot</r> permette la rotazione di 90°</li>
-        </ul>
-        <p>Il percorso ottimale utilizzabile è quello fatto percorrendo il perimetro della stanza, dunque si riporta la sua formalizzazione:</p>
-
-        <pre><code>
-    Enum TTRoutes = {HI, IP, PI, PH, PG, GP, GH}
-        </code></pre>
-        <img src="img/ServiceAreaPosition-Routes3.png" alt="">
-
 
         <!------------------------ ------------------------>
-
-
 
 
 
 
 
 <h3>Transport Trolley (<r2>TT</r2>)</h3>
-    <p>Il <r>TransportTrolley</r> è l'entità <i>Software</i> si occupa di far eseguire la <r>Deposit Action</r> al <r>DDR</r> inviandogli i comandi di movimento.</p>
+    <p>Il <r>TransportTrolley</r> è l'entità <i>Software</i> si occupa di controllare e far eseguire la <r>Deposit Action</r> al <r>DDR</r> inviandogli i comandi di movimento.</p>
 
     <p>Fisicamente è formalizzato come un quadrato di dimensione RD.</p>
         <pre><code>
@@ -258,24 +275,8 @@ QActor transporttrolley context ctxwasteservice {
 </code></pre>
 
         <tt>Visto il requisito riguardante la possibilità di gestione di richieste anche durante l'esecuzione di un deposito e il voler liberare il camion il prima possibile, si evidenziano le seguenti transazioni necessarie:
-                <pre><code>
-                    State depositPlastic {...}
-                    <del>Goto goHome</del>
-                    <b>Transition t2	whenTime 200 -> goHome
-                                        whenRequest pickupReq -> pickup</b>
-                </code></pre>
-                <pre><code>
-                    State depositGlass {...}
-                    <del>Goto goHome</del>
-                    <b>Transition t2	whenTime 200 -> goHome
-                                        whenRequest pickupReq -> pickup</b>
-                </code></pre>
         </tt>
-        <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak"> Metamodello QAK TransportTrolley</a></p><br>
         <img src="./img/TransportTrolley.png" alt="TransportTrolleyModelDiagram" style="width: 220px">
-
-    <h4>Architecture Evolution</h4>
-        <img src="./img/Logical_Architecture_v1.png" alt="General Architecture">
 
         <!------------------------ ------------------------>
 
