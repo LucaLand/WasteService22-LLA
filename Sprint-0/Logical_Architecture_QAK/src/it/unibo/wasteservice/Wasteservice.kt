@@ -46,7 +46,7 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t05",targetState="requestHandling",cond=whenRequest("depositRequest"))
+					 transition(edgeName="t02",targetState="requestHandling",cond=whenRequest("depositRequest"))
 				}	 
 				state("requestHandling") { //this:State
 					action { //it:State
@@ -89,21 +89,18 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 					action { //it:State
 						CommUtils.outgreen("	 $name: Request -$ID- Accepted!")
 						CommUtils.outgreen("	 $name: Requesting pickingUp...")
-						request("pickupReq", "pickupReq($ID,$T)" ,"transporttrolley" )  
+						delay(7000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t16",targetState="pickupOk",cond=whenReply("pickupOk"))
+					 transition( edgeName="goto",targetState="pickupOk", cond=doswitch() )
 				}	 
 				state("pickupOk") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("pickupOk(ID)"), Term.createTerm("pickupOk(ID)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outgreen("	 $name: PickupOK received! Finished ${payloadArg(0)}")
-								answer("depositRequest", "loadaccept", "loadaccept($ID)"   )  
-						}
+						CommUtils.outgreen("	 $name: PickupOK received! Finished ${payloadArg(0)}")
+						answer("depositRequest", "loadaccept", "loadaccept($ID)"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

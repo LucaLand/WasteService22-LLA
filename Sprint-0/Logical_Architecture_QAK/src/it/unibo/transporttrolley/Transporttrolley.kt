@@ -42,33 +42,19 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						updateResourceRep( pos  
 						)
 						CommUtils.outblue("	 $name: TransportTrolley at Home!")
-						emit("robotStateEvent", "robotStateEvent(atHome)" ) 
 						CommUtils.outblue("	 $name: ready and waiting for pickupRequest!")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="pickup",cond=whenRequest("pickupReq"))
 				}	 
 				state("pickup") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("pickupReq(ID,T)"), Term.createTerm("pickupReq(ID,T)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								 	ID = payloadArg(0) 
-												materialType = payloadArg(1)
-								CommUtils.outblue("	 $name: pickupRequest($ID) received!")
-								CommUtils.outblue("	 $name: Sending cmd(MOVES) to BasicRobot22")
-								CommUtils.outblue("	 $name: Robot going from $pos to Indoor")
-								forward("cmd", "cmd(Pickup)" ,"basicrobotexample" ) 
-								emit("robotStateEvent", "robotStateEvent(moving)" ) 
-								delay(10000) 
-								 pos = "indoor"  
-								updateResourceRep( pos  
-								)
-								CommUtils.outblue("	 $name: PickupOK!")
-								answer("pickupReq", "pickupOk", "pickupOk($ID)"   )  
-						}
+						CommUtils.outblue("	 $name: pickupRequest($ID) received!")
+						CommUtils.outblue("	 $name: Sending cmd(MOVES) to BasicRobot22")
+						CommUtils.outblue("	 $name: Robot going from $pos to Indoor")
+						delay(10000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -94,10 +80,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_depositPlastic", 
-				 	 					  scope, context!!, "local_tout_transporttrolley_depositPlastic", 100.toLong() )
+				 	 					  scope, context!!, "local_tout_transporttrolley_depositPlastic", 500.toLong() )
 					}	 	 
-					 transition(edgeName="t11",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositPlastic"))   
-					transition(edgeName="t12",targetState="pickup",cond=whenRequest("pickupReq"))
+					 transition(edgeName="t10",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositPlastic"))   
 				}	 
 				state("depositGlass") { //this:State
 					action { //it:State
@@ -114,10 +99,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_depositGlass", 
-				 	 					  scope, context!!, "local_tout_transporttrolley_depositGlass", 200.toLong() )
+				 	 					  scope, context!!, "local_tout_transporttrolley_depositGlass", 500.toLong() )
 					}	 	 
-					 transition(edgeName="t23",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositGlass"))   
-					transition(edgeName="t24",targetState="pickup",cond=whenRequest("pickupReq"))
+					 transition(edgeName="t21",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositGlass"))   
 				}	 
 				state("goHome") { //this:State
 					action { //it:State

@@ -1,1 +1,0 @@
-{"actor":"wasteserviceguiactor", "msgType":"dispatch", "curstate":"handleChanges", "nextstate":"handleChanges", "msgId":"coapUpdate"}

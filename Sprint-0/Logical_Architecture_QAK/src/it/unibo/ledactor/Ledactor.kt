@@ -36,20 +36,17 @@ class Ledactor ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, s
 				}	 
 				state("handleRobotStateEvent") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("robotStateEvent(STATE)"), Term.createTerm("robotStateEvent(STATE)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outred("	 $name: Handling RobotStateEvent change!")
-								  
-												val robotState = payloadArg(0)
-								if(  robotState == "atHome"  
-								 ){ ledState = "off"  
-								}
-								if(  robotState == "moving"  
-								 ){ ledState = "blinking"  
-								}
-								if(  robotState == "stopped"  
-								 ){ ledState = "on"  
-								}
+						CommUtils.outred("	 $name: Handling RobotStateEvent change!")
+						  
+									val robotState = "null"
+						if(  robotState == "atHome"  
+						 ){ ledState = "off"  
+						}
+						if(  robotState == "moving"  
+						 ){ ledState = "blinking"  
+						}
+						if(  robotState == "stopped"  
+						 ){ ledState = "on"  
 						}
 						CommUtils.outred("	 $name: Led state- $ledState")
 						updateResourceRep( ledState  
@@ -59,10 +56,9 @@ class Ledactor ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, s
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_handleRobotStateEvent", 
-				 	 					  scope, context!!, "local_tout_ledactor_handleRobotStateEvent", 5000.toLong() )
+				 	 					  scope, context!!, "local_tout_ledactor_handleRobotStateEvent", 8000.toLong() )
 					}	 	 
-					 transition(edgeName="t012",targetState="handleRobotStateEvent",cond=whenTimeout("local_tout_ledactor_handleRobotStateEvent"))   
-					transition(edgeName="t013",targetState="handleRobotStateEvent",cond=whenEvent("robotStateEvent"))
+					 transition(edgeName="t08",targetState="handleRobotStateEvent",cond=whenTimeout("local_tout_ledactor_handleRobotStateEvent"))   
 				}	 
 			}
 		}

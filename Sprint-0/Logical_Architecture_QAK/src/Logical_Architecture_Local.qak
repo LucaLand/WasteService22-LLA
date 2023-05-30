@@ -1,9 +1,5 @@
 System logicalarchitecture
 
-	//WasteService - TT
-	Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
-	Reply pickupOk : pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
-	
 	
 	//WasteService - SmartDevice
 	Request depositRequest : depositRequest(ID, Type, TruckLoad)
@@ -12,28 +8,27 @@ System logicalarchitecture
 	
 
 	//To BasicRobot22
-	Dispatch cmd : cmd(MOVE)
-	
-	
-	//LedActor
-	Event robotStateEvent : robotStateEvent(STATE)		//STATE : atHome, moving, stopped
-
-	//COAPUPDATE
-	Dispatch coapUpdate : coapUpdate(ACTOR, VALUE)
+	Dispatch cmd       	: cmd(MOVE)      
+	Dispatch end       	: end(ARG)   
+	  
+	Request step       : step( TIME )	
+	Reply   stepdone   : stepdone(V)  
+	Reply   stepfail   : stepfail(DURATION, CAUSE)
 
 
-//Context ctxwasteservice ip[host="localhost" port=8076]
-//Context ctxraspberry ip[host="localhost" port=8078]
-//Context ctxsmartdevice ip[host="localhots" port=8074]
-//Context ctxwasteservicegui ip[host="localhost" port=8072]
-//Context ctxddr ip[host="localhost" port=8070]
-Context ctxgeneral ip[host="localhost" port=8092]
+
+Context ctxraspberry ip[host="localhost" port=8078]
+Context ctxsmartdevice ip[host="localhots" port=8074]
+Context ctxddrobot ip[host="localhost" port=8070]
+Context ctxwasteservice ip[host="localhost" port=8076]
+
+//Context ctxgeneral ip[host="localhost" port=8092]
 
 
 
 
 //WasteService Ctx
-QActor transporttrolley context ctxgeneral {
+QActor transporttrolley context ctxwasteservice {
 	[#
 		val name = "TransportTrolley"
 		val version = "V1.0"
@@ -52,38 +47,23 @@ QActor transporttrolley context ctxgeneral {
 		[# pos = "home" #]
 		updateResource [# pos #]
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
-		emit robotStateEvent : robotStateEvent(atHome)
 		
 		println("\t $name: ready and waiting for pickupRequest!") color blue
-	} 
-	Transition t0 whenRequest pickupReq -> pickup
+	}
 
 	State pickup {
 		
-		onMsg(pickupReq : pickupReq(ID, T)){
-			[# 	ID = payloadArg(0) 
-				materialType = payloadArg(1)
-			#]
 			println("\t $name: pickupRequest($ID) received!") color blue
 			
 			
 			//Sending messages to BasicRobot22
 			println("\t $name: Sending cmd(MOVES) to BasicRobot22") color blue
 			println("\t $name: Robot going from $pos to Indoor") color blue
-			forward basicrobotexample -m cmd:cmd(Pickup)
 			
-			//Robot Moving
-			emit robotStateEvent : robotStateEvent(moving)
+			//Robot Moving to Indoor
 			
 			delay 10000
-			
-			[# pos = "indoor" #]
-			updateResource [# pos #]
-			
-			//Sending pikcup finished
-			println("\t $name: PickupOK!") color blue
-			replyTo pickupReq with pickupOk : pickupOk($ID) 
-		}
+
 	} 
 	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
 
@@ -101,8 +81,7 @@ QActor transporttrolley context ctxgeneral {
 		println("\t $name: Depositing Plastic!") color blue
 		delay 6000
 	} 
-	Transition t1	whenTime 100 -> goHome
-					whenRequest pickupReq -> pickup
+	Transition t1 whenTime 500 -> goHome
 
 	State depositGlass {
      	println("\t $name: Going to GlassBox!") color blue
@@ -119,8 +98,7 @@ QActor transporttrolley context ctxgeneral {
 		println("\t $name: Depositing Glass!") color blue
 		delay 6000
 	} 
-	Transition t2	whenTime 200 -> goHome
-					whenRequest pickupReq -> pickup
+	Transition t2	whenTime 500 -> goHome
 
 	State goHome {
      	println("\t $name: Finished Deposit - Going home") color blue
@@ -134,7 +112,7 @@ QActor transporttrolley context ctxgeneral {
 
 
 
-QActor wasteservice context ctxgeneral {
+QActor wasteservice context ctxwasteservice {
 	[# 	
 		val name = "WasteService"
 		val version = "0"
@@ -184,15 +162,14 @@ QActor wasteservice context ctxgeneral {
 	State pickingUp {
 		println("\t $name: Request -$ID- Accepted!") color green
 		println("\t $name: Requesting pickingUp...") color green
-		request transporttrolley -m pickupReq : pickupReq($ID, $T)
+		
+		delay 7000
 	}
-	Transition t1 whenReply pickupOk -> pickupOk
+	Goto pickupOk
 	
 	State pickupOk {
-		onMsg(pickupOk : pickupOk(ID)){
-			println("\t $name: PickupOK received! Finished ${payloadArg(0)}") color green
-			replyTo depositRequest with loadaccept : loadaccept($ID)
-		}
+		println("\t $name: PickupOK received! Finished ${payloadArg(0)}") color green
+		replyTo depositRequest with loadaccept : loadaccept($ID)
 	}
 	Goto waiting
 }
@@ -202,7 +179,7 @@ QActor wasteservice context ctxgeneral {
 
 //SmartDevice Ctx
 
-QActor smartdevice context ctxgeneral {
+QActor smartdevice context ctxsmartdevice {
 	[#
 		val name = "SmartDevice"
 		val version = "V1.0"
@@ -262,7 +239,7 @@ QActor smartdevice context ctxgeneral {
 //Raspberry Ctx
 
 //Led
-QActor ledactor context ctxgeneral {
+QActor ledactor context ctxraspberry {
 	[#
 		val name = "LedActor"
 		val version = "V1.0"
@@ -277,35 +254,32 @@ QActor ledactor context ctxgeneral {
 	
 	
 	State handleRobotStateEvent {
-		onMsg(robotStateEvent : robotStateEvent(STATE)){
-			println("\t $name: Handling RobotStateEvent change!") color red
-			[#  
-				val robotState = payloadArg(0)
-			#]
-			
-			if[# robotState == "atHome" #]{
-				[# ledState = "off" #]
-			}
-			if[# robotState == "moving" #]{
-				[# ledState = "blinking" #]
-			}
-			if[# robotState == "stopped" #]{
-				[# ledState = "on" #]
-			}
+		println("\t $name: Handling RobotStateEvent change!") color red
+		[#  
+			val robotState = "null"
+		#]
+		
+		if[# robotState == "atHome" #]{
+			[# ledState = "off" #]
+		}
+		if[# robotState == "moving" #]{
+			[# ledState = "blinking" #]
+		}
+		if[# robotState == "stopped" #]{
+			[# ledState = "on" #]
 		}
 		
 		println("\t $name: Led state- $ledState") color red
 		updateResource [# ledState #]
 	}
-	Transition t0 	whenTime 5000 -> handleRobotStateEvent
-					whenEvent robotStateEvent -> handleRobotStateEvent
+	Transition t0 	whenTime 8000 -> handleRobotStateEvent
 	
 }
 
 
 
 //Sonar
-QActor sonaractorexemple context ctxgeneral {
+QActor sonaractorexemple context ctxraspberry {
 	[#
 		val name = "SonarActorExemple"
 		val version = "V.Ex"
@@ -327,7 +301,7 @@ QActor sonaractorexemple context ctxgeneral {
 
 //BasicRobot22
 
-QActor basicrobotexample context ctxgeneral {
+QActor basicrobotexample context ctxddrobot {
 	[#
 		val name = "BasicRobotExemple"
 		val version = "V.Ex"
@@ -349,7 +323,7 @@ QActor basicrobotexample context ctxgeneral {
 
 //WasteServiceGui
 
-QActor wasteserviceguiactor context ctxgeneral {
+QActor wasteserviceguiactor context ctxwasteservice {
 	[#
 		val name = "WasteServiceGui"
 		val version = "V1.0"
@@ -364,30 +338,13 @@ QActor wasteserviceguiactor context ctxgeneral {
 	
 	State s0 initial {
 		println("\t $name: Started! $version")
-		observeResource transporttrolley
-		observeResource ledactor
-		println("\t $name: Observing and Registered to variables!")
+		println("\t $name: Ready to observe and update")
 	}
 	Goto handleChanges if [# active #] else deactivated
 	
 	State handleChanges {
-		printCurrentMessage
+		//printCurrentMessage
 		discardMsg Off
-		
-		onMsg(coapUpdate : coapUpdate(ACTOR, VALUE)){
-			[# val actor = payloadArg(0) #]
-			
-			if[# actor == "transporttrolley" #]{
-				[# pos = payloadArg(1) #]
-			}
-			if[# actor == "ledactor" #]{
-				[# ledState = payloadArg(1) #]
-			}
-		}
-		
-		onMsg(robotStateEvent : robotStateEvent(STATE)){
-			[# TTState = payloadArg(0) #]
-		}
 		
 		println("\t $name: GUI STATE:")
 		println("\t\t\t TTState: $TTState")
@@ -396,8 +353,7 @@ QActor wasteserviceguiactor context ctxgeneral {
 		println("\t\t\t LedState: $ledState")
 		
 	}
-	Transition t0 	whenMsg coapUpdate -> handleChanges
-					whenEvent robotStateEvent -> handleChanges
+	Transition t0 	whenTime 20000 -> handleChanges
 					
 	State deactivated {
 		

@@ -45,7 +45,7 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				 	 		stateTimer = TimerActor("timer_idle", 
 				 	 					  scope, context!!, "local_tout_smartdevice_idle", 1000.toLong() )
 					}	 	 
-					 transition(edgeName="t07",targetState="truckArrived",cond=whenTimeout("local_tout_smartdevice_idle"))   
+					 transition(edgeName="t03",targetState="truckArrived",cond=whenTimeout("local_tout_smartdevice_idle"))   
 				}	 
 				state("truckArrived") { //this:State
 					action { //it:State
@@ -68,9 +68,9 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				 	 		stateTimer = TimerActor("timer_truckArrived", 
 				 	 					  scope, context!!, "local_tout_smartdevice_truckArrived", 20000.toLong() )
 					}	 	 
-					 transition(edgeName="t18",targetState="truckArrived",cond=whenTimeout("local_tout_smartdevice_truckArrived"))   
-					transition(edgeName="t19",targetState="truckGoAway",cond=whenReply("loadaccept"))
-					transition(edgeName="t110",targetState="truckGoAway",cond=whenReply("loadrejecetd"))
+					 transition(edgeName="t14",targetState="truckArrived",cond=whenTimeout("local_tout_smartdevice_truckArrived"))   
+					transition(edgeName="t15",targetState="truckGoAway",cond=whenReply("loadaccept"))
+					transition(edgeName="t16",targetState="truckGoAway",cond=whenReply("loadrejecetd"))
 				}	 
 				state("truckGoAway") { //this:State
 					action { //it:State
@@ -90,7 +90,7 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 				 	 		stateTimer = TimerActor("timer_truckGoAway", 
 				 	 					  scope, context!!, "local_tout_smartdevice_truckGoAway", 1000.toLong() )
 					}	 	 
-					 transition(edgeName="t311",targetState="idle",cond=whenTimeout("local_tout_smartdevice_truckGoAway"))   
+					 transition(edgeName="t37",targetState="idle",cond=whenTimeout("local_tout_smartdevice_truckGoAway"))   
 				}	 
 			}
 		}
