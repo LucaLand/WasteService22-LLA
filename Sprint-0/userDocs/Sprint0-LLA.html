@@ -190,7 +190,7 @@
 <h3>Definizione delle componenti del sistema</h3>
     <div class="remark">
     <!------------------------ ------------------------>
-        <h4>DDR Robot</h4>
+        <h3>DDR Robot</h3>
         <p>Con <r>DDR Robot</r> si intende <i>Differential Drive Robot</i> la cui documentazione è disponibile nel documento seguente, fornito dalla nostra <i>Software House</i>: <a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/VirtualRobot.html#differential-drive-robot">Differential Drive Robot</a></p>
         <p>Non avendo a disposizione un <r>DDR Robot</r> fisico e considerando i tempi, i costi di realizzazione del robot e la necessità di effettuare test
             del <i>Software</i>, viene messo a disposizione, dalla nostra <i>Software House</i>, un simulatore virtuale del <r>DDR Robot</r>: il <i><a target="_blank" href="http://htmlpreview.github.io/?https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/userDocs/wenv.html">"Wenv22-VirtualRobot</a></i>.</p>
@@ -229,7 +229,7 @@
 
 
 
-
+<br>
 <h3>Transport Trolley (<r2>TT</r2>)</h3>
     <p>Il <r>TransportTrolley</r> è l'entità <i>Software</i> si occupa di controllare e far eseguire la <r>Deposit Action</r> al <r>DDR</r> inviandogli i comandi di movimento.</p>
 
@@ -254,7 +254,7 @@ QActor transporttrolley context ctxwasteservice {
 
 	State waiting {
 	    ...
-	} Transition t0 whenRequest pickupReq -> pickup
+	}...
 
 	State pickup {
             ...
@@ -274,8 +274,7 @@ QActor transporttrolley context ctxwasteservice {
 }
 </code></pre>
 
-        <tt>Visto il requisito riguardante la possibilità di gestione di richieste anche durante l'esecuzione di un deposito e il voler liberare il camion il prima possibile, si evidenziano le seguenti transazioni necessarie:
-        </tt>
+        <tt>Visto il requisito riguardante la possibilità di gestione di richieste anche durante l'esecuzione di un deposito e il voler liberare il camion il prima possibile</tt>
         <img src="./img/TransportTrolley.png" alt="TransportTrolleyModelDiagram" style="width: 220px">
 
         <!------------------------ ------------------------>
@@ -293,13 +292,18 @@ QActor transporttrolley context ctxwasteservice {
 
         <!------------------------ ------------------------>
 
-        <h3>WasteTruckRequest</h3>
+<h4>WasteTruckRequest</h4>
 
         <p>Il <r>WasteService</r> e il <r>WasteTruck</r> sono in comunicazione tramite lo <r>Smart Device</r>.
             Lo <r>Smart Device</r> effettuerà una <i>request</i> (<r>DepositRequest</r>) di deposito di materiale specificando il tipo di materiale e attenderà la risposta del <b>WasteService</b>.</p>
         <ul>
             <li><code>loadaccepted</code>: richiesta accettata (quando è possibile gestirla/capacità Box non piena)</li>
             <li><code>loadrejecetd</code>: richiesta rifiutata (quando non è possibile gestirla/capacità Box piena)</li>
+        </ul>
+        <p>Si introducono dunque due componenti <i>Software</i>:</p>
+        <ul>
+            <li>Il <code>WasteService</code>: attore che gestisce le richieste in entrata al sistema dallo <r>Smart Device</r></li>
+            <li>Lo <code>SmartDevice</code>: attore che simula l'interazione dello <r>Smart Device</r> con il nostro <code>WasteService</code></li>
         </ul>
 
     <p>Formalizziamo l'interazione con i seguenti messaggi:</p>
@@ -321,24 +325,17 @@ QActor transporttrolley context ctxwasteservice {
             <li>Reply <code>loadrejecetd</code>: risposta negativa alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID della richiesta di deposito.</li>
         </ul>
         <p>Il parametro <code>ID</code> è stato inserito per poter gestire richieste duplicate ed eventuali errori, rendendo più robusto il sistema</p>
-        <tt>Il committente ha specificato che sarebbe meglio mandare via il truck il prima possibile, per questo motivo
-            va confermato il pickup del trolley allo <r>Smart Device</r> non appena il <r>DDR</r> ha terminato lo scarico.</tt>
-        <p>Non essendo specificati altri comportamenti per il <r>Waste Truck</r> non risulta necessario l'invio di entrambi i messaggi <code>loadaccept</code> e <code>pickupOk</code>. La formalizzazione dei messaggi e dell'interazione Request/Response evolve come segue:</p>
-        <p>Viene modificato il significato della <code>loadaccept</code> come segue:</p>
-        <ul><li>La <code>loadaccept</code> verrà inviata direttamente al completamento dello scarico dei rifiuti da parte del <r>DDR</r> svincolando direttamente il <r>Waste Truck</r></li></ul>
-        <p>Ciò aggiunge inoltre il vantaggio alla nostra architettura di non aver bisogno che il <r>WasteService</r> conosca il contesto dello <r>SmartDevice</r> in quanto dovrà solo effettuare una reply alle richieste.</p>
+        <tt>Il committente ha specificato che sarebbe meglio mandare via il truck il prima possibile, per questo motivo,
+            non essendo specificati altri comportamenti per il <r>Waste Truck</r> non risulta necessario l'invio di entrambi i messaggi <code>loadaccept</code> e <code>pickupOk</code>.
+            <p>La formalizzazione dei messaggi e dell'interazione Request/Response evolve come segue:</p>
+            <p>Viene modificato il significato della <code>loadaccept</code> come segue:</p>
+            <ul><li>La <u><code>loadaccept</code> verrà inviata direttamente al completamento dello scarico dei rifiuti</u> da parte del <r>DDR</r> svincolando direttamente il <r>Waste Truck</r></li></ul>
+        </tt>
+        <img src="img/WasteTruckRequest_Architecture.png" alt="">
 
+    <h3>WasteService e SmartDevice</h3>
 
-
-        <h4>Formalizzazione a stati finiti (QAK)</h4>
-        <p>Si introducono dunque due componenti <i>Software</i>:</p>
-        <ul>
-            <li>Il <code>WasteService</code>: attore che gestisce le richieste in entrata al sistema dallo <r>Smart Device</r></li>
-            <li>Lo <code>SmartDevice</code>: attore che simula l'interazione dello <r>Smart Device</r> con il nostro <code>WasteService</code></li>
-        </ul>
-
-
-        <h5>WasteService</h5>
+        <h4>WasteService</h4>
         <pre><code>
 QActor wasteservice context ctxwasteservice{
 	State s0 initial {
@@ -370,7 +367,7 @@ QActor wasteservice context ctxwasteservice{
 <!--        <img src="./img/WasteService.png" alt="WasteService Actor" style="width: 350px">-->
         
         
-        <h5>Smart Device</h5>
+        <h4>Smart Device</h4>
         <p>Lo <r>SmartDevice</r> viene utilizzato dal driver per approcciare all'INDOOR mandando una richiesta per depositare il carico specificando il tipo di materiale e il TruckLoad.
             La richiesta da inviare è stata formalizzata precedentemente nel paragrafo relativo alla <a href=#wasteTruckRequest>WasteTruckRequest</a>.
         <p>Lo <r>SmartDevice</r> è un componente esterno al nostro sistema, ma che per motivi di simulazione e testing verrà rappresentato come un attore.
@@ -403,32 +400,6 @@ QActor smartdevice context ctxsmartdevice{
 </code></pre>
 
         <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak"> Metamodello QAK SmartDevice</a></p>
-<!--        <img src="img/SmartDevice.png" alt="SmartDevice Actor" style="width: 200px">-->
-
-    <h4>Modello dell'interazione</h4>
-        <img src="./img/WasteTruckRequest-V3.2.png" alt="DepositRequest V3.2 - New interaction model">
-
-
-    <h4>Modellazione <r>Transport Trolley</r></h4>
-        <p>Avendo ora introdotto il componente <r>WasteService</r> descriviamo una interazione esemplificativa con il <r>TransportTrolley</r></p>
-        <pre><code>
-    Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
-    Reply pickupOk : pickupOk(ID)		//Risposta di fine pickup, relativa ad una richiesta
-        </code></pre>
-        <img src="./img/WasteService_TransportTrolley_Int.png" alt="WasteService interaction with TransportTrolley">
-        <p>A seguire il riferimento al metamodello eseguibile del contesto: <a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/WasteServiceCtx_QAK/src/WasteServiceCtx_v3.3.qak">WasteServiceCtx_v3.3.qak</a></p>
-
-    <h4>Architettura</h4>
-        <img src="./img/Logical_Architecture_v2.png" alt="" style="width: 80vw">
-
-
-    <h4>Modello dell'interazione - Use cases</h4>
-        <ul><li>DepositRequest accettata</li></ul>
-        <img src="./img/WasteTruckRequest-complete-accept.png" alt="WasteService Interaction. V3.3" style="width: 70vw">
-        <br>
-
-        <ul><li>DepositRequest Rifiutata</li></ul>
-        <img src="./img/WasteTruckRequest-complete-reject.png" alt="WasteService Interaction. V3.3" style="width: 70vw">
 
   <!------------------------ ------------------------>
 
@@ -475,14 +446,13 @@ QActor ledactor context ctxraspberry {
             ...
 		println("\t $name: Led state- $ledState") color red
 	}
-	Transition t0 	whenTime 5000 -> handleRobotStateEvent
-			whenEvent robotStateEvent -> handleRobotStateEvent
+	...
 
 }
 	</code></pre>
 	
 	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/LedActor.qak"> Metamodello QAK LedActor</a></p><br>
-    <img src="img/LedActor.png" alt="Led Actor" style="width: 250px">
+    <img src="img/LedActor.png" alt="Led Actor" style="width: 200px">
 
     <!------------------------ ------------------------>
 
@@ -496,6 +466,7 @@ QActor ledactor context ctxraspberry {
 
 <p>Sonar Qak già implementato fornito nel package unibo.actor22.events della directory test del progetto unibo.actor22, riportiamo la classe SonarActor22
 che definisce il Sonar come un attore proattivo e reattivo.
+        <img src="img/SonarActor.png" alt="" style="width: 250px">
 <p><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/SonarObservable.html#il-sonar-come-attore-che-emette-eventi"> Documentazione SonarActor22</a></p>
 <p><a href="https://github.com/anatali/issLab2022/blob/main/unibo.sonarqak22/src/sonarqak22.qak">Metamodello QAK SonarQak22</a></p>
     <!------------------------ ------------------------>
@@ -516,7 +487,7 @@ che definisce il Sonar come un attore proattivo e reattivo.
         </ul>
         <br>
 
-        <img src="img/Raspberry_Architecture.png" alt="Led Actor" style="width: 380px">
+        <img src="img/Raspberry_Architecture.png" alt="Led Actor" style="width: 340px">
 
     <!------------------------ ------------------------>
 
@@ -541,10 +512,10 @@ che definisce il Sonar come un attore proattivo e reattivo.
         <p>Il <r>WasteServiceStatusGUI</r> è inteso come un sistema composto da:</p>
         <ul>
             <li>Una <b>Interfaccia Grafica Web</b> che permetta la visualizzazione di tutte queste info.</li>
-            <li>Un <b>Attore <i>osservatore</i></b> che osservi le variabili condivise e aggiorni i valori dell'<i>Interfaccia Grafica Web</i> </li>
+            <li>Un componente software (<b>Attore</b>) che aggiorni i valori dell'<i>Interfaccia Grafica Web</i> in base allo stat del sistema.</li>
         </ul>
 
-        <img src="img/WasteServiceGui_Arch.png" alt="WasteServiceGui Architecture image" style="width: 350px">
+        <img src="img/WasteServiceStatusGui.png" alt="WasteServiceGui Architecture image" style="width: 200px">
 
 <br>
 
@@ -592,19 +563,10 @@ che definisce il Sonar come un attore proattivo e reattivo.
 <br/><br/> 	
 </div>  
 
-    <!-- USEFUL
-    <table style="width:100%" border="1">
-    <tr>
-    <td style="width:50%">
-    </td>
-    <td></td>
-    </tr>
-    </table>
-    -->
+
+
 
     <br><br>
-</div>
-
 <div style="background-color:rgba(86, 56, 253, 0.9); width:100%; height: 28vw; text-align:left; color:white;">
     <p style="text-align: center; font-size: 12pt;">Studenti: Luca Landolfi, Antonio Franzese, Luca De Risi</p>
     <p style="text-align: center; font-size: 12pt;">Email: luca.landolfi3@studio.unibo.it,  antonio.franzese4@studio.unibo.it, luca.derisi@studio.unibo.it;</p>
