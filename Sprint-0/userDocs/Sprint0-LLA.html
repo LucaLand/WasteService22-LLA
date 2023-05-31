@@ -1,11 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="it">
 
-<!--
-<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
-<script type="text/javascript" src="../css/issStyle.js"></script>
--->
-
 
 <head>
     <title>Iss2023-LLA-Sprint 0</title>
@@ -105,7 +100,7 @@
         <pre><code>
     Enum Position = {Indoor, PlasticBox, GlassBox, Home}
         </code></pre>
-        <img src="./img/Rettangolo-ServiceArea3.png" style="width: 30%" alt="ServiceArea Rectangle (x,y)">
+        <img src="./img/ServiceArea.png" style="width: 480px" alt="ServiceArea Rectangle (x,y)">
 
         <br>
         <br>
@@ -138,15 +133,10 @@
         <h4>Gestione tempo di raccolta/deposito del materiale dal truck</h4>
         <p>Il commitente precisa che il tempo di raccolta del materiale del truck è sempre limitato e prevedibile,
             mentre il tempo necessario per il deposito potrebbe essere anche alquanto lungo.</p>
-        <p>Significa che:</p>
         <ul>
             <li>Avremo un <code><i>PickingTime</i></code> definito</li>
             <pre><code>var pickingTime : int (seconds)</code></pre>
         </ul>
-        <n> Potrà essere usato per gestire il reinvio di richieste da parte dello SmartDevice allo scadere di un Timeout.<br>
-            Per quanto riguarda invece lo scarico, avendo un modello a scambio di messaggi con interazioni ad eventi non risulta un problema.
-        </n>
-
 
         <!------------------------ ------------------------>
 
@@ -278,7 +268,8 @@ QActor transporttrolley context ctxwasteservice {
 }
 </code></pre>
 
-        <tt>Visto il requisito riguardante la possibilità di gestione di richieste anche durante l'esecuzione di un deposito e il voler liberare il camion il prima possibile</tt>
+        <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak">TransportTrolley.qak</a>
+
         <img src="./img/TransportTrolley.png" alt="TransportTrolleyModelDiagram" style="width: 220px">
 
         <!------------------------ ------------------------>
@@ -296,7 +287,7 @@ QActor transporttrolley context ctxwasteservice {
 
         <!------------------------ ------------------------>
 
-<h4>WasteTruckRequest</h4>
+<h3>WasteTruckRequest</h3>
 
         <p>Il <r>WasteService</r> e il <r>WasteTruck</r> sono in comunicazione tramite lo <r>Smart Device</r>.
             Lo <r>Smart Device</r> effettuerà una <i>request</i> (<r>DepositRequest</r>) di deposito di materiale specificando il tipo di materiale e attenderà la risposta del <b>WasteService</b>.</p>
@@ -304,40 +295,38 @@ QActor transporttrolley context ctxwasteservice {
             <li><code>loadaccepted</code>: richiesta accettata (quando è possibile gestirla/capacità Box non piena)</li>
             <li><code>loadrejecetd</code>: richiesta rifiutata (quando non è possibile gestirla/capacità Box piena)</li>
         </ul>
-        <p>Si introducono dunque due componenti <i>Software</i>:</p>
-        <ul>
-            <li>Il <code>WasteService</code>: attore che gestisce le richieste in entrata al sistema dallo <r>Smart Device</r></li>
-            <li>Lo <code>SmartDevice</code>: attore che simula l'interazione dello <r>Smart Device</r> con il nostro <code>WasteService</code></li>
-        </ul>
 
     <p>Formalizziamo l'interazione con i seguenti messaggi:</p>
         <pre><code>
-	Request depositRequest	: 	depositRequest(ID, TYPE, TRUCKLOAD)
-	Reply loadaccept	: 	loadaccept(ID)
-	Reply loadrejecetd	: 	loadrejecetd(ID)
+	Request depositRequest	: 	depositRequest(TYPE, TRUCKLOAD, ...)
+	Reply loadaccept	: 	loadaccept(...)
+	Reply loadrejecetd	: 	loadrejecetd(...)
 	</code></pre>
-    <pre><code>
-        var ID          : String
-        var TRUCKLOAD   : float
 
-        enum TYPE = {"plastic", "glass"}
-    </code></pre>
         <p>Spiegazione di ciascun messaggio:</p>
         <ul>
-            <li>Request <code>depositRequest</code>: comando che indica la richiesta di un deposito di rifiuti. I parametri inclusi nella richiesta sono l'ID del deposito, il tipo di rifiuti e il carico del camion.</li>
-            <li>Reply <code>loadaccept</code>: risposta positiva alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID della richiesta di deposito.</li>
-            <li>Reply <code>loadrejecetd</code>: risposta negativa alla richiesta di deposito dei rifiuti. L'ID incluso nella risposta corrisponde all'ID della richiesta di deposito.</li>
+            <li>Request <code>depositRequest</code>: comando che indica la richiesta di un deposito di rifiuti. I parametri inclusi nella richiesta sono il tipo di rifiuti e il quantitativo di carico del camion.</li>
+            <li>Reply <code>loadaccept</code>: risposta positiva alla richiesta di deposito dei rifiuti.</li>
+            <li>Reply <code>loadrejecetd</code>: risposta negativa alla richiesta di deposito dei rifiuti.</li>
         </ul>
-        <p>Il parametro <code>ID</code> è stato inserito per poter gestire richieste duplicate ed eventuali errori, rendendo più robusto il sistema</p>
-        <tt>Il committente ha specificato che sarebbe meglio mandare via il truck il prima possibile e non definisce ulteriori operazoini da effettuare con il <r>Waste Truck</r>.<br>
-            Per questo motivo il <r>Waste Truck</r> può essere svincolato direttamente dopo la risposta <code>loadaccept</code>.
-            <p>La formalizzazione dei messaggi e dell'interazione Request/Response evolve come segue:</p>
-            <p>Viene modificato il significato della <code>loadaccept</code> come segue:</p>
+
+        <tt><p>Il committente non specifica ulteriori operazioni di scarico con il <r>Waste Truck</r> ma richiede di liberarlo il prima possibile.<br>
+            Il <r>Waste Truck</r> può essere svincolato direttamente dopo la risposta <code>loadaccept</code>.</p>
             <ul><li>La <u><code>loadaccept</code> verrà inviata direttamente al completamento dello scarico dei rifiuti</u> da parte del <r>DDR</r> svincolando direttamente il <r>Waste Truck</r></li></ul>
         </tt>
-        <img src="img/WasteTruckRequest_Architecture.png" alt="">
 
-    <h3>WasteService e SmartDevice</h3>
+
+
+
+
+<h3>WasteService e SmartDevice</h3>
+        <p>Si introducono dunque due componenti <i>Software</i>:</p>
+        <ul>
+            <li>Il <code><b>WasteService</b></code>: attore che gestisce le richieste in entrata al sistema dallo <r>Smart Device</r></li>
+            <li>Lo <code><b>SmartDevice</b></code>: attore che simula l'interazione dello <r>Smart Device</r> con il nostro <code>WasteService</code></li>
+        </ul>
+
+        <img src="img/WasteTruckRequest_Architecture.png" alt="">
 
         <h4>WasteService</h4>
         <pre><code>
