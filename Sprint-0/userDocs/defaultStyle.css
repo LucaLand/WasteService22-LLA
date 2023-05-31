@@ -71,6 +71,10 @@ pre {
     padding: 1px;
 }
 
+code {
+    font-size: 102%;
+}
+
 
 /* ---- CUSTOM TAGS ----*/
 tt {
