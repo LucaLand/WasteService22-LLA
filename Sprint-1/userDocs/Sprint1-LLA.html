@@ -1,16 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="it">
 
-<!--
-<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
-<script type="text/javascript" src="../css/issStyle.js"></script>
--->
-
 
 <head>
     <title>Iss2023-LLA-Sprint1</title>
-    <link href="defaultStyle.css" rel="stylesheet">
-	<link  href="menuCss.css" rel="stylesheet">
+    <link href="./defaultStyle.css" rel="stylesheet">
+	<link href="./menuCss.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--  To solve accent problems  -->
 </head>
 
 
@@ -21,13 +17,12 @@
 <div class="remark">
 <nav>
     <ul>
-        <li><a href="./Sprint0-LLA.html">sprint0</a></li>
+        <li><a href="../../Sprint-0/userDocs/Sprint0-LLA.html">sprint0</a></li>
         <li><a href="./Sprint1-LLA.html">sprint1</a></li>
     </ul>
 </nav>
 </div>
 
-<div class="body">
     <h2>Introduction</h2>
     <div class="remark">
 	<p>
@@ -40,7 +35,7 @@
     <div class="remark">
         <p>Si riporta la pagina di requisiti del committente: <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2022/blob/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/TemaFinale22.html" traget="_blank" >Waste
             Service 22.pdf</a></p>
-		<p>Inoltre si riporta il file dei requisiti dello Sprint0: <a href="./Sprint0-LLA.html#Requirements">Requisiti Sprint0</a>
+		<p>Inoltre si riporta il file dei requisiti dello Sprint0: <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Requirements">Requisiti Sprint0</a>
     </div>
 
     <!----------------------- REQUIREMENT ANALYSIS --------------------------->
@@ -58,32 +53,32 @@
             (possibile visitare la pagina riassuntiva <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/Applicazioni22.html">Applicazioni22</a> dei moduli sviluppati)</li>
         <li>Analisi delle responsabilità e delle interazioni tra i componenti <i>wasteservice</i>, <i>trasporttrolley</i> e <i>basicrobot</i></li>
         <li>Sviluppo / adattamento di tali componenti</li>
-        <li>Realizzazione di un modello eseguibile (a tal proposito verrà utilizzato il metamodello <a href="./QAK.html">QAK</a>).</li>
+        <li>Realizzazione di un modello eseguibile (a tal proposito verrà utilizzato il metamodello <a href="../../Sprint-0/userDocs/QAK.html">QAK</a>).</li>
         <li>Realizzazione di un (più completo) test-plan per il modello</li>
     </ul>
         
     </div>
 	
 	<!--PROBLEM ANALYSIS-->
-	<A NAME="ProblemAnalysis"></A>
+	<a NAME="ProblemAnalysis"></a>
 	<h2>Problem analysis</h2>
 	<div class="remark">
-		<h4><b>Architettura logica precedente:</b></h4>
-		<img src="img/Logical_Architecture_complete_v2.png" alt="General Logical Architecture">
-		<p style="width: 100%; text-align: right;"><a href="img/Legenda.png">Legenda.png</a></p>
+		<h4>Architettura logica precedente:</h4>
+		<img src="./img/Logical_Architecture_complete_v2.png" alt="General Logical Architecture">
+		<p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
 		<br>
 		
 		
-		    <h3><b>Wasteservice</b></h3>
+		    <h3>Wasteservice</h3>
 
     <h4>Quando rispondere allo <b>Smart device</b>?</h4>
     <p>Siccome i requisiti aggiuntivi dicono che sarebbe bene mandare via il <b>Waste-truck</b> appena possibile, se una richiesta può essere soddisfatta il driver deve essere liberato subito dopo 
 	   il <b>Pickup</b> (inviando allo <b>Smart device</b> una <b>loadaccept</b>). 
        Se invece la richiesta effettuata non può essere soddisfatta, è bene rispondere immediatamente con una <b>loadrejected</b> (qualunque cosa stia facendo il robot in quel momento).</p>
 
-    <h3><b>Transport trolley</b></h3>
+    <h3>Transport trolley</h3>
 
-    <h4 id="DDR_robot_vs_Transport_trolley"><b>DDR robot</b> vs <b>Transport trolley</b>:</h4>
+        <h4 id="DDR_robot_vs_Transport_trolley"><u>DDR robot</u> vs <u>Transport trolley</u>:</h4>
     <ul>
         <p>Possibile una separazione dei due concetti: </p>
         <li>
@@ -91,18 +86,20 @@
 			come "avanti", "destra", "sinistra", "halt", ecc.. <br>
          <p>Nel seguente file la documentazione completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c>.
 		    E un suo modello eseguibile <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">basicrobot.qak</a></p>, che infatti riceve comandi:
-            <code><pre>
-//MOVE =  w | a | s | d | h    | l | r
-Dispatch cmd           : cmd(MOVE)</pre>
-            </code>
+            <pre><code>
+//MOVE =  w | a | s | d | h | l | r
+
+Dispatch cmd           : cmd(MOVE)
+            </code></pre>
+
         </li>
         <li>
             Invece il <b>Transport trolley</b> è concepita come entità astratta di più alto livello che si occuperà di ricevere la destinazione generica<br>
-            <code><pre>
+            <pre><code>
 //POSITION =  INDOOR | PLASTICBOX | GLASSBOX | HOME
 Request moveto         : moveto(POSITION)
-Reply   movetoanswer   : movetoanswer(RESULT)</pre>
-            </code>
+Reply   movetoanswer   : movetoanswer(RESULT)
+            </code></pre>
         </li>
     </ul>
     <p>IN CHE MODO COMUNICANO WASTE SERVICE e TT?? 
@@ -110,8 +107,8 @@ Reply   movetoanswer   : movetoanswer(RESULT)</pre>
 
     <h4>Dove collocare <b>Transport trolley</b>:</h4>
     Abbiamo identificato 3 contesti - Waste Service e TT stanno nello stesso contesto (ctxwasteservice) e comunicano con il BasicRobot che si trova in un altro contesto (ctxddrobot) 
-    <img class="centerimg" style="width: 800px;" src="img/LogicalArch_sprint1.png"/>
-    <p style="width: 100%; text-align: right;"><a href="img/Legenda.png">Legenda.png</a></p>
+    <img class="centerimg" style="width: 800px;" src="./img/LogicalArch_sprint1.png"/>
+    <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
 
     <h4>Operazioni eseguite dal <b>Transport trolley</b>:</h4>
 <br>
@@ -162,13 +159,13 @@ evitando la necessità di sviluppare nuove soluzioni da zero.</li>
 <li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
 <li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
 
-<p>Dopo un'attenta analisi delle diverse opzioni presentate già nello <a href="./Sprint0-LLA.html#DepositAction">Sprint0</a> , abbiamo scelto di adottare una soluzione senza l'uso di coordinate, basandoci esclusivamente su una FSM (Finite State Machine), considerando l'importanza e la rilevanza di tale decisione.</p>
+<p>Dopo un'attenta analisi delle diverse opzioni presentate già nello <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#DepositAction">Sprint0</a> , abbiamo scelto di adottare una soluzione senza l'uso di coordinate, basandoci esclusivamente su una FSM (Finite State Machine), considerando l'importanza e la rilevanza di tale decisione.</p>
 
     <div class="remark" style="background-color: #c3fbe8;">
         <h3>Riassunto situazione attuale:</h3>
         <h4>Architettura logica:</h4>
-        <img src="img/Logical_Architecture_complete_v2.png" alt="General Logical Architecture">
-		<p style="width: 100%; text-align: right;"><a href="img/Legenda.png">Legenda.png</a></p>
+        <img src="./img/Logical_Architecture_complete_v2.png" alt="General Logical Architecture">
+		<p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
         <h4>QAK</h4>
         <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Logical_Architecture_QAK/src/Logical_Architecture_Local.qak">Modello del sistema QAK</a> <br>
         <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/WasteService.qak">Primo metamodello QAK <i>wasteservice</i></a> <small>(= a sprint0)</small><br>
