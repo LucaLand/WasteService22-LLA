@@ -28,7 +28,7 @@
 <div class="remark">
 <p>Progetto finale di ISS che consiste nel realizzare un sistema di gestione dei rifiuti in cui un robot svolge il compito
     di trasportare i materiali dal camion ai relativi contenitori di smistamento. Attualmente, ci concentriamo su una fase
-    preliminare di analisi dei requisiti, che consiste nel comprendere le esigenze del cliente e tradurle in una forma formalizzata e strutturata.</p>
+    preliminare di analisi dei requisiti, che consiste nel comprendere le esigenze del cliente e tradurli in maniera formale e strutturata.</p>
 
 </div>
 
@@ -200,16 +200,30 @@
 
 
         <h4>BasicRobot22</h4>
-        <p>Definiamo in breve il <c><a target="_blank" href="https://github.com/anatali/issLab2022/tree/main/unibo.basicrobot22">BasicRobot22</a></c>:</p>
+        <p>Definiamo in breve il <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c>:</p>
         <ul>
-            <li>Esegue comandi-base di spostamento, con argomento:<pre><code> MOVE = w | s | l | r | h </code></pre> </li>
+            <li>Esegue comandi-base di spostamento, con argomento:
+                <pre><code> MOVE = w | s | l | r | h </code></pre>
+            </li>
             <li>Permette l'esecuzione di <i>step</i>, rispondendo con <b>stepdone</b> o <b>stepfail</b></li>
             <li>È in grado di utilizzare diversi tipi di robot (virtuali e reali) costruiti ciascuno con una propria tecnologia</li>
             <li>È in grado di percepire e gestire informazioni provenienti dall’ambiente</li>
         </ul>
+        <p>Messaggi BasicRobot22:</p>
+
+        <pre><code>
+    Dispatch cmd       : cmd(MOVE)
+
+    Request step       : step( TIME )
+    Reply   stepdone   : stepdone(V)
+    Reply   stepfail   : stepfail(DURATION, CAUSE)
+
+    Event  sonar       : sonar(DISTANCE,NAME)
+        </code></pre>
+
         <img src="./img/BasicRobot22.png" alt="basicrobot22" style="width: 200px">
-        <p>Nel seguente file la documentazione completa: <c><a target="_blank" href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html">BasicRobot22</a></c>.
-        E un suo modello eseguibile <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">basicrobot.qak</a></p>
+        <p>Riferimenti: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/BasicRobot22.html"">Documentazone BasicRobot22</a>  ||  <a href="https://github.com/anatali/issLab2022/tree/main/unibo.basicrobot22">Progetto BasicRobot22</a>  ||
+       <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">Modello Eseguibile basicrobot.qak</a></p>
 
         <!------------------------ ------------------------>
 
