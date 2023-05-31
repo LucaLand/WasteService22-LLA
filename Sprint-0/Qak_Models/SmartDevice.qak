@@ -17,21 +17,18 @@ QActor smartdevice context ctxsmartdevice{
 		val version = "V1.0"
 
 		var request_ID = 0
-		#
-	]
+	#]
 
 	State s0 initial{
 		println("\t $name: Started! $version") color yellow
 	}
 	Goto idle
 
-
 	State idle {
 		println("\t $name: Waiting for Truck...") color yellow
 		[# request_ID ++ #]
 	}
-	Transition t0 whenTime 1000 -> truckArrived  //Changed V3.3 - testing multiple requests
-
+	Transition t0 whenTime 1000 -> truckArrived
 
 	State truckArrived {
 		[# val ID = request_ID #]
@@ -47,7 +44,7 @@ QActor smartdevice context ctxsmartdevice{
 			//request wasteservice -m depositRequest : depositRequest($ID , glass, 8)
 		}
 	}
-	Transition t1 	whenTime  20000 -> truckArrived				//(Req) Avendo lo scarico un tempo limitato possiamo presumere che se passa troppo tempo si sia persa la richiesta e la reinviamo. Abbiamo anche un meccanismo a ID per evitare richieste duplicate
+	Transition t1 	whenTime  20000 -> truckArrived				//(Req) Avendo lo scarico un tempo limitato possiamo presumere che se passa troppo tempo si sia persa la richiesta e possiamo reinviarla.
 					whenReply loadaccept -> truckGoAway
 					whenReply loadrejecetd -> truckGoAway
 

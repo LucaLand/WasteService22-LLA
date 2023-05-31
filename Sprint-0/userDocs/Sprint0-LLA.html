@@ -288,10 +288,10 @@ QActor transporttrolley context ctxwasteservice {
 
         <!------------------------ ------------------------>
 
-<h3>WasteTruckRequest</h3>
+<h3 id="wasteTruckRequest">WasteTruckRequest</h3>
 
-        <p>Il <r>WasteService</r> e il <r>WasteTruck</r> sono in comunicazione tramite lo <r>Smart Device</r>.
-            Lo <r>Smart Device</r> effettuerà una <i>request</i> (<r>DepositRequest</r>) di deposito di materiale specificando il tipo di materiale e attenderà la risposta del <b>WasteService</b>.</p>
+        <p>Il <r>WasteService</r> e il <r>WasteTruck</r> sono in comunicazione tramite lo <r>Smart Device</r>.<br>
+            Lo <r>Smart Device</r> effettuerà una <i>request</i> (<r>DepositRequest</r>) di deposito di materiale specificando il tipo di materiale e il carico <code><r>TruckLoad</r></code>, attendendo poi la risposta del <b>WasteService</b>.</p>
         <ul>
             <li><code>loadaccepted</code>: richiesta accettata (quando è possibile gestirla/capacità Box non piena)</li>
             <li><code>loadrejecetd</code>: richiesta rifiutata (quando non è possibile gestirla/capacità Box piena)</li>
@@ -360,13 +360,15 @@ QActor wasteservice context ctxwasteservice{
         
         
     <h4>Smart Device</h4>
-        <p>Lo <r>SmartDevice</r> viene utilizzato dal driver per approcciare all'INDOOR mandando una richiesta per depositare il carico specificando il tipo di materiale e il TruckLoad.
+        <p>Lo <r>SmartDevice</r> viene utilizzato dal driver del <r>Waste Truck</r> nell'INDOOR per mandare una richiesta di deposito del carico, specificando il tipo di materiale e il <code>TruckLoad</code>.
             La richiesta da inviare è stata formalizzata precedentemente nel paragrafo relativo alla <a href=#wasteTruckRequest>WasteTruckRequest</a>.
-        <p>Lo <r>SmartDevice</r> è un componente esterno al nostro sistema, ma che per motivi di simulazione e testing verrà rappresentato come un attore.
-            Un modo veloce e semplice di simulare il comportamento di un Truck esterno al sistema che interagisce con il nostro <r>WasteService</r>.</p>
+        <p>Lo <r>SmartDevice</r> è un componente esterno al nostro sistema, che verrà simulato da un attore che invia richieste.
+            Un modo veloce e semplice di simulare l'interazione con il nostro <r>WasteService</r>.</p>
+
         <pre><code>
 QActor smartdevice context ctxsmartdevice{
 	[# var request_ID = 0 #]
+
 	State s0 initial{
 	    <b>...</b>
 	} Goto idle
@@ -376,23 +378,20 @@ QActor smartdevice context ctxsmartdevice{
 	} Transition t0 whenTime 10000 -> truckArrived
 
 	State truckArrived {
-	    <b>...</b>
-	} Transition t1 	whenTime  10000 -> truckArrived
-				whenReply loadaccept -> waitPickUp
-				whenReply loadrejecetd -> truckGoAway
-
-	State waitPickUp {
-	    <b>...</b>
-	} Transition t2 whenMsg pickupOk -> truckGoAway
+	    //Arriva il truck e invia una richiesta di scarico
+	}
+        Transition t1 	whenTime  10000 -> truckArrived
+                        whenReply loadaccept -> truckGoAway
+                        whenReply loadrejecetd -> truckGoAway
 
 	State truckGoAway {
-	    <b>...</b>
+            //Truck svincolato
 	} Transition t3 whenTime 3000 -> idle
 }
 </code></pre>
 
-        <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak"> Metamodello QAK SmartDevice</a></p>
-
+        <p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak">SmartDevice.qak</a></p>
+        <img src="img/SmartDevice.png" alt="" style="width: 200px">
   <!------------------------ ------------------------>
 
     <h3>Raspberry</h3>
