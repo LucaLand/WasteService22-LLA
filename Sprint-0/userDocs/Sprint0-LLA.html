@@ -418,18 +418,14 @@ QActor smartdevice context ctxsmartdevice{
     enum LedState = {LedOff, LedOn, LedBlink};
         </code></pre>
         <pre><code>
-    enum robotState = {atHome, moving, Stopped};
+    enum robotState = {atHome, moving, stopped};
         </code></pre>
         <br>
 
-<!--        <p>Il <r>TransportTrolley</r> emetterà dunque un evento, che verrà ricevuto e gestito dal <r>LedActor</r></p>-->
-<!--        <pre><code>-->
-<!--    Event robotStateEvent : robotStateEvent(STATE)		//STATE : atHome, moving, stopped-->
-<!--        </code></pre>-->
-
-        <p>Metamodello QAK del <r>LedActor</r>:</p>
+        <p>Metamodello QAK del <r>Led</r>:</p>
 	<pre><code>
 QActor ledactor context ctxraspberry {
+
 	State s0 initial {
 		println("\t $name: Started! $version") color red
 	}
@@ -440,12 +436,12 @@ QActor ledactor context ctxraspberry {
             ...
 		println("\t $name: Led state- $ledState") color red
 	}
-	...
 
+    ...
 }
 	</code></pre>
 	
-	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/LedActor.qak"> Metamodello QAK LedActor</a></p><br>
+	<p><a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/Led.qak">Led.qak</a></p><br>
     <img src="img/LedActor.png" alt="Led Actor" style="width: 200px">
 
     <!------------------------ ------------------------>

@@ -1,0 +1,44 @@
+System ledactor
+
+	
+Context ctxRaspberry ip[host="localhost" port=8076]
+	
+
+QActor led context ctxRaspberry {
+	[#
+		val name = "LedActor"
+		val version = "V1.0"
+
+		var ledState = "off"
+	#]
+
+	State s0 initial {
+		println("\t $name: Started! $version") color red
+	}
+	Goto handleRobotStateEvent
+
+
+	State handleRobotStateEvent {
+        println("\t $name: Handling RobotState change!") color red
+        [#
+            val robotState = "null"
+        #]
+
+        //Handling example
+        if[# robotState == "atHome" #]{
+            [# ledState = "LedOff" #]
+        }
+        if[# robotState == "moving" #]{
+            [# ledState = "LedBlink" #]
+        }
+        if[# robotState == "stopped" #]{
+            [# ledState = "LedOn" #]
+        }
+
+		println("\t $name: Led state- $ledState") color red
+		
+		delay 6000 //Simulating robot state changes
+	}
+	Goto handleRobotStateEvent
+
+}
