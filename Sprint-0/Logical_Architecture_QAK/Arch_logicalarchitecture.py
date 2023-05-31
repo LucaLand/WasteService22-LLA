@@ -29,7 +29,7 @@ with Diagram('logicalarchitectureArch', show=False, outformat='png', graph_attr=
      with Cluster('ctxwasteservice', graph_attr=nodeattr):
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
           wasteservice=Custom('wasteservice','./qakicons/symActorSmall.png')
-          wasteserviceguiactor=Custom('wasteserviceguiactor','./qakicons/symActorSmall.png')
+          wasteservicestatusguiactor=Custom('wasteservicestatusguiactor','./qakicons/symActorSmall.png')
      transporttrolley >> Edge(color='blue', style='solid', xlabel='cmd', fontcolor='blue') >> basicrobotexample
      smartdevice >> Edge(color='magenta', style='solid', xlabel='depositRequest', fontcolor='magenta') >> wasteservice
 diag

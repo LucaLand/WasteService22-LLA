@@ -27,7 +27,7 @@ Context ctxwasteservice ip[host="localhost" port=8076]
 
 
 
-//WasteService Ctx
+//---- WasteService Ctx
 QActor transporttrolley context ctxwasteservice {
 	[#
 		val name = "TransportTrolley"
@@ -112,6 +112,7 @@ QActor transporttrolley context ctxwasteservice {
 
 
 
+//---- WasteService
 QActor wasteservice context ctxwasteservice {
 	[# 	
 		val name = "WasteService"
@@ -177,7 +178,7 @@ QActor wasteservice context ctxwasteservice {
 
 
 
-//SmartDevice Ctx
+//---- SmartDevice Ctx
 
 QActor smartdevice context ctxsmartdevice {
 	[#
@@ -236,9 +237,9 @@ QActor smartdevice context ctxsmartdevice {
 
 
 
-//Raspberry Ctx
+//---- Raspberry Ctx
 
-//Led
+//---- Led
 QActor ledactor context ctxraspberry {
 	[#
 		val name = "LedActor"
@@ -278,7 +279,7 @@ QActor ledactor context ctxraspberry {
 
 
 
-//Sonar
+//---- Sonar
 QActor sonaractorexemple context ctxraspberry {
 	[#
 		val name = "SonarActorExemple"
@@ -299,7 +300,7 @@ QActor sonaractorexemple context ctxraspberry {
 
 
 
-//BasicRobot22
+//---- BasicRobot22
 
 QActor basicrobotexample context ctxddrobot {
 	[#
@@ -321,9 +322,9 @@ QActor basicrobotexample context ctxddrobot {
 
 
 
-//WasteServiceGui
+//---- WasteServiceStatusGui
 
-QActor wasteserviceguiactor context ctxwasteservice {
+QActor wasteservicestatusguiactor context ctxwasteservice {
 	[#
 		val name = "WasteServiceGui"
 		val version = "V1.0"
@@ -356,9 +357,9 @@ QActor wasteserviceguiactor context ctxwasteservice {
 	Transition t0 	whenTime 20000 -> handleChanges
 					
 	State deactivated {
-		
+		delay 5000
 	}
-	//Goto handleChanges if [# active #] else deactivated
+	Goto handleChanges if [# active #] else deactivated
 	
 	
 }
