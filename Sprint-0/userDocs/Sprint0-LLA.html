@@ -325,9 +325,9 @@ QActor transporttrolley context ctxwasteservice {
             <li>Lo <code><b>SmartDevice</b></code>: attore che simula l'interazione dello <r>Smart Device</r> con il nostro <code>WasteService</code></li>
         </ul>
 
-        <img src="img/WasteTruckRequest_Architecture.png" alt="">
+        <img src="img/WasteTruckRequest_Architecture.png" alt="" style="width: 500px">
 
-        <h4>WasteService</h4>
+    <h4>WasteService</h4>
         <pre><code>
 QActor wasteservice context ctxwasteservice{
 	State s0 initial {
@@ -359,7 +359,7 @@ QActor wasteservice context ctxwasteservice{
         <img src="./img/WasteService.png" alt="WasteService Actor" style="width: 200px">
         
         
-        <h4>Smart Device</h4>
+    <h4>Smart Device</h4>
         <p>Lo <r>SmartDevice</r> viene utilizzato dal driver per approcciare all'INDOOR mandando una richiesta per depositare il carico specificando il tipo di materiale e il TruckLoad.
             La richiesta da inviare è stata formalizzata precedentemente nel paragrafo relativo alla <a href=#wasteTruckRequest>WasteTruckRequest</a>.
         <p>Lo <r>SmartDevice</r> è un componente esterno al nostro sistema, ma che per motivi di simulazione e testing verrà rappresentato come un attore.
@@ -395,7 +395,7 @@ QActor smartdevice context ctxsmartdevice{
 
   <!------------------------ ------------------------>
 
-        <h3>Raspberry</h3>
+    <h3>Raspberry</h3>
         <p>Il committente specifica la presenza di due compomenti istallate su un nuovo contesto esterno al contesto del <r>WasteService</r>, ovvero un <c>Raspberry</c>.</p>
         <p>Viene quindi definito un nuovo contesto <c>ctxraspbaerry</c> contentente le due componenti specificate dal committente: </p>
         <ul>
@@ -405,10 +405,12 @@ QActor smartdevice context ctxsmartdevice{
 
         <h3>Led</h3>
         <p>Strumento connesso in output al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
-        <p>Rappresentato nel sistema come l'attore <i>QAK</i> <r>LedActor</r>.</p>
+        <p>Rappresentato nel sistema come l'attore <i>QAK</i> <r>Led</r>.</p>
         <p>Entità software che si occuperà di gestire lo stato del <r>Led</r> reagendo ai cambi di stato del <r>TransportTrolley</r>.</p>
+        <br>
 
-        <ul>Individuiamo e definiamo TRE modalità di funzionamento del <b>Led</b> corrispondenti ai 3 stati del <r>TransportTrolley</r>:
+        <p>Individuiamo e definiamo TRE modalità di funzionamento del <b>Led</b> corrispondenti ai 3 stati del <r>TransportTrolley</r>:</p>
+        <ul>
             <li><code>LedOff</code> : <code>atHome</code> (Quando la sua posizione è Home)</li>
             <li><code>LedOn</code>: <code>stopped</code> (Quando bloccato dal <b>Sonar</b>)</li>
             <li><code>LedBlink</code>: <code>moving</code> (quando il <r>TT</r> è in movimento, o sta scaricando/caricando materiale)</li>
@@ -419,11 +421,12 @@ QActor smartdevice context ctxsmartdevice{
         <pre><code>
     enum robotState = {atHome, moving, Stopped};
         </code></pre>
+        <br>
 
-        <p>Il <r>TransportTrolley</r> emetterà dunque un evento, che verrà ricevuto e gestito dal <r>LedActor</r></p>
-        <pre><code>
-    Event robotStateEvent : robotStateEvent(STATE)		//STATE : atHome, moving, stopped
-        </code></pre>
+<!--        <p>Il <r>TransportTrolley</r> emetterà dunque un evento, che verrà ricevuto e gestito dal <r>LedActor</r></p>-->
+<!--        <pre><code>-->
+<!--    Event robotStateEvent : robotStateEvent(STATE)		//STATE : atHome, moving, stopped-->
+<!--        </code></pre>-->
 
         <p>Metamodello QAK del <r>LedActor</r>:</p>
 	<pre><code>
@@ -462,10 +465,9 @@ QActor ledactor context ctxraspberry {
     val DLIMIT	:	Float
             </code></pre>
 
-            <p>Se la distanza corrente misurata dal Sonar è ≤ DLIMT, il robot deve fermarsi. Quando la distanza corrente è > DLIMIT il robot è libero di muoversi.
-                Definiamo la costante <b>DLIMIT</b>:</p>
-
-            <ul>Più precisamente, quello che ci si aspetta quando la distanza diventa ≤ DLIMT, è che:
+        <p>Se la distanza corrente misurata dal Sonar è ≤ DLIMT, il robot deve fermarsi. Quando la distanza corrente è > <code>DLIMIT</code> il robot è libero di muoversi.</p>
+            <p>Più precisamente, quello che ci si aspetta quando la distanza diventa  <code>≤ DLIMT</code>, è che:</p>
+            <ul>
                 <li>Se il robot si sta muovendo esso si ferma. Riprenderà il moto solo quando la distanza torna <code>> DLIMIT</code></li>
                 <li>Ogni altra operazione del robot deve terminare. Una volta terminata si rimane in attesa finché la
                     distanza non ritorna <code>> DLIMIT</code></li>
@@ -573,8 +575,7 @@ QActor ledactor context ctxraspberry {
     <p>Successivamente si provvederà ad integrare <r>LedActor</r> e <r>SonarActor</r> del contesto del <c>Raspberry</c>.</p>
     <p>Infine ci si occuperà della <b>WasteServiceStatusGUI</b>.</p>
 </div>
-<br/><br/> 	
-</div>  
+<br/><br/>
 
 
 
