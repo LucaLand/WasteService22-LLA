@@ -1,12 +1,7 @@
 System wasteservice
 
 
-	//To TransportTrolley
-	Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
-	Reply pickupOk : pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
-	
-	
-	//Request Handler
+	//From Smart Device
 	Request depositRequest : depositRequest(ID, Type, TruckLoad)
 	Reply loadaccept : loadaccept(ID)
 	Reply loadrejecetd : loadrejecetd(ID)
@@ -47,6 +42,7 @@ QActor wasteservice context ctxwasteservice{
 				L = payloadArg(2)
 			#]
 			println("Request: ($ID, $T, $L)") color green
+
 			if[# ID.toInt()%2 == 0 #]{			//If di esempio test per avere risposte alternate
 				[# accepted = true #]
 			}else{
@@ -64,16 +60,16 @@ QActor wasteservice context ctxwasteservice{
 
 	State pickingUp {
 		println("\t $name: Request -$ID- Accepted!") color green
-		println("\t $name: Requesting pickingUp...") color green
-		//request transporttrolley -m pickupReq : pickupReq($ID, $T)
+		println("\t $name: Picking Up...") color green
+		delay 7000
 	}
-	Transition t1 whenReply pickupOk -> pickupOk
+	Goto pickupOk
 
 	State pickupOk {
-		onMsg(pickupOk : pickupOk(ID)){
-			println("\t $name: PickupOK received! Finished ${payloadArg(0)}") color green
-			replyTo depositRequest with loadaccept : loadaccept($ID)
-		}
+        println("\t $name: PickupOK received! Truck ${payloadArg(0)} can go away!") color green
+        replyTo depositRequest with loadaccept : loadaccept($ID)
+        println("Depositing waste...")
 	}
 	Goto waiting
+	//Ritorna a Waiting per attendere nuove richieste, anche se il trolley sta ancora depositando
 }
