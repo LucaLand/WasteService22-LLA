@@ -71,7 +71,7 @@ QActor transporttrolley context ctxwasteservice {
 		println("\t $name: Going to PlasticBox!") color blue
 		
 		//Sending cmd(MOVES) to BasicRobot22
-		forward basicrobotexample -m cmd:cmd(DepositPlastic)
+		//forward basicrobotexample -m cmd:cmd(DepositPlastic)
 		
 		delay 3000
 		[# pos = "plasticbox" #]
@@ -88,7 +88,7 @@ QActor transporttrolley context ctxwasteservice {
      	
      	
 		//Sending cmd(MOVES) to BasicRobot22
-		forward basicrobotexample -m cmd:cmd(DepositGlass)
+		//forward basicrobotexample -m cmd:cmd(DepositGlass)
 		
 		delay 5000
 		[# pos = "glassbox" #]
@@ -102,7 +102,7 @@ QActor transporttrolley context ctxwasteservice {
 
 	State goHome {
      	println("\t $name: Finished Deposit - Going home") color blue
-     	forward basicrobotexample -m cmd:cmd(GoHome)
+     	//forward basicrobotexample -m cmd:cmd(GoHome)
 		delay 7000
 	}
 	Goto waiting
@@ -155,7 +155,7 @@ QActor wasteservice context ctxwasteservice {
 	Goto pickingUp if[# accepted == true #] else requestRejected 
 	
 	State requestRejected {
-		replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
+		replyTo depositRequest with loadrejecetd : loadrejecetd($ID) caller== smartdevice
 		println("\t $name: Request -$ID- Refused!") color green
 	}
 	Goto waiting
@@ -170,7 +170,7 @@ QActor wasteservice context ctxwasteservice {
 	
 	State pickupOk {
 		println("\t $name: PickupOK received! Finished ${payloadArg(0)}") color green
-		replyTo depositRequest with loadaccept : loadaccept($ID)
+		replyTo depositRequest with loadaccept : loadaccept($ID) caller== smartdevice
 	}
 	Goto waiting
 }
@@ -280,7 +280,7 @@ QActor ledactor context ctxraspberry {
 
 
 //---- Sonar
-QActor sonaractorexemple context ctxraspberry {
+QActor sonarqak22 context ctxraspberry {
 	[#
 		val name = "SonarActorExemple"
 		val version = "V.Ex"
@@ -302,7 +302,7 @@ QActor sonaractorexemple context ctxraspberry {
 
 //---- BasicRobot22
 
-QActor basicrobotexample context ctxddrobot {
+QActor basicrobot22 context ctxddrobot {
 	[#
 		val name = "BasicRobotExemple"
 		val version = "V.Ex"
@@ -324,7 +324,7 @@ QActor basicrobotexample context ctxddrobot {
 
 //---- WasteServiceStatusGui
 
-QActor wasteservicestatusguiactor context ctxwasteservice {
+QActor wasteservicestatusgui context ctxwasteservice {
 	[#
 		val name = "WasteServiceGui"
 		val version = "V1.0"

@@ -9,6 +9,6 @@ context(ctxwasteservice, "localhost",  "TCP", "8076").
   qactor( wasteservice, ctxwasteservice, "it.unibo.wasteservice.Wasteservice").
   qactor( smartdevice, ctxsmartdevice, "it.unibo.smartdevice.Smartdevice").
   qactor( ledactor, ctxraspberry, "it.unibo.ledactor.Ledactor").
-  qactor( sonaractorexemple, ctxraspberry, "it.unibo.sonaractorexemple.Sonaractorexemple").
-  qactor( basicrobotexample, ctxddrobot, "it.unibo.basicrobotexample.Basicrobotexample").
-  qactor( wasteservicestatusguiactor, ctxwasteservice, "it.unibo.wasteservicestatusguiactor.Wasteservicestatusguiactor").
+  qactor( sonarqak22, ctxraspberry, "it.unibo.sonarqak22.Sonarqak22").
+  qactor( basicrobot22, ctxddrobot, "it.unibo.basicrobot22.Basicrobot22").
+  qactor( wasteservicestatusgui, ctxwasteservice, "it.unibo.wasteservicestatusgui.Wasteservicestatusgui").

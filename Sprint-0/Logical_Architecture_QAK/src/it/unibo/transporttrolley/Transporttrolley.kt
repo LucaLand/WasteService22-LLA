@@ -68,7 +68,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("depositPlastic") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Going to PlasticBox!")
-						forward("cmd", "cmd(DepositPlastic)" ,"basicrobotexample" ) 
 						delay(3000) 
 						 pos = "plasticbox"  
 						updateResourceRep( pos  
@@ -87,7 +86,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("depositGlass") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Going to GlassBox!")
-						forward("cmd", "cmd(DepositGlass)" ,"basicrobotexample" ) 
 						delay(5000) 
 						 pos = "glassbox"  
 						updateResourceRep( pos  
@@ -106,7 +104,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("goHome") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Finished Deposit - Going home")
-						forward("cmd", "cmd(GoHome)" ,"basicrobotexample" ) 
 						delay(7000) 
 						//genTimer( actor, state )
 					}

@@ -21,15 +21,16 @@ with Diagram('logicalarchitectureArch', show=False, outformat='png', graph_attr=
      sys = Custom('','./qakicons/system.png')
      with Cluster('ctxraspberry', graph_attr=nodeattr):
           ledactor=Custom('ledactor','./qakicons/symActorSmall.png')
-          sonaractorexemple=Custom('sonaractorexemple','./qakicons/symActorSmall.png')
+          sonarqak22=Custom('sonarqak22','./qakicons/symActorSmall.png')
      with Cluster('ctxsmartdevice', graph_attr=nodeattr):
           smartdevice=Custom('smartdevice','./qakicons/symActorSmall.png')
      with Cluster('ctxddrobot', graph_attr=nodeattr):
-          basicrobotexample=Custom('basicrobotexample','./qakicons/symActorSmall.png')
+          basicrobot22=Custom('basicrobot22','./qakicons/symActorSmall.png')
      with Cluster('ctxwasteservice', graph_attr=nodeattr):
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
           wasteservice=Custom('wasteservice','./qakicons/symActorSmall.png')
-          wasteservicestatusguiactor=Custom('wasteservicestatusguiactor','./qakicons/symActorSmall.png')
-     transporttrolley >> Edge(color='blue', style='solid', xlabel='cmd', fontcolor='blue') >> basicrobotexample
+          wasteservicestatusgui=Custom('wasteservicestatusgui','./qakicons/symActorSmall.png')
+     wasteservice >> Edge(color='darkgreen', style='dashed', xlabel='loadrejecetd', fontcolor='darkgreen') >> smartdevice
+     wasteservice >> Edge(color='darkgreen', style='dashed', xlabel='loadaccept', fontcolor='darkgreen') >> smartdevice
      smartdevice >> Edge(color='magenta', style='solid', xlabel='depositRequest', fontcolor='magenta') >> wasteservice
 diag

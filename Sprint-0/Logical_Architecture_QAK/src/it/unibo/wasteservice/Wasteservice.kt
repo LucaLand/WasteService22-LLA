@@ -76,7 +76,7 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				}	 
 				state("requestRejected") { //this:State
 					action { //it:State
-						answer("depositRequest", "loadrejecetd", "loadrejecetd($ID)"   )  
+						answer("depositRequest", "loadrejecetd", "loadrejecetd($ID)","smartdevice"   )  
 						CommUtils.outgreen("	 $name: Request -$ID- Refused!")
 						//genTimer( actor, state )
 					}
@@ -100,7 +100,7 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				state("pickupOk") { //this:State
 					action { //it:State
 						CommUtils.outgreen("	 $name: PickupOK received! Finished ${payloadArg(0)}")
-						answer("depositRequest", "loadaccept", "loadaccept($ID)"   )  
+						answer("depositRequest", "loadaccept", "loadaccept($ID)","smartdevice"   )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
