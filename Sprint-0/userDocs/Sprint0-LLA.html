@@ -448,11 +448,8 @@ QActor ledactor context ctxraspberry {
 
         <h3>Sonar</h3>
         <p>Strumento connesso in input al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
-        <p>Il Sonar è un dispositivo che emette informazioni sulla presenza di oggetti a lui davanti e sulla loro distanza.</p>
-        <p>Il Software per l'utilizzo del sonar fisico installato sul <b>Raspberry</b> viene fornito dal committente nel progetto <a href="https://github.com/anatali/issLab2022/tree/main/unibo.sonarqak22">SonarActor22</a></p>
-<!--        <p>Il software relativo al sonar è fornito dal committente in <b>unibo.basicrobot22,-->
-<!--            it.unibo.radarSystem22.domain,-->
-<!--            unibo.sonarqak22</b>.</p>-->
+        <p>Il <b>Sonar</b> è un dispositivo che emette informazioni sulla presenza di oggetti a lui davanti e sulla loro distanza.</p>
+        <p>Il Software per l'utilizzo del <i>Sonar fisico</i> installato sul <c>Raspberry</c> viene fornito dal committente nel progetto <a href="https://github.com/anatali/issLab2022/tree/main/unibo.sonarqak22">SonarActor22</a></p>
 
         <h4>DLimit</h4>
             <p> Distanza limite relativa al <r>Sonar</r> espressa in numero decimale.</p>
@@ -478,9 +475,8 @@ QActor ledactor context ctxraspberry {
     Event    sonar           : distance( V )   //emitted by sonarSimulator or sonardatasource
     Event    sonardata       : distance( V )   //for the application level
         </code></pre>
-        <p><a href="https://github.com/anatali/issLab2022/blob/main/unibo.sonarqak22/src/sonarqak22.qak">Metamodello QAK SonarQak22</a></p>
 
-
+        <p><a href="https://github.com/anatali/issLab2022/blob/main/unibo.sonarqak22/src/sonarqak22.qak">sonarqak22.qak</a></p>
 
         <img src="img/SonarActor.png" alt="" style="width: 250px">
     <!------------------------ ------------------------>
@@ -517,7 +513,7 @@ QActor ledactor context ctxraspberry {
             <li>Un componente software (<b>Attore</b>) che aggiorni i valori dell'<i>Interfaccia Grafica Web</i> in base allo stat del sistema.</li>
         </ul>
 
-        <img src="img/WasteServiceStatusGui.png" alt="WasteServiceGui Architecture image" style="width: 200px">
+        <img src="img/WasteServiceStatusGui.png" alt="WasteServiceStatusGui Architecture image" style="width: 200px">
 
     <br>
 
@@ -557,7 +553,7 @@ QActor ledactor context ctxraspberry {
                     <li><r>LedActor</r>: Componente Software, rappresentato come un Attore, per la gestione del <i>Led</i> fisico</li>
                     <li><r>SonarActor22</r>: componente Software per la gestione del Sonar, con un implementazione disponibile nella nostra <i>Software House</i></li>
                 </ul>
-            <li><r>WasteServiceGui</r>: componente Software da sviluppare che visualizzi e aggiorni un <i>Interfaccia Grafica</i> per la visualizzazione di informazioni sul sistema</li>
+            <li><r>WasteServiceStatusGui</r>: componente Software da sviluppare che visualizzi e aggiorni un <i>Interfaccia Grafica</i> per la visualizzazione di informazioni sul sistema</li>
             <li><r>SmartDevice</r>: componente esterno al sistema, <u>non da implementare</u>, che permette la comunicazione delle richieste del <r>Waste Truck</r> al <r>WasteService</r>.
                 Verrà rappresentato come un Agente Software (Attore) per la simulazione dell'arrivo di <i>richieste di deposito</i> al nostro sistema.</li>
         </ul>
