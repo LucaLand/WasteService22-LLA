@@ -18,12 +18,12 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 	
+		
 				val name = "WasteService"
 				val version = "0"
-				
+		
 				//Only one Request at time
-				var accepted = false; 
+				var accepted = false;
 				var ID = "0"
 				var T = ""
 				var L = ""
@@ -57,6 +57,7 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 								 	ID = payloadArg(0)
 												T = payloadArg(1)
 												L = payloadArg(2)
+								CommUtils.outgreen("Request: ($ID, $T, $L)")
 								if(  ID.toInt()%2 == 0  
 								 ){ accepted = true  
 								}
@@ -88,7 +89,7 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				state("pickingUp") { //this:State
 					action { //it:State
 						CommUtils.outgreen("	 $name: Request -$ID- Accepted!")
-						CommUtils.outgreen("	 $name: Requesting pickingUp...")
+						CommUtils.outgreen("	 $name: Picking Up...")
 						delay(7000) 
 						//genTimer( actor, state )
 					}
@@ -99,8 +100,9 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				}	 
 				state("pickupOk") { //this:State
 					action { //it:State
-						CommUtils.outgreen("	 $name: PickupOK received! Finished ${payloadArg(0)}")
+						CommUtils.outgreen("	 $name: PickupOK received! Truck ${payloadArg(0)} can go away!")
 						answer("depositRequest", "loadaccept", "loadaccept($ID)","smartdevice"   )  
+						CommUtils.outblack("Depositing waste...")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

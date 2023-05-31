@@ -21,7 +21,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		
 				val name = "TransportTrolley"
 				val version = "V1.0"
-				
+		
 				var ID = ""
 				var materialType = ""
 				var pos = "" 		//pos : home, indoor, plasticbox, glassbox
@@ -39,22 +39,25 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("waiting") { //this:State
 					action { //it:State
 						 pos = "home"  
-						updateResourceRep( pos  
-						)
 						CommUtils.outblue("	 $name: TransportTrolley at Home!")
 						CommUtils.outblue("	 $name: ready and waiting for pickupRequest!")
+						delay(10000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="pickup", cond=doswitch() )
 				}	 
 				state("pickup") { //this:State
 					action { //it:State
-						CommUtils.outblue("	 $name: pickupRequest($ID) received!")
+						 materialType = "plastic"  
+						CommUtils.outblue("	 $name: pickupRequest received!")
 						CommUtils.outblue("	 $name: Sending cmd(MOVES) to BasicRobot22")
 						CommUtils.outblue("	 $name: Robot going from $pos to Indoor")
 						delay(10000) 
+						 pos = "indoor"  
+						CommUtils.outblue("	 $name: Pickup Finished!")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -68,10 +71,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("depositPlastic") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Going to PlasticBox!")
-						delay(3000) 
+						CommUtils.outblack("Sending cmd(MOVES) to BasicRobot22")
+						delay(4000) 
 						 pos = "plasticbox"  
-						updateResourceRep( pos  
-						)
 						CommUtils.outblue("	 $name: Depositing Plastic!")
 						delay(6000) 
 						//genTimer( actor, state )
@@ -79,17 +81,16 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_depositPlastic", 
-				 	 					  scope, context!!, "local_tout_transporttrolley_depositPlastic", 500.toLong() )
+				 	 					  scope, context!!, "local_tout_transporttrolley_depositPlastic", 100.toLong() )
 					}	 	 
 					 transition(edgeName="t10",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositPlastic"))   
 				}	 
 				state("depositGlass") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Going to GlassBox!")
-						delay(5000) 
+						CommUtils.outblack("Sending cmd(MOVES) to BasicRobot22")
+						delay(8000) 
 						 pos = "glassbox"  
-						updateResourceRep( pos  
-						)
 						CommUtils.outblue("	 $name: Depositing Glass!")
 						delay(6000) 
 						//genTimer( actor, state )
@@ -97,7 +98,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 				 	 		stateTimer = TimerActor("timer_depositGlass", 
-				 	 					  scope, context!!, "local_tout_transporttrolley_depositGlass", 500.toLong() )
+				 	 					  scope, context!!, "local_tout_transporttrolley_depositGlass", 200.toLong() )
 					}	 	 
 					 transition(edgeName="t21",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositGlass"))   
 				}	 

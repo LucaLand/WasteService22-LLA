@@ -20,7 +20,7 @@ with Diagram('logicalarchitectureArch', show=False, outformat='png', graph_attr=
   with Cluster('env'):
      sys = Custom('','./qakicons/system.png')
      with Cluster('ctxraspberry', graph_attr=nodeattr):
-          ledactor=Custom('ledactor','./qakicons/symActorSmall.png')
+          led=Custom('led','./qakicons/symActorSmall.png')
           sonarqak22=Custom('sonarqak22','./qakicons/symActorSmall.png')
      with Cluster('ctxsmartdevice', graph_attr=nodeattr):
           smartdevice=Custom('smartdevice','./qakicons/symActorSmall.png')

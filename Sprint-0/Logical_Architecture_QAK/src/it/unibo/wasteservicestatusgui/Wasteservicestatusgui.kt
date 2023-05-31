@@ -58,7 +58,7 @@ class Wasteservicestatusgui ( name: String, scope: CoroutineScope  ) : ActorBasi
 				 	 		stateTimer = TimerActor("timer_handleChanges", 
 				 	 					  scope, context!!, "local_tout_wasteservicestatusgui_handleChanges", 20000.toLong() )
 					}	 	 
-					 transition(edgeName="t09",targetState="handleChanges",cond=whenTimeout("local_tout_wasteservicestatusgui_handleChanges"))   
+					 transition(edgeName="t08",targetState="handleChanges",cond=whenTimeout("local_tout_wasteservicestatusgui_handleChanges"))   
 				}	 
 				state("deactivated") { //this:State
 					action { //it:State

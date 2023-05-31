@@ -50,7 +50,6 @@ QActor transporttrolley context ctxwasteservice {
 
 			//Sending pikcup finished
 			println("\t $name: Pickup Finished!") color blue
-		}
 	}
 	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
 
@@ -58,7 +57,6 @@ QActor transporttrolley context ctxwasteservice {
 		println("\t $name: Going to PlasticBox!") color blue
 
 		println("Sending cmd(MOVES) to BasicRobot22")
-		//forward basicrobotexample -m cmd:cmd(DepositPlastic)
 
 		delay 4000
 		[# pos = "plasticbox" #]
@@ -74,7 +72,6 @@ QActor transporttrolley context ctxwasteservice {
 
 
 		println("Sending cmd(MOVES) to BasicRobot22")
-		//forward basicrobotexample -m cmd:cmd(DepositGlass)
 
 		delay 8000
 		[# pos = "glassbox" #]
@@ -87,7 +84,6 @@ QActor transporttrolley context ctxwasteservice {
 
 	State goHome {
      	println("\t $name: Finished Deposit - Going home") color blue
-     	//forward basicrobotexample -m cmd:cmd(GoHome)
 		delay 7000
 	}
 	Goto waiting

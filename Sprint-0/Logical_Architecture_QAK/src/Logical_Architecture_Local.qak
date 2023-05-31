@@ -32,7 +32,7 @@ QActor transporttrolley context ctxwasteservice {
 	[#
 		val name = "TransportTrolley"
 		val version = "V1.0"
-		
+
 		var ID = ""
 		var materialType = ""
 		var pos = "" 		//pos : home, indoor, plasticbox, glassbox
@@ -40,69 +40,69 @@ QActor transporttrolley context ctxwasteservice {
 
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
-	} 
+	}
 	Goto waiting
 
 	State waiting {
 		[# pos = "home" #]
-		updateResource [# pos #]
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
-		
+
 		println("\t $name: ready and waiting for pickupRequest!") color blue
+
+		delay 10000
 	}
+    Goto pickup
 
 	State pickup {
-		
-			println("\t $name: pickupRequest($ID) received!") color blue
-			
-			
+            [# materialType = "plastic" #]
+			println("\t $name: pickupRequest received!") color blue
+
+
 			//Sending messages to BasicRobot22
 			println("\t $name: Sending cmd(MOVES) to BasicRobot22") color blue
 			println("\t $name: Robot going from $pos to Indoor") color blue
-			
-			//Robot Moving to Indoor
-			
+
+			//Robot Moving
 			delay 10000
 
-	} 
+			[# pos = "indoor" #]
+
+			//Sending pikcup finished
+			println("\t $name: Pickup Finished!") color blue
+	}
 	Goto depositPlastic if[# materialType == "plastic" #] else depositGlass
 
 	State depositPlastic {
 		println("\t $name: Going to PlasticBox!") color blue
-		
-		//Sending cmd(MOVES) to BasicRobot22
-		//forward basicrobotexample -m cmd:cmd(DepositPlastic)
-		
-		delay 3000
+
+		println("Sending cmd(MOVES) to BasicRobot22")
+
+		delay 4000
 		[# pos = "plasticbox" #]
-		updateResource [# pos #]
-		
+
 		//Depositing
 		println("\t $name: Depositing Plastic!") color blue
 		delay 6000
-	} 
-	Transition t1 whenTime 500 -> goHome
+	}
+	Transition t1	whenTime 100 -> goHome
 
 	State depositGlass {
      	println("\t $name: Going to GlassBox!") color blue
-     	
-     	
-		//Sending cmd(MOVES) to BasicRobot22
-		//forward basicrobotexample -m cmd:cmd(DepositGlass)
-		
-		delay 5000
+
+
+		println("Sending cmd(MOVES) to BasicRobot22")
+
+		delay 8000
 		[# pos = "glassbox" #]
-		updateResource [# pos #]
-		
+
 		//Depositing
 		println("\t $name: Depositing Glass!") color blue
 		delay 6000
-	} 
-	Transition t2	whenTime 500 -> goHome
+	}
+	Transition t2	whenTime 200 -> goHome
 
 	State goHome {
      	println("\t $name: Finished Deposit - Going home") color blue
-     	//forward basicrobotexample -m cmd:cmd(GoHome)
 		delay 7000
 	}
 	Goto waiting
@@ -113,28 +113,28 @@ QActor transporttrolley context ctxwasteservice {
 
 
 //---- WasteService
-QActor wasteservice context ctxwasteservice {
-	[# 	
+QActor wasteservice context ctxwasteservice{
+	[#
 		val name = "WasteService"
 		val version = "0"
-		
+
 		//Only one Request at time
-		var accepted = false; 
+		var accepted = false;
 		var ID = "0"
 		var T = ""
 		var L = ""
 	#]
-	
+
 	State s0 initial {
 		println("\t $name: Started! $version") color green
 	}
 	Goto waiting
-	
+
 	State waiting{
 		println("\t $name: ready and waiting for deposit request...") color green
 	}
 	Transition t0 whenRequest depositRequest -> requestHandling
-	
+
 	State requestHandling {
 		println("\t $name: Deposit Request arrived!") color green
 		[# accepted = false #]
@@ -144,7 +144,8 @@ QActor wasteservice context ctxwasteservice {
 				T = payloadArg(1)
 				L = payloadArg(2)
 			#]
-			//println("Request: ($ID, $T, $L)") color green
+			println("Request: ($ID, $T, $L)") color green
+
 			if[# ID.toInt()%2 == 0 #]{			//If di esempio test per avere risposte alternate
 				[# accepted = true #]
 			}else{
@@ -152,84 +153,81 @@ QActor wasteservice context ctxwasteservice {
 			}
 		}
 	}
-	Goto pickingUp if[# accepted == true #] else requestRejected 
-	
+	Goto pickingUp if[# accepted == true #] else requestRejected
+
 	State requestRejected {
 		replyTo depositRequest with loadrejecetd : loadrejecetd($ID) caller== smartdevice
 		println("\t $name: Request -$ID- Refused!") color green
 	}
 	Goto waiting
-	
+
 	State pickingUp {
 		println("\t $name: Request -$ID- Accepted!") color green
-		println("\t $name: Requesting pickingUp...") color green
-		
+		println("\t $name: Picking Up...") color green
 		delay 7000
 	}
 	Goto pickupOk
-	
+
 	State pickupOk {
-		println("\t $name: PickupOK received! Finished ${payloadArg(0)}") color green
-		replyTo depositRequest with loadaccept : loadaccept($ID) caller== smartdevice
+        println("\t $name: PickupOK received! Truck ${payloadArg(0)} can go away!") color green
+        replyTo depositRequest with loadaccept : loadaccept($ID) caller== smartdevice
+        println("Depositing waste...")
 	}
 	Goto waiting
+	//Ritorna a Waiting per attendere nuove richieste, anche se il trolley sta ancora depositando
 }
-
 
 
 
 //---- SmartDevice Ctx
 
-QActor smartdevice context ctxsmartdevice {
+QActor smartdevice context ctxsmartdevice{
 	[#
 		val name = "SmartDevice"
 		val version = "V1.0"
-		
-		var request_ID = 0 
-		#
-	]
-	
+
+		var request_ID = 0
+	#]
+
 	State s0 initial{
 		println("\t $name: Started! $version") color yellow
 	}
 	Goto idle
-	
-	
+
 	State idle {
 		println("\t $name: Waiting for Truck...") color yellow
 		[# request_ID ++ #]
 	}
-	Transition t0 whenTime 1000 -> truckArrived  //Changed V3.3 - testing multiple requests
+	Transition t0 whenTime 1000 -> truckArrived
 
-	
 	State truckArrived {
 		[# val ID = request_ID #]
 		if[# ID.toInt()%3 == 0 #]{
 			delay 10000
 		}
-		println("\t $name: Truck Arrived!") color yellow
+		println("\t $name: Truck Arrived!")
 		println("\t $name: Sending request -$request_ID-") color yellow
-		
+
 		if[# ID.toInt()%2 == 0 #]{
 			request wasteservice -m depositRequest : depositRequest($ID , plastic, 10)
 		} else {
 			request wasteservice -m depositRequest : depositRequest($ID , glass, 8)
 		}
 	}
-	Transition t1 	whenTime  20000 -> truckArrived				//(Req) Avendo lo scarico un tempo limitato possiamo presumere che se passa troppo tempo si sia persa la richiesta e la reinviamo. Abbiamo anche un meccanismo a ID per evitare richieste duplicate
+	Transition t1 	whenTime  20000 -> truckArrived				//(Req) Avendo lo scarico un tempo limitato possiamo presumere che se passa troppo tempo si sia persa la richiesta e possiamo reinviarla.
 					whenReply loadaccept -> truckGoAway
 					whenReply loadrejecetd -> truckGoAway
-			
-	
+
+
 	State truckGoAway {
 		onMsg(loadrejecetd : loadrejecetd(ID)){
 			println("\t $name: Carico - ${payloadArg(0)} - Rifiutato!") color yellow
 		}
-		
+
 		onMsg(loadaccept : loadaccept(ID)){
 			println("\t $name: Scarico - ${payloadArg(0)} - Completato!") color yellow
 		}
-		
+
 		println("\t $name: Il Truck può andare!") color yellow
 	}
 	Transition t3 whenTime 1000 -> idle  //Un po' di attesa per simulare il via del camion
@@ -240,41 +238,43 @@ QActor smartdevice context ctxsmartdevice {
 //---- Raspberry Ctx
 
 //---- Led
-QActor ledactor context ctxraspberry {
+QActor led context ctxraspberry {
 	[#
 		val name = "LedActor"
 		val version = "V1.0"
-		
+
 		var ledState = "off"
 	#]
-	
+
 	State s0 initial {
 		println("\t $name: Started! $version") color red
 	}
 	Goto handleRobotStateEvent
-	
-	
+
+
 	State handleRobotStateEvent {
-		println("\t $name: Handling RobotStateEvent change!") color red
-		[#  
-			val robotState = "null"
-		#]
-		
-		if[# robotState == "atHome" #]{
-			[# ledState = "off" #]
-		}
-		if[# robotState == "moving" #]{
-			[# ledState = "blinking" #]
-		}
-		if[# robotState == "stopped" #]{
-			[# ledState = "on" #]
-		}
-		
+        println("\t $name: Handling RobotState change!") color red
+        [#
+            val robotState = "null"
+        #]
+
+        //Handling example
+        if[# robotState == "atHome" #]{
+            [# ledState = "LedOff" #]
+        }
+        if[# robotState == "moving" #]{
+            [# ledState = "LedBlink" #]
+        }
+        if[# robotState == "stopped" #]{
+            [# ledState = "LedOn" #]
+        }
+
 		println("\t $name: Led state- $ledState") color red
-		updateResource [# ledState #]
+		
+		delay 6000 //Simulating robot state changes
 	}
-	Transition t0 	whenTime 8000 -> handleRobotStateEvent
-	
+	Goto handleRobotStateEvent
+
 }
 
 

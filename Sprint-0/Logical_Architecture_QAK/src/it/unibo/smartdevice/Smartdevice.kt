@@ -21,8 +21,8 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 		
 				val name = "SmartDevice"
 				val version = "V1.0"
-				
-				var request_ID = 0 
+		
+				var request_ID = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -53,7 +53,7 @@ class Smartdevice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name
 						if(  ID.toInt()%3 == 0  
 						 ){delay(10000) 
 						}
-						CommUtils.outyellow("	 $name: Truck Arrived!")
+						CommUtils.outblack("	 $name: Truck Arrived!")
 						CommUtils.outyellow("	 $name: Sending request -$request_ID-")
 						if(  ID.toInt()%2 == 0  
 						 ){request("depositRequest", "depositRequest($ID,plastic,10)" ,"wasteservice" )  
