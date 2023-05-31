@@ -22,3 +22,7 @@ package-lock.json
 docker/
 /.metadata/
 /src-gen/
+
+
+/.project
+/.pydevproject
