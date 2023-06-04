@@ -80,12 +80,35 @@
 
 
         <h3>1 - Simulazione Smart Device</h3>
-
+		<p>
+		
+		Come da requisiti, lo <b>Smart Device</b> non dovrà essere implementato. Per facilitare la messa appunto dell'applicazione introduciamo un <b><i>Mock-object</i></b>, 
+		cioè un dispositivo simulato che riproduce il comportamento dei dispositivi reali in modo controllato, in questo caso verrà utilizzato per la simulazione dello <b>Smart Device</b>.
+		Questo meccanismo ci consente di andare a simulare l'interazione tra lo <b>Smart Device</b> e il <b>WasteService</b>, in particolare il primo invierà una <i>DepositRequest</i>
+		e si metterà in attesa di una risposta.
+		</br>
+		</br>
+		Di seguito viene riportata la documentazione relativa ai <b><i>Mock-object</i></b>: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/RadarSystemProgetto.html#sprint1-componenti-per-i-dispositivi-di-i-o"> Mock
+		</a>
+		
+		
+		</p>
 
         <h3>2 - Divisione della Logica di business dei componenti</h3>
 
 
         <h3>3 - Gestione delle richieste</h3>
+		<p>
+		Il <b>WasteService</b> per poter gestire le richieste che arrivano dallo <b>Smart Device</b> si avvale dell'utilizzo di due variabili inizializzate nello 
+		<a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Variables">Sprint0</a>.
+		   <pre><code>
+//POSITION =  INDOOR | PLASTICBOX | GLASSBOX | HOME
+Request moveto         : moveto(POSITION)
+Reply   movetoanswer   : movetoanswer(RESULT)
+            </code></pre>
+		
+		
+		</p>
 
 
         <h3>4 - Interazione WasteService e TransportTrolley</h3>
