@@ -144,7 +144,13 @@
 
 
         <h3>Deposit Action</h3>
-        <p>La <r>Deposit Action</r> è definita come una sequenza di posizioni in cui il <r>DDR</r> deve deve raggiungere:</p>
+        <p>La <r>Deposit Action</r> è composta da 3 fasi:</p>
+        <ol>
+            <li><b>PickUp</b>: fase di carico dei rifiuti dal <i>Waste Truck</i></li>
+            <li><b>Deposit</b>: fase di deposito dei rifiuti in uno dei due <i>Box</i></li>
+            <li><b>BackHome</b>: fase di ritorno alla posizione <i>Home</i></li>
+        </ol>
+        <p>La <r>Deposit Action</r> è definita dunque come una sequenza di rispettive posizioni che il <r>DDR</r> deve deve raggiungere:</p>
         <ol>
             <li>Indoor</li>
             <li>PlasticBox/GlassBox</li>
@@ -537,7 +543,7 @@ QActor ledactor context ctxraspberry {
     <div class="remark">
         <ul>
             <li>Nessun meccanismo di svuotamento dei contenitori</li>
-
+            <li>Il <b>WasteService</b> riceverà una richiesta sola alla volta</li>
         </ul>
     </div>
     <!------------------------ ------------------------>
