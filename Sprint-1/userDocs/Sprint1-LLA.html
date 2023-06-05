@@ -116,10 +116,19 @@
 		<p>
 		Il <b>WasteService</b> per poter gestire le richieste che arrivano dallo <b>Smart Device</b> si avvale dell'utilizzo di due variabili inizializzate nello 
 		<a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Variables">Sprint0</a>.
+		Le variabili contGB e contPB, inizializzate nello Sprint0, sono rispettivamente delle variabili contatori per i due tipi di materiali da depositare e verranno verificate 
+		con la capienza massima dei box stabilita a priori tramite i valori di MAXGB e MAXPB.
 		   <pre><code>
-//POSITION =  INDOOR | PLASTICBOX | GLASSBOX | HOME
-Request moveto         : moveto(POSITION)
-Reply   movetoanswer   : movetoanswer(RESULT)
+Request depositRequest	: 	depositRequest(TYPE, TRUCKLOAD, ...)
+Reply loadaccept	: 	loadaccept(...)
+Reply loadrejecetd	: 	loadrejecetd(...)
+
+if(contGB OR  contPB + TRUCKLOAD) > MAXGB OR MAXPB{
+Reply loadrejecetd 
+}
+else{
+Reply loadaccept
+}
             </code></pre>
 		
 		
@@ -127,12 +136,79 @@ Reply   movetoanswer   : movetoanswer(RESULT)
 
 
         <h3>4 - Interazione WasteService e TransportTrolley</h3>
+<p>Il <b>WasteService</b>, una volta gestita positivamente la richiesta che arriva dallo <b>Smart Device</b>, agisce in maniera sequenziale verso il <b>Transport Trolley</b> mandando una request di Pickup
+del carico trasportato dal <b>WasteTruck</b>. Il <b>WasteService</b> sarà abilitato anche a ricevere una reply da parte del <b>TransportTrolley</b> che sancisce la fine dell'azione di 
+carico e permette al <b>WasteService</b> di mandare via il <b>WasteTruck</b> il prima possibile.
+Se la richiesta di scarico viene rifiutata, il <b>WasteService</b> resta in attesa per nuove richieste, anche se il trolley sta ancora depositando.
+
+		   <pre><code>
+Request PickupReq	:	PickupReq(...)
+Reply   PickupOK	:	PickupOk(...)
+
+
+State requestRejected {
+	replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
+	println("\t $name: Request -$ID- Refused!") color green
+}
+Goto waiting
+
+State pickingUp {
+	println("\t $name: Request -$ID- Accepted!") color green
+	println("\t $name: Picking Up...") color green
+	delay 7000
+}
+Goto pickupOk
+
+State pickupOk {
+	println("\t $name: PickupOK received! Truck ${payloadArg(0)} can go away!") color green
+	replyTo depositRequest with loadaccept : loadaccept($ID)
+	println("Depositing waste...")
+}
+Goto waiting
+//Ritorna a Waiting per attendere nuove richieste, anche se il trolley sta ancora depositando
+}
+            </code></pre>
+
+
+<h3>5 - Problema del Movimento</h3>
+    <h4>Il problema della navigazione: <br>
+        <p>Uso di un sistema di coordinate  o  boundary walker che raggiunge gli angoli rilevando il contatto con i muri?</p>
+    </h4>
+<p>La disposizione specifica delle zone INDOOR, PLASTICBOX, GLASSBOX e HOME, insieme alla presenza di un sonar o sensore di impatto sul robot, 
+consente di adottare una soluzione che non richiede l'uso di coordinate. Il robot può spostarsi all'interno dell'area di servizio lungo le pareti, 
+utilizzando la rilevazione delle collisioni con le pareti per orientarsi.</p>
+
+<p>Nella sezione seguente, esaminiamo i vantaggi dell'utilizzo di un sistema basato su coordinate e di uno senza coordinate:</p>
+
+<ul>Vantaggi dell'utilizzo di un sistema basato su coordinate:</ul>
+
+<li>Maggiore flessibilità: Un sistema basato su coordinate offre maggiore flessibilità nel gestire la posizione dei siti. 
+Ad esempio, può adattarsi facilmente se i siti non sono più posizionati agli angoli, se il robot deve seguire un percorso ottimale o se ci sono ostacoli nell'area di servizio.</li>
+
+<li>Potenziale riutilizzo di moduli esistenti: Utilizzando un sistema basato su coordinate, è possibile sfruttare moduli sviluppati precedentemente come mapper e planner, 
+evitando la necessità di sviluppare nuove soluzioni da zero.</li>
+
+<ul>Vantaggi dell'utilizzo di un sistema senza coordinate:</ul>
+
+<li>Minor complessità e costo inferiore: L'assenza di un sistema basato su coordinate semplifica il design complessivo e riduce i costi associati all'implementazione.</li>
+
+<li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
+<li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
+
+<p>Dopo un'attenta analisi delle diverse opzioni presentate già nello <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#DepositAction">Sprint0</a> , abbiamo scelto di adottare una soluzione senza l'uso di coordinate, basandoci esclusivamente su una FSM (Finite State Machine), considerando l'importanza e la rilevanza di tale decisione.</p>
+
+
+
+    <h4>PUNTO 5C : <br>
+        <p>c.	Può ricevere richieste mentre sta scaricando (2 modi) 
+				i.	Facendolo girare in dietro vs passa per la home (analizzaimo entrambi e possiamo implementare entrambi, configurabile)</p>
+    </h4>
 
 
 
 
 
-
+	<h3>6 - Interazione TT e BasicRobot22</h3>
 
 
 
@@ -211,31 +287,6 @@ Context ctxwasteservice ip[host="loaclhost" port=8072]</pre>
     </code>
     Si veda il file <a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak"> Metamodello QAK TransportTrolley</a></b>.
 
-    <h4>Il problema della navigazione: <br>
-        <p>Uso di un sistema di coordinate  o  boundary walker che raggiunge gli angoli rilevando il contatto con i muri?</p>
-    </h4>
-<p>La disposizione specifica delle zone INDOOR, PLASTICBOX, GLASSBOX e HOME, insieme alla presenza di un sonar o sensore di impatto sul robot, 
-consente di adottare una soluzione che non richiede l'uso di coordinate. Il robot può spostarsi all'interno dell'area di servizio lungo le pareti, 
-utilizzando la rilevazione delle collisioni con le pareti per orientarsi.</p>
-
-<p>Nella sezione seguente, esaminiamo i vantaggi dell'utilizzo di un sistema basato su coordinate e di uno senza coordinate:</p>
-
-<ul>Vantaggi dell'utilizzo di un sistema basato su coordinate:</ul>
-
-<li>Maggiore flessibilità: Un sistema basato su coordinate offre maggiore flessibilità nel gestire la posizione dei siti. 
-Ad esempio, può adattarsi facilmente se i siti non sono più posizionati agli angoli, se il robot deve seguire un percorso ottimale o se ci sono ostacoli nell'area di servizio.</li>
-
-<li>Potenziale riutilizzo di moduli esistenti: Utilizzando un sistema basato su coordinate, è possibile sfruttare moduli sviluppati precedentemente come mapper e planner, 
-evitando la necessità di sviluppare nuove soluzioni da zero.</li>
-
-<ul>Vantaggi dell'utilizzo di un sistema senza coordinate:</ul>
-
-<li>Minor complessità e costo inferiore: L'assenza di un sistema basato su coordinate semplifica il design complessivo e riduce i costi associati all'implementazione.</li>
-
-<li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
-<li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
-
-<p>Dopo un'attenta analisi delle diverse opzioni presentate già nello <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#DepositAction">Sprint0</a> , abbiamo scelto di adottare una soluzione senza l'uso di coordinate, basandoci esclusivamente su una FSM (Finite State Machine), considerando l'importanza e la rilevanza di tale decisione.</p>
 
     <div class="remark" style="background-color: #c3fbe8;">
         <h3>Riassunto situazione attuale:</h3>
