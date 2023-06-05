@@ -200,7 +200,15 @@ evitando la necessità di sviluppare nuove soluzioni da zero.</li>
 
 
     <h4>PUNTO 5C : <br>
-        <p>c.	Può ricevere richieste mentre sta scaricando (2 modi) 
+        <p>
+		Il <b>WasteService</b> può ricevere e gestire una richiesta alla volta mentre il <b>TransportTrolley</b> è abilitato a gestire più richieste di scarico ed è abilitato 
+		a fare questo tramite la gestione di una coda. Il <b>WasteService</b> può gestire le richieste mentre il <b>TransportTrolley</b> è ancora occupato a gestire l'azione 
+		di carico/scarico.
+		
+		Vantaggi e Svantaggi di far girare il robot all'indietro (percorso a rovescio o facendolo ritornare alla HOME e ripartire )
+		
+		
+		c.	Può ricevere richieste mentre sta scaricando (2 modi) 
 				i.	Facendolo girare in dietro vs passa per la home (analizzaimo entrambi e possiamo implementare entrambi, configurabile)</p>
     </h4>
 
