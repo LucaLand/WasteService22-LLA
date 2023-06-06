@@ -316,10 +316,36 @@ Goto waiting
 
 
 
-
 	<h3>6 - Interazione TT e BasicRobot22</h3>
-
-
+	 <p>Il <b>TransportTrolley</b>
+		si occuperà di far muovere 
+		il robot per il carico/scarico dei rifiuti. Per la messa in azione del robot 
+		è possibile riutilizzare il software già sviluppato per mappare(unibo.mapperQak22),
+		identificare il percorso (unibo.planner22) 
+		ed eseguire il path trovato (unibo.pathexecutor) e quindi il
+		<b>TransportTrolley</b> incaricherà il robot del percorso da compiere
+		mediante il riutilizzo di questo software.
+		
+		Il <b>TransportTrolley</b> è a conoscenza della destinazione del <b>BasicRobot</b> e manda una Request al <b>PathExecutor</b> e quest'ultimo si 
+		occuperà di far arrivare il <b>BasicRobot</b> a destinazione mediante l'invio di messaggi seguendo la logica del <i>BoundaryWalk</i> 
+		(W finchè non trova il muro e poi gira a sinistra) -> (Bisogna modificare il componente <b>PathExec</b>)
+		
+		</br>
+		<ol>
+		<li>TT manda doPath e delega il PathExec</li>
+		<li>PathExec inizia a comunicare con il BasicRobot e gli manda una mossa (W o S) alla volta, aspettando stepdone/stepfail</li>
+		<li>Quando il BasicRobot arriva a destinazione, PathExec manda doPathdone al TT</li>
+		</ol>
+		
+		
+		</br>
+		
+		
+		
+		
+		IL PATHEXECUTOR CHE MESSAGGI SCAMBIA? MANDA AL BASICROBOT IL PERCORSO PER INTERO O LE SINGOLE MOSSE (WWWWWWWWSWWWWWWWWSWWWWWWWW) ???????
+		</p>
+		
 
 
 
