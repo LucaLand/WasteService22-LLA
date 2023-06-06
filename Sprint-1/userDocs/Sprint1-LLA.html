@@ -130,8 +130,8 @@ Reply loadrejecetd	: 	loadrejecetd(...)
         <p>Si evidenziano i seguenti problemi da anlizzare:</p>
         <ul>
             <li><b>Logica di gestione delle richieste</b></li>
-            <li><b>Possibilità di richieste ripetute</b></li>
             <li><b>Quando rispondere allo SmartDevice</b></li>
+            <li><b>Possibilità di richieste ripetute</b></li>
         </ul>
 
         <h4>Logica Gestione delle richieste</h4>
@@ -156,6 +156,22 @@ When (Request depositRequest(TYPE, TRUCKLOAD, ID)){
 
             <tt>Il <b>WasteService</b> deve dunque richiedere il <i>PickUp</i> del materiale al <b>TransportTrolley</b></tt>
 
+        <h5>Aggiornamento e gestione delle variabili di stato dei Box</h5>
+            <p>Le variabili <code>currentPB</code> e <code>currentGB</code> vanno aggiornate per la corretta gestione delle richieste.</p>
+            <p>Siccome il <b>WasteService</b> può ricevere richieste anche prima che la <i>Deposit Action</i> sia stata completata, si evidenzia la seguente soluzione:</p>
+            <ol>
+                <li>Le variabili <code>currentPB</code> e <code>currentGB</code> saranno aggiornate non appena una richiesta viene accettata.</li>
+                <p>In caso si preveda la possibilità di errori nello scarico dei rifiuti, si implementa un meccanismo di transazioni con conferma:</p>
+                <li>Si conserverà il valore precedente delle variabili in due ulteriori variabili: <code>oldPB</code> e <code>oldGB</code></li>
+                <li>In caso di conferma di scarico del materiale da parte del <b>TransportTrolley</b>: <code>oldPB</code> e <code>oldGB</code> saranno aggiornate a <code>currentPB</code> e <code>currentGB</code></li>
+                <li>In caso di errori e mancato scarico del materiale le variabili current</li>
+            </ol>
+        <p>In questo modo il sistema è protetto da eventuali errori nel deposito dei materiali, ma si introducono problemi relativi alla notifica degli errori e ulteriori messaggi di conferma scarico da parte del <b>TransportTrolley</b>.</p>
+        <p>Siccome il committente non specifica possibilità di errori o malfunzionamenti del robot, si consiglia, in caso di errori e malfunzionamenti di interrompere il funzionamento del sistema</p>
+        <tt>Attesa conferma del committente: In caso di errori o malfunzionamenti da parte del Robot, si blocca e termina il sistema per poter permettere interventi di manutenzione.</tt>
+
+
+
 
         <h4>Quando rispondere allo <b>Smart device</b></h4>
             <p>Nell'interazione con il committente, come indicato nello SPRINT-0, si è evidenziato come il <i>Waste Truck</i> sarà libero una volta ricevuta una risposta positiva o negativa. In modo da essere liberato il prima possibile.</p>
@@ -171,6 +187,23 @@ When (Request depositRequest(TYPE, TRUCKLOAD, ID)){
         <h4>Richiesta e Conferma di PickUp</h4>
             <p>La necessità di richiesta e di conferma del <code>pickUp</code> rappresentano un ulteriore <i>Macro Problema</i>, per cui verranno analizzate nel dettaglio nella sezione successiva: <a href="#sec-Int-WS-TT">Interazione WasteService-TransportTrolley</a></p>
 
+
+        <h4>Richieste multiple</h4>
+        <p>Il <b>WasteService</b> da requisito può ricevere una sola richiesta per Truck, ma può ricevere richieste anche mentre il <b>TransportTrolley</b> sta ancora eseguendo la <i>Deposit Action</i> di un materiale.</p>
+        <p>Siccome:</p>
+        <ul>
+            <li>Da requisito, la <i>Deposit Action</i> è gestita dal <b>Transport Trolley</b></li>
+            <li>Il <b>WasteService</b> richiede la <i>Deposit Action</i> al <b>TransportTrolley</b></li>
+            <li>Il <b>WasteService</b> risponde alla request subito dopo il <i>PickUp</i> e rimane libero</li>
+        </ul>
+        <p>La possibilità di ricevere richieste durante l'esecuzione della <i>Deposit Action</i> non influisce sul <b>WasteService</b> ma riguarda il <b>TransportTrolley</b></p>
+        <tt>Il <b>TransportTrolley</b> deve prevedere l'arrivo e la gestione di ulteriori richieste di <i>PickUp</i> da parte del <b>WasteService</b> durante l'esecuzione di una <i>Deposit Action</i>.</tt>
+
+
+
+<!--        <ul>-->
+<!--            <li>Per gestire eventuali casi di richieste ripetute <u>semplicemente si scartano le richieste che arrivano durante la gestione di una richiesta</u></li>-->
+<!--        </ul>-->
 
 
 
