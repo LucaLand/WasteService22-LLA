@@ -261,27 +261,47 @@ Goto waiting
 
         <p>Nella sezione seguente, esaminiamo i vantaggi dell'utilizzo di un sistema basato su coordinate e di uno senza coordinate:</p>
 
-            <ul>Vantaggi dell'utilizzo di un sistema basato su coordinate:
-
+            <ul><h5>Vantaggi dell'utilizzo di un sistema basato su coordinate:</h5></ul>
+				<p>
                 <li>Maggiore flessibilità: Un sistema basato su coordinate offre maggiore flessibilità nel gestire la posizione dei siti.
                 Ad esempio, può adattarsi facilmente se i siti non sono più posizionati agli angoli, se il robot deve seguire un percorso ottimale o se ci sono ostacoli nell'area di servizio.</li>
 
                 <li>Potenziale riutilizzo di moduli esistenti: Utilizzando un sistema basato su coordinate, è possibile sfruttare moduli sviluppati precedentemente come mapper e planner,
                 evitando la necessità di sviluppare nuove soluzioni da zero.</li>
-
-                <ul>Vantaggi dell'utilizzo di un sistema senza coordinate:</ul>
-
+				</p>
+                <ul><h5>Vantaggi dell'utilizzo di un sistema senza coordinate:</h5></ul>
+				<p>
                 <li>Minor complessità e costo inferiore: L'assenza di un sistema basato su coordinate semplifica il design complessivo e riduce i costi associati all'implementazione.</li>
 
                 <li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
                 <li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
             </ul>
+			</p>
         <tt>Dopo un'attenta analisi delle diverse opzioni presentate già nello <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#DepositAction">Sprint0</a> , abbiamo scelto di adottare una soluzione senza l'uso di coordinate, basandoci esclusivamente su una FSM (Finite State Machine), considerando l'importanza e la rilevanza di tale decisione.</tt>
 
 
 
-        <h4>PUNTO 5C : </h4>
-        <tt>
+        <h4>Problema richieste multiple : </h4>
+		<p>
+		Come da requisiti il <b>TransportTrolley</b> può ricevere più richieste durante l'esecuzione della <i>depositAction</i>. 
+		Andiamo ad analizzare due possibili soluzioni per poter gestire richieste multiple.
+		<h5>Soluzione 1: girare indietro</h5>
+		<p>
+		La prima soluzione da noi proposta è quella di far percorrere il percorso alla rovescia al <b>DDR Robot</b>, ossia di far girare quest'ultimo di 180°. Questa soluzione
+		risulta ottimale nel momento in cui il <b>DDR Robot</b> si trova più vicino alla posizione di <b>Indoor</b> rispetto che alla posizione di <b>Home</b>.
+		<h5>Soluzione 2: passare per la home</h5>
+		<p>
+		La seconda soluzione da noi proposta prevede invece di far completare l'intero percorso al <b>DDR Robot</b> al di là delle richieste multiple o della singola richiesta.
+		Attuando questo tipo di soluzione il <b>DDR Robot</b> farà sempre lo stesso percorso, ossia <i>Home</i>-><i>Indoor</i>-><i>PlasticBox</i>-><i>GlassBox</i>-><i>Home</i>.
+		</p>
+		<tt>
+		Da capire se vogliamo attuare una sola delle due soluzione o se rendere configurabile il tutto potendo così scegliere tra le due andando però a considerare anche il punto 
+		successivo che è un requisito del committente ossia quello di far tornare il DDR Robot alla Home una volta terminata la DepositAction.
+		</tt>
+		<h3>Requisiti: problema back to home</h3>
+		<p>
+		</p>
+        <!--<tt>
             Il <b>WasteService</b> può ricevere e gestire una richiesta alla volta mentre il <b>TransportTrolley</b> è abilitato a gestire più richieste di scarico ed è abilitato
             a fare questo tramite la gestione di una coda. Il <b>WasteService</b> può gestire le richieste mentre il <b>TransportTrolley</b> è ancora occupato a gestire l'azione
             di carico/scarico.
@@ -291,7 +311,7 @@ Goto waiting
 
             c.	Può ricevere richieste mentre sta scaricando (2 modi)
                     i.	Facendolo girare in dietro vs passa per la home (analizzaimo entrambi e possiamo implementare entrambi, configurabile)
-        </tt>
+        </tt>-->
 
 
 
