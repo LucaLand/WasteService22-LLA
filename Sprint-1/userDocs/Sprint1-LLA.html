@@ -103,14 +103,16 @@
             <li>BasicRobot22</li>
         </ul>
         <p>Per quanto riguarda lo <code><i>SmartDevice</i></code> e il <code><i>BasicRobot22</i></code> sono già stati definiti precedentemente per quello non verranno analizzati.</p>
-        <p>Diamo quindi una prima organizzazione e divisione dei compiti tra i quattro componenti:</p>
+        <h4>Macro analisi delle funzionalità:</h4> <!-- e divisione dei compiti tra i componenti:</p> -->
         <ol>
             <li>Il <b>WasteService</b> prende le richieste dello <i>SmartDevice</i> e in base alla capienza dei Box le accetta o rifiuta.</li>
-            <li>In caso di accettazione il <b>WasteServcie</b> comunica con il <b>Transport Trolley</b> richiedendo il <i>PickUp</i> dei rifiuti dal camion e lo scarico degli stessi in un determinato tipo di Box.</li>
+            <li>Il <b>WasteServcie</b> comunica con il <b>Transport Trolley</b> richiedendo il <i>PickUp</i> dei rifiuti dal camion e lo scarico degli stessi in un determinato tipo di Box, in caso di richieste accettate.</li>
             <li>Il <b>Transport Trolley</b> gestirà le richieste di <i>pickUp</i> del <b>WasteService</b> inviando comandi per muovere il <b>BasicRobot22</b> per raggiungere le posizioni desiderate.</li>
             <li>Il <b>Transport Trolley</b> prevede l'invio di una conferma di <i>PickUp</i> al <b>WasteService</b> non appena avrà terminato il <i>pickUp</i>.</li>
             <li>Il <b>Transport Trolley</b> deve prevedere la gestione di richieste di scarico mentre sta ancora eseguendo una <i>Deposit Action</i>.</li>
         </ol>
+
+
 
         <h3>3 - Gestione delle richieste</h3>
 		<p>
@@ -229,6 +231,7 @@ evitando la necessità di sviluppare nuove soluzioni da zero.</li>
         <br>
         <br>
         <br>
+        <h3></h3>
 <h3>Wasteservice</h3>
 
     <h4>Quando rispondere allo <b>Smart device</b>?</h4>
