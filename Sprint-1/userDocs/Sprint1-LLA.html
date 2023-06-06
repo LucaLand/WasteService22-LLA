@@ -70,7 +70,7 @@
             <br>
 
             <h4>Focus Sprint-1</h4>
-            <p>Focus Sprint-1</p>
+            <p>[Focus Sprint-1]</p>
             <img src="img/Spint-1_Focus_Initial.png" alt="Architecture Focus Sprint-1" style="width: 80%">
         </div>
 
@@ -114,7 +114,7 @@
 
 
 
-    <h3 id="sec-GestioneRichieste">3 - Analisi Gestione delle richieste</h3>
+    <h3 id="sec-GestioneRichieste">3 - (<b>WasteService</b>) Analisi Gestione delle richieste</h3>
         <ul class="note">
             <li>Possibilità di Richieste Ripetute --> ID?</li>
             <li>Quando e come rispondere allo SmartDevice (in base al carico e dopo la conferma di PickUp</li>
@@ -127,6 +127,9 @@ Request depositRequest	: 	depositRequest(TYPE, TRUCKLOAD, ...)
 Reply loadaccept	: 	loadaccept(...)
 Reply loadrejecetd	: 	loadrejecetd(...)
         </code></pre>
+
+        <img src="img/WasteTruckRequest_Architecture.png" alt="WasteTruckRequest Arch" style="width: 500px">
+
         <p>Si evidenziano i seguenti problemi da anlizzare:</p>
         <ul>
             <li><b>Logica di gestione delle richieste</b></li>
@@ -153,7 +156,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD, ID)){
     }
 }
             </code></pre>
-
+            <img src="img/WasteService_SmartDevice_Interaction.png" alt="WasteTruckRequest Interaction">
             <tt>Il <b>WasteService</b> deve dunque richiedere il <i>PickUp</i> del materiale al <b>TransportTrolley</b></tt>
 
         <h4>Aggiornamento e gestione delle variabili di stato dei Box</h4>
@@ -212,7 +215,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD, ID)){
 
 <!--        ----------        -->
     <h3 id="sec-Int-WS-TT">4 - Interazione WasteService e TransportTrolley</h3>
-        <p>Come evidenziato nella sezione precedente (<a href="#sec-GestioneRichieste">Gestione Delle Richieste</a>) vi è la necessità di alemno due interazioni tra il <b>WasteService</b> ed il <b>TransportTrolley</b>.</p>
+        <p>Come evidenziato nella sezione precedente (<a href="#sec-GestioneRichieste">Gestione Delle Richieste</a>) vi è la necessità di interazione tra il <b>WasteService</b> ed il <b>TransportTrolley</b>.</p>
 
         <p>Il <b>WasteService</b>, una volta gestita positivamente la richiesta che arriva dallo <b>Smart Device</b>, agisce in maniera sequenziale verso il <b>Transport Trolley</b> mandando una request di Pickup
         del carico trasportato dal <b>WasteTruck</b>. Il <b>WasteService</b> sarà abilitato anche a ricevere una reply da parte del <b>TransportTrolley</b> che sancisce la fine dell'azione di
