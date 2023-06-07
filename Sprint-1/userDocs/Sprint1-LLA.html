@@ -275,44 +275,74 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 
-<!--        ----------        -->
-    <h3 id="sec-Int-WS-TT">4 - Interazione WasteService e TransportTrolley</h3>
+<!--        -----4-----        -->
+    <h3 id="sec-Int-WS-TT">4 - Interazione <b>WasteService</b> e <b>TransportTrolley</b></h3>
         <p>Come evidenziato nella sezione precedente (<a href="#sec-GestioneRichieste">Gestione Delle Richieste</a>) vi è la necessità di interazione tra il <b>WasteService</b> ed il <b>TransportTrolley</b>.</p>
 
-        <p>Il <b>WasteService</b>, una volta gestita positivamente la richiesta che arriva dallo <b>Smart Device</b>, agisce in maniera sequenziale verso il <b>Transport Trolley</b> mandando una request di Pickup
-        del carico trasportato dal <b>WasteTruck</b>. Il <b>WasteService</b> sarà abilitato anche a ricevere una reply da parte del <b>TransportTrolley</b> che sancisce la fine dell'azione di
-        carico e permette al <b>WasteService</b> di mandare via il <b>WasteTruck</b> il prima possibile.
-        Se la richiesta di scarico viene rifiutata, il <b>WasteService</b> resta in attesa per nuove richieste, anche se il trolley sta ancora depositando.
+        <h4>Richiesta e Conferma <i>PickUp</i></h4>
+            <p>Le interazioni necessarie secondo l'analisi della <a href="#sec-GestioneRichieste">sezione precedente</a> sono:</p>
+            <ul>
+                <li>Richiesta di <i>PickUp</i> del <b>WasteService</b> al <b>TransportTrolley</b></li>
+                <li>Conferma di <i>PickUp</i> del <b>TransportTrolley</b> al <b>WasteService</b></li>
+            </ul>
 
-		   <pre><code>
-Request PickupReq	:	PickupReq(...)
-Reply   PickupOK	:	PickupOk(...)
+            <p>Essendo:</p>
+            <ul>
+                <li>L'interazione composta da una richiesta e una conferma obbligatoria</li>
+                <li>Ed essendo il <b>WasteService</b> non implicato in ulteriori operazioni durante l'attesa della risposta</li>
+            </ul>
+            <tt>L'interazione verrà modellata come una <b><i>Request / Response</i></b>.
+                <pre><code>
+ Request   pickupReq   :   pickupReq(...)
+ Reply     pickupOk    :   pickupOk(...)
+                </code></pre>
+            </tt>
+            <img src="img/WasteService_TransportTrolley_Int.png" alt="WasteService-TransportTrolley Arch">
+
+            <p>Avendo poi <u>delegato</u> l'operazione di <i>Deposit Action</i> al <b>TransportTrolley</b>, questo continuerà la <i>Deposit Action</i> dopo aver scaricato il materiale e aver inviato la <code>PickupOk</code> al <b>WasteServide</b>.
+            <br>Questo è possibile in quanto la richiesta di scarico dello <b>SmartDevice</b> è stata già approvata e non sono necessarie operazioni intermedie.</p>
+            <p>Dunque il <b>WasteService</b> sarà libero di gestire ulteriori richieste mentre il <b>TransportTrolley</b> continua nel deposito dei materiali.</p>
+            <tt>
+                <p>Per permettere al <b>TransportTrolley</b> di continuare nell'operazione di Deposito, modelleremo la richiesta con i seguenti parametri:</p>
+                <ul>
+                    <li><code>TYPE</code>: Necessario per indicare al <b>TransportTrolley</b> dove scaricare i materiali</li>
+                    <li><code>ID</code>: Per identificare le richieste e rendere più facile la gestione delle stesse in modifiche future</li>
+                </ul>
+                <pre><code>
+ Request  pickupReq   :   pickupReq(ID, TYPE)
+ Reply    pickupOK    :   pickupOk(ID)
+                </code></pre>
+            </tt>
 
 
-State requestRejected {
-	replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
-	println("\t $name: Request -$ID- Refused!") color green
-}
-Goto waiting
-
-State pickingUp {
-	println("\t $name: Request -$ID- Accepted!") color green
-	println("\t $name: Picking Up...") color green
-	delay 7000
-}
-Goto pickupOk
-
-State pickupOk {
-	println("\t $name: PickupOK received! Truck ${payloadArg(0)} can go away!") color green
-	replyTo depositRequest with loadaccept : loadaccept($ID)
-	println("Depositing waste...")
-}
-Goto waiting
-//Ritorna a Waiting per attendere nuove richieste, anche se il trolley sta ancora depositando
-}
+<div class="remark remark2">
+    <span>Evoluzione del modello in qak del <b>WasteService</b>:</span>
+            <pre><code>
+ State pickingUp {
+    //Requesting PickUp to TransportTrolley
+    println("\t $name: Requesting Picking Up...") color green
+    request transporttrolley -m pickupReq : pickupReq(ID, Type)
+ } Transition t1 whenReply pickupOK -> pickupOk
             </code></pre>
 
+    <span>Evoluzione del modello in qak del <b>TransportTrolley</b>:</span>
+    <pre><code>
+        
+    </code></pre>
+    <!-- TODO. aggiungere qak del transport trolley -->
+</div>
 
+        <p>Interazione completa (in caso di richiesta accettata):</p>
+        <img src="img/WasteTruckRequest_Complete_Accept.png" alt="WasteTruckRequest complete interaction of accepted request" style="width: 800px">
+
+
+
+<!---->
+        <h4>[<i>Attesa Conferma Committente</i>] Conferma deposito (Evoluzine della gestione degli errori in scarico)</h4>
+
+
+
+<!--   --------5-------   -->
     <h3>5 - Problema del Movimento</h3>
         <h4>Il problema della navigazione: </h4>
             <tt>Uso di un sistema di coordinate  o  boundary walker che raggiunge gli angoli rilevando il contatto con i muri?</tt>

@@ -262,6 +262,10 @@ dt {
 
 .remark.remark2, .remark2 {
     background-color: #c3fbe8;
+    border: 2px solid #d5f2ed;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 25px;
 }
 
 .note {
