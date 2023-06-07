@@ -321,8 +321,8 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
             </tt>
 
 
-<div class="remark remark2">
-    <span>Evoluzione del modello in qak del <b>WasteService</b>:</span>
+        <div class="remark remark2">
+            <span>Evoluzione del modello in qak del <b>WasteService</b>:</span>
             <pre><code>
  State pickingUp {
     //Requesting PickUp to TransportTrolley
@@ -331,16 +331,35 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
  } Transition t1 whenReply pickupOK -> pickupOk
             </code></pre>
 
-    <span>Evoluzione del modello in qak del <b>TransportTrolley</b>:</span>
-    <pre><code>
-        
-    </code></pre>
-    <!-- TODO. aggiungere qak del transport trolley -->
+            <span>Evoluzione del modello in qak del <b>TransportTrolley</b>:</span>
+            <pre><code>
+ State waiting {
+    ...
+ } Transition t0 whenRequest pickupReq -> handlePickupReq
+            </code></pre>
+
+            <pre><code>
+ State handlePickupReq {
+        onMsg(pickupReq : pickupReq(ID, TYPE)){
+            println("\t $name: pickupRequest received!") color blue
+        }
+ } Goto pickUp
+            </code></pre>
+
+            <pre><code>
+ State pickUp {
+    //Sending messages to move BasicRobot22 into Indoor
+    println("\t $name: Going to Indoor!") color blue
+    ...
+    //Sending pikcup finished
+    println("\t $name: Pickup Finished!") color blue
+    <q>replyTo pickupReq with pickupOk : pickuoOk(0) caller== wasteservice</q>
+ } Goto deposit
+            </code></pre>
 </div>
 
         <p>Interazione completa (in caso di richiesta accettata):</p>
         <img src="img/WasteTruckRequest_Complete_Accept.png" alt="WasteTruckRequest complete interaction of accepted request" style="width: 800px">
-
 
 
 <!---->
