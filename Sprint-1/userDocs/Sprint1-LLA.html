@@ -367,6 +367,61 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 
+
+
+<!--  --------5--------  -->
+    <h3>Analisi <b>TransportTrolley</b></h3>
+        <h4>Delega Deposit Action</h4>
+            <p>La <i>Deposti Action</i> definita nello Sprint-0 come la sequenza di operazioni:</p>
+            <ul>
+                <li><b>PickUp</b></li>
+                <li><b>Deposit</b></li>
+                <li><b>Return Home</b></li>
+            </ul>
+            <p>Come analizzato nella <a href="#sec-Int-WS-TT">sezione precedente</a> questa viene <u>delegata</u> dal <b>WasteService</b> tramite la richietsa di <i>PickUp</i>.
+            Passando anche il parametro di <code>TYPE</code> del materiale, in modo che il <b>TransportTrolley</b>, una volta completato il <i>PickUp</i> possa proseguire autonomamente con la <i>Deposit</i></p>
+
+            <p>Vengono quindi instanziate le variabili: </p>
+            <pre><code>
+ var ID
+ var MaterialType
+            </code></pre>
+            <ul>
+                <li><code>ID</code>: per tenere traccia di quale richiesta si sta eseguendo</li>
+                <li><code>MaterialType</code>: per gestire dove scaricare i rifiuti una volta raccolti</li>
+            </ul>
+
+            <p>Queste vengono aggiornate ad ogni richiesta <code>pickupReq(ID, TYPE)</code> ricevuta, con i parametri della richiesta:</p>
+            <pre><code>
+ onMsg(pickupReq : pickupReq(ID, TYPE)){
+    [#
+        ID = payloadArg(0)
+        MaterialType = payloadArg(1)
+    #]
+    println("\t $name: pickupRequest received! ($ID, $MaterialType)") color blue
+ }
+            </code></pre>
+
+        <p>La <i>Deposit</i> verrà dunque poi gestita in base al tipo di materiale:</p>
+        <pre><code>
+ State deposit {
+    if[# materialType == "plastic" #]{
+        //Goto PlasticBox
+        println("\t $name: Going to PlasticBox!") color blue
+        ...
+    }
+
+    if[# materialType == "glass" #]{
+        //Goto GlassBox
+        println("\t $name: Going to GlassBox!") color blue
+        ...
+    }
+ }
+        </code></pre>
+
+        <h4>Problema del movimento/Invio comandi al BasicRobot22</h4>
+
+
 <!--   --------5-------   -->
     <h3>5 - Problema del Movimento</h3>
         <h4>Il problema della navigazione: </h4>
