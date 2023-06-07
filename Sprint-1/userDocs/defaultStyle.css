@@ -80,6 +80,10 @@ code {
     font-size: 102%;
 }
 
+span {
+    font-size: 1.02em;
+}
+
 
 /* ---- CUSTOM TAGS ----*/
 tt {

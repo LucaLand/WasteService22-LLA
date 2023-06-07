@@ -114,18 +114,13 @@
 
 
 
-    <h3 id="sec-GestioneRichieste">3 - (<b>WasteService</b>) Analisi Gestione delle richieste</h3>
-        <ul class="note">
-            <li>Possibilità di Richieste Ripetute --> ID?</li>
-            <li>Quando e come rispondere allo SmartDevice (in base al carico e dopo la conferma di PickUp</li>
-            <li>Nuovo Problema: richiesta di PickUp del materiale al <r>TT</r> e bisogno di una conferma del PickUp dal <r>TT</r></li>
-        </ul>
+    <h3 id="sec-GestioneRichieste">3 - <b>WasteService</b>: Analisi Gestione delle richieste</h3>
 
         <p>Dati i messaggi definiti da requisito nello Sprint-0:</p>
         <pre><code>
-Request depositRequest	: 	depositRequest(TYPE, TRUCKLOAD, ...)
-Reply loadaccept	: 	loadaccept(...)
-Reply loadrejecetd	: 	loadrejecetd(...)
+ Request depositRequest	: 	depositRequest(TYPE, TRUCKLOAD, ...)
+ Reply loadaccept	: 	loadaccept(...)
+ Reply loadrejecetd	: 	loadrejecetd(...)
         </code></pre>
 
         <img src="img/WasteTruckRequest_Architecture.png" alt="WasteTruckRequest Arch" style="width: 500px">
@@ -148,7 +143,7 @@ Reply loadrejecetd	: 	loadrejecetd(...)
 
             <p>Pseudo codice di gestione delle richieste:</p>
             <pre><code>
-When (Request depositRequest(TYPE, TRUCKLOAD, ID)){
+When (Request depositRequest(TYPE, TRUCKLOAD)){
     if(contGB OR  contPB + TRUCKLOAD) > MAXGB OR MAXPB{
         Reply loadrejecetd
     }else{
@@ -156,9 +151,44 @@ When (Request depositRequest(TYPE, TRUCKLOAD, ID)){
     }
 }
             </code></pre>
-            <img src="img/WasteService_SmartDevice_Interaction.png" alt="WasteTruckRequest Interaction">
-            <tt>Il <b>WasteService</b> deve dunque richiedere il <i>PickUp</i> del materiale al <b>TransportTrolley</b></tt>
 
+        <img src="img/WasteService_SmartDevice_Interaction.png" alt="WasteTruckRequest Interaction">
+
+        <div class="remark remark2">
+            <span>Formalizzando in linguaggio qak, si traduce nella seguente evoluzione dello stato del <b>WasteService</b>:</span>
+            <pre><code>
+ State requestHandling {
+    ...
+    onMsg(depositRequest : depositRequest(ID, T, L)){
+        [# Type = payloadArg(0)
+            TruckLoad = payloadArg(1).toInt() #]
+        println("Request: ($ID, $Type, $TruckLoad)") color green
+        if[# Type == "plastic" #]{
+            if[# (currentPB + TruckLoad) < MAXPB #]{
+                [# accepted = true #]
+            }
+        }if[# Type == "glass" #]{
+            if[# (currentGB + TruckLoad) < MAXGB #]{
+                [# accepted = true #]
+            }
+        }
+    }
+ } Goto requestAccepted if[# accepted == true #] else requestRejected
+            </code></pre>
+
+            <pre><code>
+ State requestAccepted {
+    //Requesting PickUp to TransportTrolley
+    println("\t $name: Requesting Picking Up...") color green
+ }
+            </code></pre>
+        </div>
+
+        <tt>Il <b>WasteService</b> deve dunque richiedere il <i>PickUp</i> del materiale al <b>TransportTrolley</b></tt>
+
+
+
+<!---->
         <h4>Aggiornamento e gestione delle variabili di stato dei Box</h4>
             <p>Le variabili <code>currentPB</code> e <code>currentGB</code> vanno aggiornate per la corretta gestione delle richieste.</p>
             <p>Siccome il <b>WasteService</b> può ricevere richieste anche prima che la <i>Deposit Action</i> sia stata completata, si evidenzia la seguente soluzione:</p>
@@ -170,23 +200,55 @@ When (Request depositRequest(TYPE, TRUCKLOAD, ID)){
                 <li>In caso di errori e mancato scarico del materiale le variabili current</li>
             </ol>
         <p>In questo modo il sistema è protetto da eventuali errori nel deposito dei materiali, ma si introducono problemi relativi alla notifica degli errori e ulteriori messaggi di conferma scarico da parte del <b>TransportTrolley</b>.</p>
-        <p>Siccome il committente non specifica possibilità di errori o malfunzionamenti del robot, si consiglia, in caso di errori e malfunzionamenti di interrompere il funzionamento del sistema</p>
-        <tt>Attesa conferma del committente: In caso di errori o malfunzionamenti da parte del Robot, si blocca e termina il sistema per poter permettere interventi di manutenzione.</tt>
+        <p>Siccome il committente non specifica possibilità di errori o malfunzionamenti del robot, si consiglia, in caso di errori e malfunzionamenti di interrompere il funzionamento del sistema, senza la gestione delle variabili in caso di eventuali situazioni di errore.</p>
 
 
 
+        <div class="remark remark2">
+            <span>Formalizzazione in QAK:</span>
+            <pre><code>
+     State requestAccepted {
+            println("\t $name: Request -$ID- Accepted!") color green
+            if[# Type == "plastic" #]{
+                [# currentPB += TruckLoad #]
+            }
+            if[# Type == "glass" #]{
+                [# currentGB += TruckLoad #]
+            }
+        } Goto pickingUp
+            </code></pre>
+        </div>
 
+        <tt>Attesa conferma del committente: In caso di errori o malfunzionamenti da parte del Robot, il sistema si blocca e termina per poter permettere interventi di manutenzione.<br>
+            - Non verranno dunque considerate situazioni di gestione di errori dopo l'accettazione di una richiesta</tt>
+
+
+
+<!---->
         <h4>Quando rispondere allo <b>Smart device</b></h4>
             <p>Nell'interazione con il committente, come indicato nello SPRINT-0, si è evidenziato come il <i>Waste Truck</i> sarà libero una volta ricevuta una risposta positiva o negativa. In modo da essere liberato il prima possibile.</p>
             <p>In caso di <code><b>loadrejected</b></code>:</p>
                 <ul><li>La risposta viene inviata, come già descritto sopra, non  appena ci si accorge che non può essere accolta.</li></ul>
+            <pre><code>
+ State requestRejected {
+    replyTo depositRequest with loadrejecetd : loadrejecetd(0)
+    println("\t $name: Request -$ID- Refused!") color green
+ } Goto waiting
+            </code></pre>
             <p>Nel caso di <code><b>loadaccepted</b></code>:</p>
                 <ul><li>La risposta deve essere inviata dopo che il <b>TransportTrolley</b> ha terminato il <i>PickUp</i></li></ul>
-
+            <pre><code>
+ State pickupOk {
+    println("\t $name: Pickup finished! Truck ($ID) can go away!") color green
+    replyTo depositRequest with loadaccept : loadaccept(0)
+ } Goto waiting
+            </code></pre>
         <tt>Si necessità di una conferma del <i>PickUp</i> del <b>TransportTrolley</b> al <b>WasteService</b></tt>
 
 
 
+
+<!---->
         <h4>Richiesta e Conferma di PickUp</h4>
             <p>La necessità di richiesta e di conferma del <code>pickUp</code> rappresentano un ulteriore <i>Macro Problema</i>, per cui verranno analizzate nel dettaglio nella sezione successiva: <a href="#sec-Int-WS-TT">Interazione WasteService-TransportTrolley</a></p>
 
