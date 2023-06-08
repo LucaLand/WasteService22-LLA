@@ -496,11 +496,47 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 <!---->
         <h4>Logica di Navigazione</h4>
             <p>Data la scelta di adottare un sistema senza coordinate, nasce il problema della navigazione del <i>Robot</i> tra le 4 posizioni salienti.</p>
+            <p>Visti i percorsi effettuabili nello <a>Sprint-0</a></p>
+            <img src="" alt="">
+            <p>Considerando le posizioni ordinate in senso antiorario: <code>Home, Indoor, PlasticBox, GlassBox</code>.</p>
+            <p>L'implementazione per la navigazione ordinata tra queste avverà con la seguente logica:</p>
+            <ul>
+                <li>Il robot si muove in avanti finché non rileva il muro</li>
+                <li>Il robot si ruota di 90° verso sinistra</li>
+                <li>Ripetere per la prossima posizione saliente</li>
+            </ul>
+        <p>Questo ci permette di visitare in ordine le posizioni <code>Home, Indoor, PlasticBox, GlassBox</code>.</p>
+        <img src="img/" alt="">
 
 
 
 <!---->
         <h4>Astrazione della navigazione per il <b>TransportTrolley</b></h4>
+            <p>Date le scelte sulla rappresentazione delle posizioni, il <b>TransportTrolley</b> navigherà solo sulla base delle 4 psizioni salienti:</p>
+            <p>Presentiamo varie soluzioni:</p>
+            <ol>
+                <li>Il <b>TransportTrolley</b> implementerà la logica di moviemento tra le 4 posizioni</li>
+                <li>Il <b>TransportTrolley</b> astrarrà dall'implementazione dei percorsi</li>
+            </ol>
+        <p>Per una più corretta progettazione e implementazione del codice decidiamo di astrarre il componente <b>TransportTrolley</b> dalla logica implementativa della navigazione.</p>
+
+        <p>Il <b>TransportTrolley</b> si occuperà dunque solo di:</p>
+        <ul>
+            <li><i>Conoscere</i> la posizione in cui si trova</li>
+            <li><i>Indicare</i> la posizione da raggiungere</li>
+        </ul>
+
+        <tt>
+            <p>Per fare ciò si introducono due messaggi che il <b>TransportTrolley</b> invierà con semantica <i>Request/Response</i>:</p>
+            <pre><code>
+ Request move           :   move(CurrentPos, NewPos)
+ Reply   moveComplete   :   moveComplete(NewPos)
+            </code></pre>
+        </tt>
+        <tt>
+            Vista l'astrazione introdotta risulta necessaria l'introduzione di un <b>nuovo componente</b> <i>mediatore</i> tra il <b>TransportTrolley</b> e il <b>BasicRobot22</b>.<br>
+            Che enalizzeremo nella <a href="#sec-6">Macro-Sezione Successiva</a>
+        </tt>
 
 
 
@@ -543,7 +579,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 
-	<h3>6 - Interazione TT e BasicRobot22</h3>
+	<h3 id="sec-6">6 - Interazione TT e BasicRobot22</h3>
 	 <p>Il <b>TransportTrolley</b> si occuperà di far muovere il robot per il carico/scarico dei rifiuti. Per la messa in azione del robot è possibile 
 		riutilizzare il software già sviluppato per eseguire il path trovato (unibo.pathexecutor) e quindi il <b>TransportTrolley</b> incaricherà il robot 
 		del percorso da compiere mediante il riutilizzo di questo software.

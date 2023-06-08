@@ -95,6 +95,7 @@ tt {
     border-radius: 10px;
     background-color: rgba(134, 211, 222, 0.45);
     border: solid rgba(0, 119, 255, 0.47) 1px;
+    margin: 10px 0;
 }
 
 r {
