@@ -511,14 +511,15 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		<p>
 		La prima soluzione da noi proposta è quella di far percorrere il percorso alla rovescia al <b>DDR Robot</b>, ossia di far girare quest'ultimo di 180°. Questa soluzione
 		risulta ottimale nel momento in cui il <b>DDR Robot</b> si trova più vicino alla posizione di <b>Indoor</b> rispetto che alla posizione di <b>Home</b>.
-		<h5>Soluzione 2: passare per la home</h5>
+		<h5>Soluzione 2: passare per la Home</h5>
 		<p>
 		La seconda soluzione da noi proposta prevede invece di far completare l'intero percorso al <b>DDR Robot</b> al di là delle richieste multiple o della singola richiesta.
 		Attuando questo tipo di soluzione il <b>DDR Robot</b> farà sempre lo stesso percorso, ossia <i>Home</i>-><i>Indoor</i>-><i>PlasticBox</i>-><i>GlassBox</i>-><i>Home</i>.
 		</p>
 		<tt>
-		Da capire se vogliamo attuare una sola delle due soluzione o se rendere configurabile il tutto potendo così scegliere tra le due andando però a considerare anche il punto 
-		successivo che è un requisito del committente ossia quello di far tornare il DDR Robot alla Home una volta terminata la DepositAction.
+		La scelta tra una soluzione e l'altra non influisce sull'architettura del sistema per le scelte progettuali effettuate, quindi possono essere implementate entrambe
+		configurandole a livello applicativo.
+		
 		</tt>
 
         <!--<tt>
