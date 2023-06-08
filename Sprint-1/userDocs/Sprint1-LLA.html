@@ -531,8 +531,8 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <tt>
             <p>Per fare ciò si introducono due messaggi che il <b>TransportTrolley</b> invierà con semantica <i>Request/Response</i>:</p>
             <pre><code>
- Request move           :   move(CurrentPos, NewPos)
- Reply   moveComplete   :   moveComplete(NewPos)
+ Request move        :    move(CurrentPos, NewPos)
+ Reply   moveDone    :    moveDone(NewPos)
             </code></pre>
         </tt>
         <tt>
@@ -594,7 +594,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		Come già anticipato,andrà aggiunto questo nuovo componente custom nel contesto <i>ctxwasteservice</i> che fa da tramite per l'interazione tra <b>TransportTrolley</b> e <b>BasicRobot</b> e l'architettura risulterà come segue:
 		
 		<div>
-		<img src="img/.png" alt="General Architecture with new custom component" style="width: 800px">
+		<img src="" alt="General Architecture with new custom component" style="width: 800px">
 		</div>
 		
 		
@@ -613,7 +613,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <div class="remark" style="background-color: #c3fbe8;">
             <h3>Riassunto situazione attuale:</h3>
             <h4>Architettura logica:</h4>
-            <img src="./img/Logical_Architecture_complete_v2.png" alt="General Logical Architecture">
+            <img src="" alt="General Logical Architecture">
             <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
             <h4>QAK</h4>
             <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Logical_Architecture_QAK/src/Logical_Architecture_Local.qak">Modello del sistema QAK</a> <br>
