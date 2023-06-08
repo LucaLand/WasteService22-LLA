@@ -508,7 +508,10 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <h4>Problema richieste multiple : </h4>
 		<p>
 		Come da requisiti il <b>TransportTrolley</b> può ricevere più richieste durante l'esecuzione della <i>depositAction</i>. 
-		Andiamo ad analizzare due possibili soluzioni per poter gestire richieste multiple.
+		Le richieste possono arrivare in due momenti, quando il <b>DDR Robot</b> è in movimento o quando sta effettuando l'operazione di deposito in uno dei due box.
+		Non essendoci vincoli da requisiti, la scelta progettuale che ci è parsa più conveniente è quella di far arrivare il <b>DDR Robot</b> alla prossima posizione anche se 
+		quest'ultimo riceve richieste mentre è in movimento.
+		Andiamo ora ad analizzare due possibili soluzioni per poter gestire richieste multiple.
 		<h5>Soluzione 1: girare indietro</h5>
 		<p>
 		La prima soluzione da noi proposta è quella di far percorrere il percorso alla rovescia al <b>DDR Robot</b>, ossia di far girare quest'ultimo di 180°. Questa soluzione
