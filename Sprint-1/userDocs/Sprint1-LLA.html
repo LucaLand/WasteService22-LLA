@@ -419,11 +419,27 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
  }
         </code></pre>
 
-        <h4>Problema del movimento/Invio comandi al BasicRobot22</h4>
 
 
-<!--   --------5-------   -->
-    <h3>5 - Problema del Movimento</h3>
+
+
+
+
+    <h3>5 - Analisi Movimento</h3>
+        <p>Il <b>TransportTrolley</b> da requisiti si occuperà di muovere il robot fisico.</p>
+        <p>Analizziamo qui dunque il Macro-Problema della logica di movimento.</p>
+        <div class="note">
+            <ul>
+                <li>Rappresentazione della posizione nella <i>Service Area</i></li>
+                <li>Navigazione</li>
+                <li>Astrazione del Movimento per il TransportTrolley</li>
+                <li>Problema comandi al <i>DDR Robot</i></li>
+                <li>Richieste Multiple durante l'esecuzione</li>
+            </ul>
+        </div>
+
+        <h4>Astrazione Del Movimento</h4>
+
         <h4>Il problema della navigazione: </h4>
             <tt>Uso di un sistema di coordinate  o  boundary walker che raggiunge gli angoli rilevando il contatto con i muri?</tt>
 
