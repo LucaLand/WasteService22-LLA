@@ -430,17 +430,18 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <p>Analizziamo qui dunque il Macro-Problema della logica di movimento.</p>
         <div class="note">
             <ul>
+                <li>Delega Deposit Action</li>
                 <li>Rappresentazione della posizione nella <i>Service Area</i></li>
                 <li>Navigazione</li>
                 <li>Astrazione del Movimento per il TransportTrolley</li>
-                <li>Problema comandi al <i>DDR Robot</i> <b>Sec-6</b></li>
-                <li>Delega Deposit Action</li>
                 <li>Richieste Multiple durante l'esecuzione</li>
+            <ul>
                 <ul>
                     <li>Gestione richieste mentre sta scaricando</li>
                     <li>Problema gestione richieste in movimento (gestire tornare in dietro oppure no?)</li>
                     Farla gestire dalla prossima posizione utile.
                 </ul>
+                <li>Problema comandi al <i>DDR Robot</i> <b>Sec-6</b></li>
             </ul>
         </div>
 
@@ -457,9 +458,9 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <p>Il <i>Robot</i> dovrà quindi eseguire spostamenti di grandezza <code>RD</code> denominabili <i>Step</i>.</p>
         <p>Così facendo la posizine del Robot sarà individuabile in ogni momento come coppia ordinata di numeri. () </p>
         <pre><code>
-            pos = (x,y)
+ pos = (x,y)
         </code></pre>
-        <img src="img/ServiceArea_with_Coords" alt="">
+        <img src="img/ServiceAreaPosition-Coords.png" alt="" style="width: 500px">
         <p>Vantaggi:</p>
         <ul>
             <li>Maggiore flessibilità: Un sistema basato su coordinate offre maggiore flessibilità nel gestire la posizione dei siti.
@@ -476,6 +477,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
             <li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
             <li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
         </ul>
+        <img src="img/ServiceAreaPosition-4.png" alt="" style="width: 400px">
 
         <p>Assunto che: (dallo Sprint-0)</p>
         <ul>
@@ -486,7 +488,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <tt>La soluzione scelta è quella di un sistema di rappresentazione <b>senza coordinate</b>. Dati i vantaggi evidenziati.<br>
             Si mappa dunque la posizione tramite le <i>posizioni salienti</i>:
             <pre><code>
-                Enum Position = {Indoor, PlasticBox, GlassBox, Home}
+ Enum Position = {Indoor, PlasticBox, GlassBox, Home}
             </code></pre>
         </tt>
 
@@ -519,7 +521,6 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		<tt>
 		La scelta tra una soluzione e l'altra non influisce sull'architettura del sistema per le scelte progettuali effettuate, quindi possono essere implementate entrambe
 		configurandole a livello applicativo.
-		
 		</tt>
 
         <!--<tt>
@@ -561,22 +562,10 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 <!-- ------------------------------------------------------ -->
 <h2>Modello Eseguibile</h2>
         <ul>
+            <li>Componenti</li>
             <li>Interfacce (Messaggi scambiati)</li>
             <li>Modello Eseguibile QAK</li>
         </ul>
-    <h3>Wasteservice</h3>
-
-
-
-    <br>
-    <h3>Transport trolley</h3>
-        <p>L'interfaccia del transporttrolley risulta quindi essere la seguente:</p>
-        <pre><code>
-    //Req from WasteService
-    Request pickupReq : pickupReq(ID, T)	//Richiesta di pickup di un relativo materiale
-    Reply pickupOk : pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
-        </code></pre>
-        Si veda il file <a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak"> Metamodello QAK TransportTrolley</a></b>.
 
         <div class="remark" style="background-color: #c3fbe8;">
             <h3>Riassunto situazione attuale:</h3>
