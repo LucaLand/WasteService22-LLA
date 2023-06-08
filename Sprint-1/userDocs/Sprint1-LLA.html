@@ -303,7 +303,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
  Reply     pickupOk    :   pickupOk(...)
                 </code></pre>
             </tt>
-            <img src="img/WasteService_TransportTrolley_Int.png" alt="WasteService-TransportTrolley Arch">
+            <img src="img/WasteService_TransportTrolley_Interaction.png" alt="WasteService-TransportTrolley Arch" style="width: 400px">
 
             <p>Avendo poi <u>delegato</u> l'operazione di <i>Deposit Action</i> al <b>TransportTrolley</b>, questo continuerà la <i>Deposit Action</i> dopo aver scaricato il materiale e aver inviato la <code>PickupOk</code> al <b>WasteServide</b>.
             <br>Questo è possibile in quanto la richiesta di scarico dello <b>SmartDevice</b> è stata già approvata e non sono necessarie operazioni intermedie.</p>
@@ -357,6 +357,8 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
  } Goto deposit
             </code></pre>
 </div>
+        <p>Architettura</p>
+        <img src="img/Logical_Architecture_Sprint1-1.png" alt="">
 
         <p>Interazione completa (in caso di richiesta accettata):</p>
         <img src="img/WasteTruckRequest_Complete_Accept.png" alt="WasteTruckRequest complete interaction of accepted request" style="width: 800px">
@@ -506,7 +508,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
                 <li>Ripetere per la prossima posizione saliente</li>
             </ul>
         <p>Questo ci permette di visitare in ordine le posizioni <code>Home, Indoor, PlasticBox, GlassBox</code>.</p>
-        <img src="img/" alt="">
+<!--TODO        <img src="" alt="">-->
 
 
 
@@ -535,8 +537,10 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         </tt>
         <tt>
             Vista l'astrazione introdotta risulta necessaria l'introduzione di un <b>nuovo componente</b> <i>mediatore</i> tra il <b>TransportTrolley</b> e il <b>BasicRobot22</b>.<br>
-            Che enalizzeremo nella <a href="#sec-6">Macro-Sezione Successiva</a>
+            Che enalizzeremo nella <a href="#sec-6">Macro-Sezione Successiva</a>.
+            <img src="img/TransportTrolley_BasicRobot_Interaction.png" alt="" style="width: 550px">
         </tt>
+        
 
 
 
