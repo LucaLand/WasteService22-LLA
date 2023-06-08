@@ -538,7 +538,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <tt>
             Vista l'astrazione introdotta risulta necessaria l'introduzione di un <b>nuovo componente</b> <i>mediatore</i> tra il <b>TransportTrolley</b> e il <b>BasicRobot22</b>.<br>
             Che enalizzeremo nella <a href="#sec-6">Macro-Sezione Successiva</a>.
-            <img src="img/TransportTrolley_BasicRobot_Interaction.png" alt="" style="width: 550px">
+            <img src="img/TransportTrolley_BasicRobot_Interaction.png" alt="" style="width: 600px">
         </tt>
         
 
@@ -583,7 +583,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 
-	<h3 id="sec-6">6 - Interazione TT e BasicRobot22</h3>
+	<h3 id="sec-6">CustomPathExecutor e BasicRobo22</h3>
 	 <p>Il <b>TransportTrolley</b> si occuperà di far muovere il robot per il carico/scarico dei rifiuti. Per la messa in azione del robot è possibile 
 		riutilizzare il software già sviluppato per eseguire il path trovato (unibo.pathexecutor) e quindi il <b>TransportTrolley</b> incaricherà il robot 
 		del percorso da compiere mediante il riutilizzo di questo software.
@@ -592,11 +592,16 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		occuperà di far arrivare il <b>BasicRobot</b> a destinazione mediante l'invio di messaggi seguendo la logica di spostamento sul perimetro e gestendo le collisioni con le pareti.
 		Il <b>CustomPathExecutor</b> sarà in grado di comunicare tramite una Reply al <b>TransportTrolley</b> quando il <b>BasicRobot</b> arriva a destinazione.
 		Come già anticipato,andrà aggiunto questo nuovo componente custom nel contesto <i>ctxwasteservice</i> che fa da tramite per l'interazione tra <b>TransportTrolley</b> e <b>BasicRobot</b> e l'architettura risulterà come segue:
-		
-		<div>
-		<img src="" alt="General Architecture with new custom component" style="width: 800px">
-		</div>
-		
+
+        <div class="note">
+            <ul>
+                <li>Il <b>CustomPathExecutor</b> invierà le mosse da fare al <b>BasicRobot22</b> tramite la <i>dispatch</i> <code>cmd(MOVE)</code></li>
+                <li>Il <b>CustomPathExecutor</b> si registrerà all'attore <b>BasicRobot22</b> come risorsa osservabile e gestirà i messaggi di tipo <code>ResourceUpdate</code> per capire quando esso incontra un ostacolo</li>
+            </ul>
+        </div>
+		<img src="img/CustomPathExecutor.png" alt="" style="width: 160px">
+		<img src="img/CustomPathExecutor_Interaction.png" alt="" style="width: 600px">
+        <img src="img/Logical_Architecture_Sprint1-3.png" alt="" style="width: 1000px;">
 		
 		<br>
         <br>
