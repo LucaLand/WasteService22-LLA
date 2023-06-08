@@ -425,47 +425,81 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 
-    <h3>5 - Analisi Movimento</h3>
-        <p>Il <b>TransportTrolley</b> da requisiti si occuperà di muovere il robot fisico.</p>
+    <h3>5 - Analisi TransportTrolley</h3>
+        <p>Il <b>TransportTrolley</b> da requisiti si occuperà di muovere e rappresentare come entità Software il Robot fisico <i>DDR</i>.</p>
         <p>Analizziamo qui dunque il Macro-Problema della logica di movimento.</p>
         <div class="note">
             <ul>
                 <li>Rappresentazione della posizione nella <i>Service Area</i></li>
                 <li>Navigazione</li>
                 <li>Astrazione del Movimento per il TransportTrolley</li>
-                <li>Problema comandi al <i>DDR Robot</i></li>
+                <li>Problema comandi al <i>DDR Robot</i> <b>Sec-6</b></li>
+                <li>Delega Deposit Action</li>
                 <li>Richieste Multiple durante l'esecuzione</li>
+                <ul>
+                    <li>Gestione richieste mentre sta scaricando</li>
+                    <li>Problema gestione richieste in movimento (gestire tornare in dietro oppure no?)</li>
+                    Farla gestire dalla prossima posizione utile.
+                </ul>
             </ul>
         </div>
 
-        <h4>Astrazione Del Movimento</h4>
-
-        <h4>Il problema della navigazione: </h4>
-            <tt>Uso di un sistema di coordinate  o  boundary walker che raggiunge gli angoli rilevando il contatto con i muri?</tt>
-
-        <p>La disposizione specifica delle zone INDOOR, PLASTICBOX, GLASSBOX e HOME, insieme alla presenza di un sonar o sensore di impatto sul robot,
-        consente di adottare una soluzione che non richiede l'uso di coordinate. Il robot può spostarsi all'interno dell'area di servizio lungo le pareti,
-        utilizzando la rilevazione delle collisioni con le pareti per orientarsi.</p>
-
-        <p>Nella sezione seguente, esaminiamo i vantaggi dell'utilizzo di un sistema basato su coordinate e di uno senza coordinate:</p>
-
-            <ul><h5>Vantaggi dell'utilizzo di un sistema basato su coordinate:</h5></ul>
-				<p>
-                <li>Maggiore flessibilità: Un sistema basato su coordinate offre maggiore flessibilità nel gestire la posizione dei siti.
-                Ad esempio, può adattarsi facilmente se i siti non sono più posizionati agli angoli, se il robot deve seguire un percorso ottimale o se ci sono ostacoli nell'area di servizio.</li>
-
-                <li>Potenziale riutilizzo di moduli esistenti: Utilizzando un sistema basato su coordinate, è possibile sfruttare moduli sviluppati precedentemente come mapper e planner,
-                evitando la necessità di sviluppare nuove soluzioni da zero.</li>
-				</p>
-                <ul><h5>Vantaggi dell'utilizzo di un sistema senza coordinate:</h5></ul>
-				<p>
-                <li>Minor complessità e costo inferiore: L'assenza di un sistema basato su coordinate semplifica il design complessivo e riduce i costi associati all'implementazione.</li>
-
-                <li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
-                <li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
+        <h4>Rappresentazione della posizione nella <i>Service Area</i></h4>
+            <p>Analizzando la problematica le soluzioni indivudate sono 2:</p>
+            <ul>
+                <li>Rappresentazione tramite <b>Coordinate</b></li>
+                <li>Rappresentazione delle sole <b>posizioni salienti</b>: Home, Indoor, PlasticBox, GlassBox.</li>
             </ul>
-			</p>
-        <tt>Dopo un'attenta analisi delle diverse opzioni presentate già nello <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#DepositAction">Sprint0</a> , abbiamo scelto di adottare una soluzione senza l'uso di coordinate, basandoci esclusivamente su una FSM (Finite State Machine), considerando l'importanza e la rilevanza di tale decisione.</tt>
+        <p></p>
+
+        <h5>Vantaggi dell'utilizzo di un sistema basato su coordinate:</h5>
+        <p>Un sistema basato su coordinate prevede la divisione di tutta la service Area in una matrice con celle di dimensione <code>RD</code>, ovvero la dimensione del robot.</p>
+        <p>Il <i>Robot</i> dovrà quindi eseguire spostamenti di grandezza <code>RD</code> denominabili <i>Step</i>.</p>
+        <p>Così facendo la posizine del Robot sarà individuabile in ogni momento come coppia ordinata di numeri. () </p>
+        <pre><code>
+            pos = (x,y)
+        </code></pre>
+        <img src="img/ServiceArea_with_Coords" alt="">
+        <p>Vantaggi:</p>
+        <ul>
+            <li>Maggiore flessibilità: Un sistema basato su coordinate offre maggiore flessibilità nel gestire la posizione dei siti.
+                Ad esempio, può adattarsi facilmente se i siti non sono più posizionati agli angoli, se il robot deve seguire un percorso ottimale o se ci sono ostacoli nell'area di servizio.</li>
+            <li>Potenziale riutilizzo di moduli esistenti: Utilizzando un sistema basato su coordinate, è possibile sfruttare moduli sviluppati precedentemente come mapper e planner,
+                evitando la necessità di sviluppare nuove soluzioni da zero.</li>
+        </ul>
+
+        <h5>Vantaggi dell'utilizzo di un sistema senza coordinate:</h5>
+        <p>La disposizione specifica delle <i>zone salienti</i> e la presenza di un sonar on-board sul robot, permettono la realizzazione senza l'uso di coordinate.<br>
+            Il robot può spostarsi all'interno dell'area di servizio lungo le pareti, utilizzando la rilevazione delle collisioni con le pareti per orientarsi.</p>
+        <ul>
+            <li>Minor complessità e costo inferiore: L'assenza di un sistema basato su coordinate semplifica il design complessivo e riduce i costi associati all'implementazione.</li>
+            <li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
+            <li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
+        </ul>
+
+        <p>Assunto che: (dallo Sprint-0)</p>
+        <ul>
+            <li>Il committente non specifica un particolare tipo di rappresentazioni delle posizioni</li>
+            <li>Il <i>Robot</i> si muoverà solo sul perimetro della stanza</li>
+            <li>La <i>Service Area</i> non contiene ulteriori ostacoli</li>
+        </ul>
+        <tt>La soluzione scelta è quella di un sistema di rappresentazione <b>senza coordinate</b>. Dati i vantaggi evidenziati.<br>
+            Si mappa dunque la posizione tramite le <i>posizioni salienti</i>:
+            <pre><code>
+                Enum Position = {Indoor, PlasticBox, GlassBox, Home}
+            </code></pre>
+        </tt>
+
+
+<!---->
+        <h4>Logica di Navigazione</h4>
+            <p>Data la scelta di adottare un sistema senza coordinate, nasce il problema della navigazione del <i>Robot</i> tra le 4 posizioni salienti.</p>
+
+
+
+<!---->
+        <h4>Astrazione della navigazione per il <b>TransportTrolley</b></h4>
+
 
 
 
@@ -486,9 +520,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		Da capire se vogliamo attuare una sola delle due soluzione o se rendere configurabile il tutto potendo così scegliere tra le due andando però a considerare anche il punto 
 		successivo che è un requisito del committente ossia quello di far tornare il DDR Robot alla Home una volta terminata la DepositAction.
 		</tt>
-		<h3>Requisiti: problema back to home</h3>
-		<p>
-		</p>
+
         <!--<tt>
             Il <b>WasteService</b> può ricevere e gestire una richiesta alla volta mentre il <b>TransportTrolley</b> è abilitato a gestire più richieste di scarico ed è abilitato
             a fare questo tramite la gestione di una coda. Il <b>WasteService</b> può gestire le richieste mentre il <b>TransportTrolley</b> è ancora occupato a gestire l'azione
@@ -500,6 +532,8 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
             c.	Può ricevere richieste mentre sta scaricando (2 modi)
                     i.	Facendolo girare in dietro vs passa per la home (analizzaimo entrambi e possiamo implementare entrambi, configurabile)
         </tt>-->
+
+
 
 
 
@@ -528,7 +562,6 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <ul>
             <li>Interfacce (Messaggi scambiati)</li>
             <li>Modello Eseguibile QAK</li>
-            <li>TestUnit</li>
         </ul>
     <h3>Wasteservice</h3>
 
@@ -544,6 +577,22 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         </code></pre>
         Si veda il file <a target="_blank" href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak"> Metamodello QAK TransportTrolley</a></b>.
 
+        <div class="remark" style="background-color: #c3fbe8;">
+            <h3>Riassunto situazione attuale:</h3>
+            <h4>Architettura logica:</h4>
+            <img src="./img/Logical_Architecture_complete_v2.png" alt="General Logical Architecture">
+            <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
+            <h4>QAK</h4>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Logical_Architecture_QAK/src/Logical_Architecture_Local.qak">Modello del sistema QAK</a> <br>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/WasteService.qak">Primo metamodello QAK <i>wasteservice</i></a> <small>(= a sprint0)</small><br>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak">Primo metamodello QAK <i>transporttrolley</i></a> <br>
+
+
+        </div>
+
+
+
+<h2>Test-Unit</h2>
 
 
 
@@ -555,18 +604,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 <!-- ------------------------------------------------------ -->
-    <div class="remark" style="background-color: #c3fbe8;">
-        <h3>Riassunto situazione attuale:</h3>
-        <h4>Architettura logica:</h4>
-        <img src="./img/Logical_Architecture_complete_v2.png" alt="General Logical Architecture">
-		<p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
-        <h4>QAK</h4>
-        <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Logical_Architecture_QAK/src/Logical_Architecture_Local.qak">Modello del sistema QAK</a> <br>
-        <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/WasteService.qak">Primo metamodello QAK <i>wasteservice</i></a> <small>(= a sprint0)</small><br>
-        <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak">Primo metamodello QAK <i>transporttrolley</i></a> <br>
 
-
-    </div>
 
 </div>
 
