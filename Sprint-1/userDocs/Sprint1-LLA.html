@@ -79,6 +79,7 @@
                 <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">BasicRobot22.qak</a>
             </span>
         </div>
+    </div>
 
 
 
@@ -86,21 +87,21 @@
 
 
     <h3>1 - Simulazione Smart Device</h3>
+    <div class="remark">
 		<p>
-		
-		Come da requisiti, lo <b>Smart Device</b> non dovrà essere implementato. Per facilitare la messa appunto dell'applicazione introduciamo un <b><i>Mock-object</i></b>, 
-		cioè un dispositivo simulato che riproduce il comportamento dei dispositivi reali in modo controllato, in questo caso verrà utilizzato per la simulazione dello <b>Smart Device</b>.
-		Questo meccanismo ci consente di andare a simulare l'interazione tra lo <b>Smart Device</b> e il <b>WasteService</b>, in particolare il primo invierà una <i>DepositRequest</i>
-		e si metterà in attesa di una risposta.
-		</br>
-		</br>
-		Di seguito viene riportata la documentazione relativa ai <b><i>Mock-object</i></b>: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/RadarSystemProgetto.html#sprint1-componenti-per-i-dispositivi-di-i-o"> Mock
-		</a>
-		
-		
+            Come da requisiti, lo <b>Smart Device</b> non dovrà essere implementato. Per facilitare la messa appunto dell'applicazione introduciamo un <b><i>Mock-object</i></b>,
+            cioè un dispositivo simulato che riproduce il comportamento dei dispositivi reali in modo controllato, in questo caso verrà utilizzato per la simulazione dello <b>Smart Device</b>.
+            Questo meccanismo ci consente di andare a simulare l'interazione tra lo <b>Smart Device</b> e il <b>WasteService</b>, in particolare il primo invierà una <i>DepositRequest</i>
+            e si metterà in attesa di una risposta.
+            </br>
+            </br>
+            Di seguito viene riportata la documentazione relativa ai <b><i>Mock-object</i></b>: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/RadarSystemProgetto.html#sprint1-componenti-per-i-dispositivi-di-i-o"> Mock
+            </a>
 		</p>
+    </div>
 
     <h3>2 - Analisi della Core Business Logic </h3>
+    <div class="remark">
         <p>In questa sezione iniziamo con il delineare una prima organizzazione della <i>Logica di Business</i> dei <i>Core Components</i>.</p>
         <ul>
             <li>SmartDevice</li>
@@ -117,11 +118,13 @@
             <li>Il <b>Transport Trolley</b> prevede l'invio di una conferma di <i>PickUp</i> al <b>WasteService</b> non appena avrà terminato il <i>pickUp</i>.</li>
             <li>Il <b>Transport Trolley</b> deve prevedere la gestione di richieste di scarico mentre sta ancora eseguendo una <i>Deposit Action</i>.</li>
         </ol>
+    </div>
+
 
 
 
     <h3 id="sec-GestioneRichieste">3 - <b>WasteService</b>: Analisi Gestione delle richieste</h3>
-
+    <div class="remark">
         <p>Dati i messaggi definiti da requisito nello Sprint-0:</p>
         <pre><code>
  Request depositRequest	: 	depositRequest(TYPE, TRUCKLOAD, ...)
@@ -200,7 +203,24 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
             <p>Siccome il <b>WasteService</b> può ricevere richieste anche prima che la <i>Deposit Action</i> sia stata completata, si evidenzia la seguente soluzione:</p>
             <ol>
                 <li>Le variabili <code>currentPB</code> e <code>currentGB</code> saranno aggiornate non appena una richiesta viene accettata.</li>
-                <p>In caso si preveda la possibilità di errori nello scarico dei rifiuti, si implementa un meccanismo di transazioni con conferma:</p>
+            </ol>
+            <div class="remark remark2">
+                <span>Formalizzazione in QAK:</span>
+                <pre><code>
+ State requestAccepted {
+        println("\t $name: Request -$ID- Accepted!") color green
+        if[# Type == "plastic" #]{
+            [# currentPB += TruckLoad #]
+        }
+        if[# Type == "glass" #]{
+            [# currentGB += TruckLoad #]
+        }
+    } Goto pickingUp
+                </code></pre>
+            </div>
+
+            <w>Warning! - In caso si preveda la possibilità di errori nello scarico dei rifiuti, si può implementare un meccanismo di transazioni con conferma.</w>
+            <ol>
                 <li>Si conserverà il valore precedente delle variabili in due ulteriori variabili: <code>oldPB</code> e <code>oldGB</code></li>
                 <li>In caso di conferma di scarico del materiale da parte del <b>TransportTrolley</b>: <code>oldPB</code> e <code>oldGB</code> saranno aggiornate a <code>currentPB</code> e <code>currentGB</code></li>
                 <li>In caso di errori e mancato scarico del materiale le variabili current</li>
@@ -209,24 +229,10 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <p>Siccome il committente non specifica possibilità di errori o malfunzionamenti del robot, si consiglia, in caso di errori e malfunzionamenti di interrompere il funzionamento del sistema, senza la gestione delle variabili in caso di eventuali situazioni di errore.</p>
 
 
-
-        <div class="remark remark2">
-            <span>Formalizzazione in QAK:</span>
-            <pre><code>
-     State requestAccepted {
-            println("\t $name: Request -$ID- Accepted!") color green
-            if[# Type == "plastic" #]{
-                [# currentPB += TruckLoad #]
-            }
-            if[# Type == "glass" #]{
-                [# currentGB += TruckLoad #]
-            }
-        } Goto pickingUp
-            </code></pre>
-        </div>
-
-        <tt>Attesa conferma del committente: In caso di errori o malfunzionamenti da parte del Robot, il sistema si blocca e termina per poter permettere interventi di manutenzione.<br>
-            - Non verranno dunque considerate situazioni di gestione di errori dopo l'accettazione di una richiesta</tt>
+        <tt>
+            Non verranno dunque considerate situazioni di gestione di errori dopo l'accettazione di una richiesta, in quanto i requisiti non lo richiedono.<br>
+            Inoltre, in caso di errori o malfunzionamenti da parte del Robot, il sistema rimarrebbe comunque inutilizzabile, previa manutenzione, dunque tenere le variabili aggionrate diventa un problema secondario.
+        </tt>
 
 
 
@@ -263,11 +269,11 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <p>Il <b>WasteService</b> da requisito può ricevere una sola richiesta per Truck, ma può ricevere richieste anche mentre il <b>TransportTrolley</b> sta ancora eseguendo la <i>Deposit Action</i> di un materiale.</p>
         <p>Siccome:</p>
         <ul>
-            <li>Da requisito, la <i>Deposit Action</i> è gestita dal <b>Transport Trolley</b></li>
-            <li>Il <b>WasteService</b> richiede la <i>Deposit Action</i> al <b>TransportTrolley</b></li>
+            <li>Il <b>WasteService</b> da requisito può ricevere una sola richiesta alla volta</li>
+            <li>La <i>Deposit Action</i> è gestita dal <b>Transport Trolley</b></li>
             <li>Il <b>WasteService</b> risponde alla request subito dopo il <i>PickUp</i> e rimane libero</li>
         </ul>
-        <p>La possibilità di ricevere richieste durante l'esecuzione della <i>Deposit Action</i> non influisce sul <b>WasteService</b> ma riguarda il <b>TransportTrolley</b></p>
+        <tt>La possibilità di ricevere richieste durante l'esecuzione della <i>Deposit Action</i> non influisce sul <b>WasteService</b> ma riguarda il <b>TransportTrolley</b></tt>
         <tt>Il <b>TransportTrolley</b> deve prevedere l'arrivo e la gestione di ulteriori richieste di <i>PickUp</i> da parte del <b>WasteService</b> durante l'esecuzione di una <i>Deposit Action</i>.</tt>
 
 
@@ -275,7 +281,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 <!--        <ul>-->
 <!--            <li>Per gestire eventuali casi di richieste ripetute <u>semplicemente si scartano le richieste che arrivano durante la gestione di una richiesta</u></li>-->
 <!--        </ul>-->
-
+    </div>
 
 
 
@@ -283,6 +289,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 <!--        -----4-----        -->
     <h3 id="sec-Int-WS-TT">4 - Interazione <b>WasteService</b> e <b>TransportTrolley</b></h3>
+    <div class="remark">
         <p>Come evidenziato nella sezione precedente (<a href="#sec-GestioneRichieste">Gestione Delle Richieste</a>) vi è la necessità di interazione tra il <b>WasteService</b> ed il <b>TransportTrolley</b>.</p>
 
         <h4>Richiesta e Conferma <i>PickUp</i></h4>
@@ -362,17 +369,12 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
         <p>Interazione completa (in caso di richiesta accettata):</p>
         <img src="img/WasteTruckRequest_Complete_Accept.png" alt="WasteTruckRequest complete interaction of accepted request" style="width: 800px">
-
-
-<!---->
-        <h4>[<i>Attesa Conferma Committente</i>] Conferma deposito (Evoluzine della gestione degli errori in scarico)</h4>
-
-
-
+    </div>
 
 
 <!--  --------5--------  -->
-    <h3>Analisi <b>TransportTrolley</b></h3>
+    <h3>5 - Analisi <b>TransportTrolley</b></h3>
+    <div class="remark">
         <h4>Delega Deposit Action</h4>
             <p>La <i>Deposti Action</i> definita nello Sprint-0 come la sequenza di operazioni:</p>
             <ul>
@@ -421,13 +423,14 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
  }
         </code></pre>
 
+    </div>
 
 
 
 
-
-
+<!--  ----------5----------  -->
     <h3>5 - Analisi TransportTrolley</h3>
+    <div class="remark">
         <p>Il <b>TransportTrolley</b> da requisiti si occuperà di muovere e rappresentare come entità Software il Robot fisico <i>DDR</i>.</p>
         <p>Analizziamo qui dunque il Macro-Problema della logica di movimento.</p>
         <div class="note">
@@ -577,13 +580,14 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
             c.	Può ricevere richieste mentre sta scaricando (2 modi)
                     i.	Facendolo girare in dietro vs passa per la home (analizzaimo entrambi e possiamo implementare entrambi, configurabile)
         </tt>-->
+    </div>
 
 
 
 
-
-
+<!--  -----------6--------------  -->
 	<h3 id="sec-6">CustomPathExecutor e BasicRobo22</h3>
+    <div class="remark">
 	 <p>Il <b>TransportTrolley</b> si occuperà di far muovere il robot per il carico/scarico dei rifiuti. Per la messa in azione del robot è possibile 
 		riutilizzare il software già sviluppato per eseguire il path trovato (unibo.pathexecutor) e quindi il <b>TransportTrolley</b> incaricherà il robot 
 		del percorso da compiere mediante il riutilizzo di questo software.
@@ -602,13 +606,19 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		<img src="img/CustomPathExecutor.png" alt="" style="width: 160px">
 		<img src="img/CustomPathExecutor_Interaction.png" alt="" style="width: 600px">
         <img src="img/Logical_Architecture_Sprint1-3.png" alt="" style="width: 1000px;">
-		
+
+    </div>
+
+
+
+
 		<br>
         <br>
         <br>
 
 <!-- ------------------------------------------------------ -->
 <h2>Modello Eseguibile</h2>
+<div class="remark">
             <h4>Componenti</h4>
             <a href="">Modello del sistema QAK</a>
 			<br>
@@ -624,15 +634,19 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		<br>
 		</div>
 		<div class="remark" style="background-color: #c3fbe8;">
-            <h3>Architettura logica risultante Sprint1:</h3>
+            <h3>Architettura logica risultante Sprint1</h3>
             <img src="" alt="General Logical Architecture">
             <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
         </div>
+</div>
 
 
 
 <h2>Test-Unit</h2>
+<div class="remark">
 
+
+</div>
 
 
 
@@ -644,8 +658,6 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 <!-- ------------------------------------------------------ -->
 
-
-</div>
 
 
 <!-- FOOTER -->

@@ -98,6 +98,16 @@ tt {
     margin: 10px 0;
 }
 
+w {
+    font-family: "Arial",serif;
+    display: block;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: rgba(255, 185, 185, 0.5);
+    border: solid rgb(166, 1, 1) 1px;
+    margin: 10px 0;
+}
+
 r {
     font-style: italic;
     /*font-weight: bold;*/
