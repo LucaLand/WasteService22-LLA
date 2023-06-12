@@ -637,10 +637,25 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		e l'architettura risulterà come segue:</p>
 
     <pre><code>
+ 	//CustomPathExecutor - BasicRobot22
+ 	Dispatch cmd       	: cmd(MOVE)
+ 	
+ 	//COAP UPDATE
+ 	Dispatch coapUpdate	: coapUpdate(RESOURCE, VALUE)
+ 	Event coapUpdateEvent : coapUpdateEvent(RESOURCE, VALUE)
+	
 	QActor custompathexecutor context ctxwasteservice {
 	[# 
 		val name = "CustomPathExecutor"
 		val version = "1"
+		
+		
+		var Pos = ""
+		var NewPos = ""
+
+		var pathToDo = ""
+		var pathStep = 0
+		var pathLenght = -1
 	#]
 	
 	
@@ -659,24 +674,96 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 	State handleMoveRequest {
 		onMsg(move : move(Pos, NewPos)){
 			[# 
-				val Pos = payloadArg(0)
-				val NewPos = payloadArg(1) 
+				Pos = payloadArg(0)
+				NewPos = payloadArg(1)
+				pathStep = 0
 			#]
 			
 			println("\t $name: doing move($Pos, $NewPos)")
 			//MOVING LOGIC
-			delay 10000  
 			
-			replyTo move with moveDone : moveDone($NewPos) caller==transporttrolley
+			if[# Pos == "home"  && NewPos == "indoor" #]{
+				[# pathToDo = "wl" #]
+			}
+			if[# Pos == "indoor"  && NewPos == "plasticbox" #]{
+				[# pathToDo = "wl" #]
+			}
+			if[# Pos == "indoor"  && NewPos == "glassbox" #]{
+				[# pathToDo = "wlwl" #]
+			}
+			if[# Pos == "plasticbox"  && NewPos == "home" #]{
+				[# pathToDo = "wlwl" #]
+			}
+			if[# Pos == "glassbox"  && NewPos == "home" #]{
+				[# pathToDo = "wl" #]
+			}
+			
+			//Turn Around
+			if[# Pos == "glassbox"  && NewPos == "indoor" #]{
+				[# pathToDo = "wl" #]
+			}
+			if[# Pos == "plasticbox"  && NewPos == "indoor" #]{
+				[# pathToDo = "wl" #]
+			}
+			if[# NewPos == "indoor" && Pos == "platicbox" #]{
+				[# pathToDo = "lwll" #]
+			}
+			if[# NewPos == "indoor" && Pos == "glassbox" #]{
+				[# pathToDo = "lwrwll" #]
+			} 
+			[# pathLenght = pathToDo.lastIndex #]
 		}
+	}
+	Goto working
+	
+	State working {
+		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
+			[#
+				val Resource = payloadArg(0)
+				val Value = payloadArg(1)
+				if(Value.contains("obstacle"))
+					pathStep++
+			#]
+			println("\t $name: coapUpdate($Resource, $Value)")
+		}
+		if[# pathStep <= pathLenght #]{
+			[#
+				val CMD = pathToDo.get(pathStep)
+			#]
+			println("\t $name: Forwarding to BasicRobot cmd($CMD)")
+			if[# CMD == 'w' #]{
+				forward basicrobot -m cmd : cmd($CMD)
+			}
+			if[# CMD == 'l' || CMD == 'r' #]{
+				forward basicrobot -m cmd : cmd($CMD)
+				delay 1000
+				[# pathStep++ #]
+			}
+		}
+	}
+	Transition t1 	whenTime 2000 -> working
+					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> working 
+					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> pathDone
+					whenInterrupt stop -> stop
+	
+	
+	State pathDone {
+		println("\t $name: Path done in $NewPos")
+		replyTo move with moveDone : moveDone($NewPos) caller==transporttrolley
 	}
 	Goto waiting
 	
+	//FUTURE FUNCTION
+	State stop {
+		
+		//Advanced future function
+		onMsg(goBack : goBack(ARG)){
+			[# pathToDo = "llwr"#]
+		}
+		
+	}
 }
 	
-	
-	
-
 	</pre></code>
 	
 	<p>Nel codice QAK sopra, viene definito l'agente <b>CustomPathExecutor</b> che invia le mosse da fare al <b>BasicRobot22</b> tramite la dispatch <b>cmd(MOVE)</b>. 
