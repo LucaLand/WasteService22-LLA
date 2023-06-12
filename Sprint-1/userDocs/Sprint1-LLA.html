@@ -265,7 +265,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
             <p>La necessità di richiesta e di conferma del <code>pickUp</code> rappresentano un ulteriore <i>Macro Problema</i>, per cui verranno analizzate nel dettaglio nella sezione successiva: <a href="#sec-Int-WS-TT">Interazione WasteService-TransportTrolley</a></p>
 
 
-        <h4>Richieste multiple</h4>
+        <h4>Gestione richieste in esecuzione</h4>
         <p>Il <b>WasteService</b> da requisito può ricevere una sola richiesta per Truck, ma può ricevere richieste anche mentre il <b>TransportTrolley</b> sta ancora eseguendo la <i>Deposit Action</i> di un materiale.</p>
         <p>Siccome:</p>
         <ul>
@@ -372,31 +372,52 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
     </div>
 
 
-<!--  --------5--------  -->
+
+
+<!--  ----------5----------  -->
     <h3>5 - Analisi <b>TransportTrolley</b></h3>
     <div class="remark">
-        <h4>Delega Deposit Action</h4>
-            <p>La <i>Deposti Action</i> definita nello Sprint-0 come la sequenza di operazioni:</p>
+        <div class="note">
             <ul>
-                <li><b>PickUp</b></li>
-                <li><b>Deposit</b></li>
-                <li><b>Return Home</b></li>
-            </ul>
-            <p>Come analizzato nella <a href="#sec-Int-WS-TT">sezione precedente</a> questa viene <u>delegata</u> dal <b>WasteService</b> tramite la richietsa di <i>PickUp</i>.
+                <li>Delega Deposit Action</li>
+                <li>Rappresentazione della posizione nella <i>Service Area</i></li>
+                <li>Navigazione</li>
+                <li>Astrazione del Movimento per il TransportTrolley</li>
+                <li>Gestione richieste in esecuzione</li>
+                <ul>
+                    <ul>
+                        <li>Gestione richieste mentre sta scaricando</li>
+                        <li>Problema gestione richieste in movimento (gestire tornare in dietro oppure no?)</li>
+                        Farla gestire dalla prossima posizione utile.
+                    </ul>
+                    <li>Problema comandi al <i>DDR Robot</i> <b>Sec-6</b></li>
+                </ul>
+        </div>
+        <p>Il <b>TransportTrolley</b> da requisiti si occuperà di muovere e rappresentare come entità Software il Robot fisico <i>DDR</i>.</p>
+        <p>Analizziamo qui dunque i Macro-Problemi relativi alla logica di business e di movimento.</p>
+
+        <h4>Delega Deposit Action</h4>
+        <p>La <i>Deposti Action</i> definita nello Sprint-0 come la sequenza di operazioni:</p>
+        <ul>
+            <li><b>PickUp</b></li>
+            <li><b>Deposit</b></li>
+            <li><b>Return Home</b></li>
+        </ul>
+        <p>Come analizzato nella <a href="#sec-Int-WS-TT">sezione precedente</a> questa viene <u>delegata</u> dal <b>WasteService</b> tramite la richietsa di <i>PickUp</i>.
             Passando anche il parametro di <code>TYPE</code> del materiale, in modo che il <b>TransportTrolley</b>, una volta completato il <i>PickUp</i> possa proseguire autonomamente con la <i>Deposit</i></p>
 
-            <p>Vengono quindi instanziate le variabili: </p>
-            <pre><code>
+        <p>Vengono quindi instanziate le variabili: </p>
+        <pre><code>
  var ID
  var MaterialType
             </code></pre>
-            <ul>
-                <li><code>ID</code>: per tenere traccia di quale richiesta si sta eseguendo</li>
-                <li><code>MaterialType</code>: per gestire dove scaricare i rifiuti una volta raccolti</li>
-            </ul>
+        <ul>
+            <li><code>ID</code>: per tenere traccia di quale richiesta si sta eseguendo</li>
+            <li><code>MaterialType</code>: per gestire dove scaricare i rifiuti una volta raccolti</li>
+        </ul>
 
-            <p>Queste vengono aggiornate ad ogni richiesta <code>pickupReq(ID, TYPE)</code> ricevuta, con i parametri della richiesta:</p>
-            <pre><code>
+        <p>Queste vengono aggiornate ad ogni richiesta <code>pickupReq(ID, TYPE)</code> ricevuta, con i parametri della richiesta:</p>
+        <pre><code>
  onMsg(pickupReq : pickupReq(ID, TYPE)){
     [#
         ID = payloadArg(0)
@@ -422,33 +443,6 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
     }
  }
         </code></pre>
-
-    </div>
-
-
-
-
-<!--  ----------5----------  -->
-    <h3>5 - Analisi TransportTrolley</h3>
-    <div class="remark">
-        <p>Il <b>TransportTrolley</b> da requisiti si occuperà di muovere e rappresentare come entità Software il Robot fisico <i>DDR</i>.</p>
-        <p>Analizziamo qui dunque il Macro-Problema della logica di movimento.</p>
-        <div class="note">
-            <ul>
-                <li>Delega Deposit Action</li>
-                <li>Rappresentazione della posizione nella <i>Service Area</i></li>
-                <li>Navigazione</li>
-                <li>Astrazione del Movimento per il TransportTrolley</li>
-                <li>Richieste Multiple durante l'esecuzione</li>
-            <ul>
-                <ul>
-                    <li>Gestione richieste mentre sta scaricando</li>
-                    <li>Problema gestione richieste in movimento (gestire tornare in dietro oppure no?)</li>
-                    Farla gestire dalla prossima posizione utile.
-                </ul>
-                <li>Problema comandi al <i>DDR Robot</i> <b>Sec-6</b></li>
-            </ul>
-        </div>
 
         <h4>Rappresentazione della posizione nella <i>Service Area</i></h4>
             <p>Analizzando la problematica le soluzioni indivudate sono 2:</p>
@@ -502,7 +496,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
         <h4>Logica di Navigazione</h4>
             <p>Data la scelta di adottare un sistema senza coordinate, nasce il problema della navigazione del <i>Robot</i> tra le 4 posizioni salienti.</p>
             <p>Visti i percorsi effettuabili nello <a>Sprint-0</a></p>
-            <img src="" alt="">
+            <img src="img/ServiceAreaPosition-Routes3.png" alt="" style="width: 450px">
             <p>Considerando le posizioni ordinate in senso antiorario: <code>Home, Indoor, PlasticBox, GlassBox</code>.</p>
             <p>L'implementazione per la navigazione ordinata tra queste avverà con la seguente logica:</p>
             <ul>
@@ -510,8 +504,9 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
                 <li>Il robot si ruota di 90° verso sinistra</li>
                 <li>Ripetere per la prossima posizione saliente</li>
             </ul>
+        <img src="" alt="" style="width: 450px;">
+        <img src="" alt="">
         <p>Questo ci permette di visitare in ordine le posizioni <code>Home, Indoor, PlasticBox, GlassBox</code>.</p>
-<!--TODO        <img src="" alt="">-->
 
 
 
@@ -548,25 +543,37 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 
-        <h4>Problema richieste multiple : </h4>
-		<p>
-		Come da requisiti il <b>TransportTrolley</b> può ricevere più richieste durante l'esecuzione della <i>depositAction</i>. 
-		Le richieste possono arrivare in due momenti, quando il <b>DDR Robot</b> è in movimento o quando sta effettuando l'operazione di deposito in uno dei due box.
-		Non essendoci vincoli da requisiti, la scelta progettuale che ci è parsa più conveniente è quella di far arrivare il <b>DDR Robot</b> alla prossima posizione anche se 
-		quest'ultimo riceve richieste mentre è in movimento.
-		Andiamo ora ad analizzare due possibili soluzioni per poter gestire richieste multiple.
+        <h4>Gestione richieste in esecuzione</h4>
+            <p>
+                Come da requisiti il <b>TransportTrolley</b> può ricevere più richieste durante l'esecuzione della <i>depositAction</i>.
+                Le richieste possono arrivare in due momenti, quando il <b>DDR Robot</b> è in movimento o quando sta effettuando l'operazione di deposito in uno dei due box.
+                Non essendoci vincoli da requisiti, la scelta progettuale che ci è parsa più conveniente è quella di far arrivare il <b>DDR Robot</b> alla prossima posizione anche se
+                quest'ultimo riceve richieste mentre è in movimento.
+                Andiamo ora ad analizzare due possibili soluzioni per poter gestire richieste durante l'esecuzione.
+            </p>
+
 		<h5>Soluzione 1: girare indietro</h5>
-		<p>
-		La prima soluzione da noi proposta è quella di far percorrere il percorso alla rovescia al <b>DDR Robot</b>, ossia di far girare quest'ultimo di 180°. Questa soluzione
-		risulta ottimale nel momento in cui il <b>DDR Robot</b> si trova più vicino alla posizione di <b>Indoor</b> rispetto che alla posizione di <b>Home</b>.
-		<h5>Soluzione 2: passare per la Home</h5>
-		<p>
-		La seconda soluzione da noi proposta prevede invece di far completare l'intero percorso al <b>DDR Robot</b> al di là delle richieste multiple o della singola richiesta.
-		Attuando questo tipo di soluzione il <b>DDR Robot</b> farà sempre lo stesso percorso, ossia <i>Home</i>-><i>Indoor</i>-><i>PlasticBox</i>-><i>GlassBox</i>-><i>Home</i>.
-		</p>
+            <p>
+                La prima soluzione da noi proposta è quella di far percorrere il percorso alla rovescia al <b>DDR Robot</b>, ossia di far girare quest'ultimo di 180°. Questa soluzione
+                risulta ottimale nel momento in cui il <b>DDR Robot</b> si trova più vicino alla posizione di <b>Indoor</b> rispetto che alla posizione di <b>Home</b>.
+            </p>
+        <img src="" alt="">
+        <img src="" alt="">
+        <img src="" alt="">
+
+        <h5>Soluzione 2: passare per la Home</h5>
+            <p>
+                La seconda soluzione da noi proposta prevede invece di far completare l'intero percorso al <b>DDR Robot</b> al di là delle richieste durante l'esecuzione o meno.
+                Attuando questo tipo di soluzione il <b>DDR Robot</b> farà sempre lo stesso percorso, ossia <i>Home</i>-><i>Indoor</i>-><i>PlasticBox</i>-><i>GlassBox</i>-><i>Home</i>.
+                Riducendo così la complessità di movimento e movimento e di gestione.
+            </p>
+        <img src="" alt="">
+        <img src="" alt="">
+
+
 		<tt>
-		La scelta tra una soluzione e l'altra non influisce sull'architettura del sistema per le scelte progettuali effettuate, quindi possono essere implementate entrambe
-		configurandole a livello applicativo.
+            La scelta tra una soluzione e l'altra non influisce sull'architettura del sistema per le scelte progettuali effettuate, quindi possono essere implementate entrambe
+            configurandole a livello applicativo.
 		</tt>
 
         <!--<tt>
