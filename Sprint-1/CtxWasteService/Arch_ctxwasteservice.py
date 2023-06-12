@@ -21,6 +21,8 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
      sys = Custom('','./qakicons/system.png')
      with Cluster('ctxsmartdevice', graph_attr=nodeattr):
           smartdevice=Custom('smartdevice(ext)','./qakicons/externalQActor.png')
+     with Cluster('ctxbasicrobot', graph_attr=nodeattr):
+          basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxwasteservice', graph_attr=nodeattr):
           wasteservice=Custom('wasteservice','./qakicons/symActorSmall.png')
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
@@ -29,5 +31,6 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
      wasteservice >> Edge(color='magenta', style='solid', xlabel='pickupReq', fontcolor='magenta') >> transporttrolley
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='move', fontcolor='magenta') >> custompathexecutor
      transporttrolley >> Edge(color='darkgreen', style='dashed', xlabel='pickupOk', fontcolor='darkgreen') >> wasteservice
+     custompathexecutor >> Edge(color='blue', style='solid', xlabel='cmd', fontcolor='blue') >> basicrobot
      custompathexecutor >> Edge(color='darkgreen', style='dashed', xlabel='moveDone', fontcolor='darkgreen') >> transporttrolley
 diag

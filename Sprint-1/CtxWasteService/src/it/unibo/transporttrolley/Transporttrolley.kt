@@ -83,6 +83,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("pickupDone") { //this:State
 					action { //it:State
 						 Pos = "indoor"  
+						CommUtils.outblue("	 $name: Picking up...")
+						delay(5000) 
 						CommUtils.outblue("	 $name: Pickup Finished!")
 						answer("pickupReq", "pickupOk", "pickupOk(0)","wasteservice"   )  
 						//genTimer( actor, state )
