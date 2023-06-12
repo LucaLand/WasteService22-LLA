@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="it">
+
+
+<head>
+    <title>Iss2023-LLA-Sprint2</title>
+    <link href="./defaultStyle.css" rel="stylesheet">
+	<link href="./menuCss.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--  To solve accent problems  -->
+</head>
+
+
+<body>
+<div id="top">
+    <h1>Progetto Finale ISS - Waste Service</h1>
+</div>
+<div class="remark">
+<nav>
+    <ul>
+        <li><a href="../../Sprint-0/userDocs/Sprint0-LLA.html">sprint0</a></li>
+        <li><a href="../../Sprint-1/userDocs/Sprint1-LLA.html">sprint1</a></li>
+		<li><a href="./Sprint2-LLA.html">sprint2</a></li>
+    </ul>
+</nav>
+</div>
+
+    <h2>Introduction</h2>
+    <div class="remark">
+	<p>
+	Progetto finale di ISS che consiste nel realizzare un sistema di gestione dei rifiuti in cui un robot svolge il compito di trasportare i materiali dal camion ai relativi contenitori di smistamento. 
+	Attualmente, ci concentriamo su una fase preliminare di analisi dei requisiti, che consiste nel comprendere le esigenze del cliente e tradurle in una forma formalizzata e strutturata.
+	</p>
+	</div>
+
+    <h2>Requirements</h2>
+    <div class="remark">
+        <p>Si riporta la pagina di requisiti del committente: <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2022/blob/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/TemaFinale22.html" traget="_blank" >Waste
+            Service 22.pdf</a></p>
+		<p>Inoltre si riporta il file dei requisiti dello Sprint0: <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Requirements">Requisiti Sprint0</a>
+    </div>
+	
+	
+    <h2>Requirements analysis</h2>
+    <div class="remark">
+     <p>Una più dettagliata analisi insieme alle osservazioni qui presentate ci consente di delineare in modo più preciso il comportamento che il robot e il LED devono assumere in caso di allarmi:</p>
+	
+<ol>
+	<li>In caso di allarme, il robot deve fermarsi immediatamente a causa di un'emergenza, pertanto è opportuno interrompere, per quanto possibile, tutte le operazioni in corso. Tuttavia, abbiamo ricevuto indicazioni dal committente che il robot non deve essere interrotto mentre è in movimento.
+		Di conseguenza, possiamo dedurre che le operazioni da interrompere e successivamente riprendere sono il prelievo (Pickup), il deposito (Dropout) e l'avanzamento (move forward).</li>
+	<li>Il LED serve a segnalare il potenziale pericolo derivante dai movimenti del robot durante l'esecuzione di un'azione di deposito (Deposit action). Pertanto, il LED deve segnalare quando il robot è in movimento o, più in generale, quando sta svolgendo un'operazione.</li>
+</ol>
+		<ol>Da ciò si deduce che il LED:
+			<li>Deve lampeggiare quando il robot sta svolgendo (o ha svolto e sta tornando alla posizione di partenza) un'azione di deposito, segnalando che il robot può muoversi.</li>
+			<li>Inoltre, se il robot si trova nella posizione di partenza (HOME) ma è in movimento (ad esempio, per riposizionarsi dopo aver completato un'azione di deposito), il LED deve comunque lampeggiare.</li>
+			<li>Il LED rimarrà acceso solo se l'azione di deposito viene interrotta da un allarme.</li>
+			<li>Il LED rimarrà spento solo quando non ci sarà più nulla da gestire (e quindi il robot si troverà nella posizione di partenza, HOME).</li>
+		</ol>
+    </div>
+
+    <!----------------------- REQUIREMENT ANALYSIS --------------------------->
+
+    <h2>Scrum Goal and Work Plan</h2>
+    <div class="remark">
+	<h4>Scrum goal:</h4>
+	<p>Obiettivo dello SPRINT2 è estendere la demo dello SPRINT1 per soddisfare i requisiti relativi al LED e al Sonar indicati dal committente al punto 4. Questa parte è considerata più significativa e sostanziale rispetto all'interfaccia grafica (GUI) descritta al punto 3.</p>
+	<h4>Work plan:</h4>
+	<ul>
+		<li>Studio del problema relativo a chi e in che modo riceve le informazioni riguardanti un allarme al fine di implementare l'interruzione (halt) del robot.</li>
+		<li>Analisi del problema riguardante chi e in che modo riceve le informazioni per aggiornare lo stato del LED.</li>
+		<li>Sviluppo o adattamento dei componenti necessari per affrontare le suddette problematiche.</li>
+		<li>Creazione di un modello eseguibile utilizzando il metamodello QAK.</li>
+		<li>Elaborazione di un piano di test più completo per il modello realizzato.</li>
+    </ul>
+        
+    </div>
+	
+	<!--PROBLEM ANALYSIS-->
+	<a NAME="ProblemAnalysis"></a>
+	<h2>Problem analysis</h2>
+	<div class="remark">
+        <div class="remark remark2">
+            <h4>Architettura logica precedente:</h4>
+            <img src="" alt="General Logical Architecture" style="width: 600px;" >
+            <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
+            <br>
+
+            <h4>Focus Sprint-2</h4>
+            <p>Nello Sprint-2 si vedrà dunque un focus sui seguenti componenti e sui loro modelli.</p>
+            <img src="" alt="Architecture Focus Sprint-1" style="width: 80%">
+            <span>Sprint-0:
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak">SmartDevice.qak</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/WasteService.qak">WasteService.qak</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak">TransportTrolley.qak</a>  ||
+				<a href="">CustomPathExecutor.qak</a>
+                <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">BasicRobot22.qak</a>
+            </span>
+        </div>
+    </div>
+
+
+
+
+
+
+    <h3>1 - Led</h3>
+    <div class="remark">
+	
+	
+	
+    </div>
+
+    <h3>2 - Sonar </h3>
+    <div class="remark">
+
+
+
+    </div>
+
+
+<!-- ------------------------------------------------------ -->
+<h2>Modello Eseguibile</h2>
+<div class="remark">
+            <h4>Componenti</h4>
+            <a href="">Modello del sistema QAK</a>
+			<br>
+            <a href="">Primo metamodello QAK <i>smartdevice</i></a> <small></small><br>
+            <a href="">Primo metamodello QAK <i>wasteservice</i></a> <br>
+            <a href="">Primo metamodello QAK <i>transporttrolley</i></a> <br>
+            <a href="">Primo metamodello QAK <i>custompathexecutor</i></a> <br>
+            <a href="">Primo metamodello QAK <i>basicrobot</i></a> <br>
+			<a href="">Primo metamodello QAK <i>led</i></a> <br>
+            <a href="">Primo metamodello QAK <i>sonar</i></a> <br>
+
+		<h4>Interfacce</h4>
+		<div>
+		<br>
+		<br>
+		</div>
+		<div class="remark" style="background-color: #c3fbe8;">
+            <h3>Architettura logica risultante Sprint1</h3>
+            <img src="" alt="General Logical Architecture">
+            <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
+        </div>
+</div>
+
+
+
+<h2>Test-Unit</h2>
+<div class="remark">
+
+
+
+</div>
+
+
+
+
+<br>
+<br>
+<br>
+
+
+<!-- ------------------------------------------------------ -->
+
+
+
+<!-- FOOTER -->
+<br><br>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%; height: 28vw; text-align:left; color:white;">
+    <p style="text-align: center; font-size: 12pt;">Studenti: Luca Landolfi, Antonio Franzese, Luca De Risi</p>
+    <p style="text-align: center; font-size: 12pt;">Email: luca.landolfi3@studio.unibo.it,  antonio.franzese4@studio.unibo.it, luca.derisi@studio.unibo.it;</p>
+    <div style="display: block; margin: 0 15vw;">
+        <img src="./img/img_luca.png"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_anto.jpg"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_lude.JPG"   style="float: left; width: 22vw; height: 20vw">
+    </div>
+</div>
+
+</body>
+</html>
