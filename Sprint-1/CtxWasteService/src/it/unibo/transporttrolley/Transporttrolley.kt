@@ -117,7 +117,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						if( checkMsgContent( Term.createTerm("moveDone(NewPos)"), Term.createTerm("moveDone(NewPos)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val Arg = payloadArg(0)  
-								if(  Arg == "plasticbox" || Arg == "glassbox" 
+								if(  Arg == "plasticbox" || Arg == "glassbox" || Arg == "2" || Arg == "3" 
 								 ){ Pos = Arg  
 								CommUtils.outblue("	 $name: Depositing $MaterialType!")
 								delay(6000) 
@@ -148,6 +148,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t37",targetState="waiting",cond=whenReply("moveDone"))
+					transition(edgeName="t38",targetState="handlePickupReq",cond=whenRequest("pickupReq"))
 				}	 
 			}
 		}
