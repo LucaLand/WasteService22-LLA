@@ -53,7 +53,7 @@
 			<li>Deve lampeggiare quando il robot sta svolgendo (o ha svolto e sta tornando alla posizione di partenza) un'azione di deposito, segnalando che il robot può muoversi.</li>
 			<li>Inoltre, se il robot si trova nella posizione di partenza (HOME) ma è in movimento (ad esempio, per riposizionarsi dopo aver completato un'azione di deposito), il LED deve comunque lampeggiare.</li>
 			<li>Il LED rimarrà acceso solo se l'azione di deposito viene interrotta da un allarme.</li>
-			<li>Il LED rimarrà spento quando sarà fermi in HOME</li>
+			<li>Il LED rimarrà spento quando sarà fermo in HOME</li>
 		</ol>
     </div>
 
@@ -62,7 +62,7 @@
     <h2>Scrum Goal and Work Plan</h2>
     <div class="remark">
 	<h4>Scrum goal:</h4>
-	<p>Obiettivo dello SPRINT2 è estendere la demo dello SPRINT1 per soddisfare i requisiti relativi al LED e al Sonar indicati dal committente al punto 4. Questa parte è considerata più significativa e sostanziale rispetto all'interfaccia grafica (GUI) descritta al punto 3.</p>
+	<p>Obiettivo dello SPRINT2 è estendere la demo dello SPRINT1 per soddisfare i requisiti relativi al LED e al Sonar indicati dal committente. Questa parte è considerata più significativa e sostanziale rispetto all'interfaccia grafica (GUI).</p>
 	<h4>Work plan:</h4>
 	<ul>
 		<li>Studio del problema relativo a chi e in che modo riceve le informazioni riguardanti un allarme al fine di implementare l'interruzione (halt) del robot.</li>
@@ -102,17 +102,60 @@
 
 
 
-    <h3>1 - Led</h3>
+    <h3>1 - Sonar</h3>
     <div class="remark">
+	<h4>Che informazioni invia il sonar?</h4>
+	
+<p>Il sonar dovrà emettere un evento quando ad ogni nuova misurazione</p>
+	<ul>Può emettere un'informazione del tipo: </ul> 
+	<li>DISTANZA RILEVATA (CI SERVE?)</li>
+	<li>EVENTO NOTIFICA ( currentDist < o > DLIMIT)</li>
+	
+	<ul> ANALIZZARE SE EFFETTIVAMENTE CI SERVE LA DISTANZA MISURATA perchè se deve rilevare una collisione ci basterà che il sonar si attiva a parete rilevata e quindi ci interessa 
+	soltanto</ul>
+	<li>RILEVAZIONE DELL'ALLARME</li>
+	
+	<pre><code>
+	Event alarm       : alarm(_)
+	Event alarmstop : alarmstop(_)   Ci interessa anche allarme cessato??  
+	</code></pre>
+
+	
+<p>L'allarme viene inviato al sistema -> è il fatto che dicemmo qakruntime?? COME SI FA AD INVIARLO AL SISTEMA? c'è un  componente dedicato?</p>
+	
+	<pre><code>
+		-----	
+	</code></pre>
+
+	<p>Per implementare il componente sarà quindi opportuno modificare il Sonar di unibo.sonarqak22, tale componente lo chiameremo sonarLLA.</p>
+	
+	<h4>Chi riceve le informazioni del sonar e gestisce l'halt?</h4>
 	
 	
+	<h4>Chi riceve le informazioni del sonar e gestisce il LED?</h4>
+	
+	
+	<b>HALT e LED vengono gestisti dallo stesso componente che riceve l'info e manda halt e azione al LED???????</b>
 	
     </div>
 
-    <h3>2 - Sonar </h3>
+    <h3>2 - Led </h3>
     <div class="remark">
 
+<h4>Come calcolare lo stato del Led?</h4>
+<ul>Lo stato del Led dipende:</ul>
 
+<li>Dal fatto che il robot si trovi o meno in HOME .</li>
+<li>Dal fatto che il robot sia in movimento (o che comunque stia operando) piuttosto che si trovi invece bloccato da un allarme.
+Dunque potrà essere creato una specie di controller che ossreva questi attori e che invia messaggi al Led.
+
+<h4>Come interagire con il componente Led?</h4>
+Il componente Led può ricevere gli aggiornamenti di stato tramite eventi. 
+Inoltre lo stato del Led sulla gui potrà essere aggiornato facendo uso del medesimo evento.
+
+<pre><code>
+Event    update_led 	  : update_led(LEDSTATE) // LEDSTATE = ON | OFF | BLINK
+</code></pre>
 
     </div>
 
