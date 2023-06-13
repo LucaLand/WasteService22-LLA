@@ -593,7 +593,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 	
 	<!--  -----------6-------------- V2  -->
-	<h3 id="sec-6">CustomPathExecutor e BasicRobot22 - V2</h3>
+	<h3 id="sec-6">CustomPathExecutor e BasicRobot22</h3>
     <div class="remark">
 
 		<p>Il TransportTrolley ha il compito di gestire il movimento del robot durante le operazioni di carico/scarico dei rifiuti.Il TransportTrolley è consapevole della posizione iniziale e della destinazione del BasicRobot. Invia una richiesta (Request) a un nuovo componente personalizzato chiamato CustomPathExecutor,
@@ -611,8 +611,16 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 		<p>Utilizzando una logica di spostamento sul perimetro e gestendo eventuali collisioni con le pareti,il CustomPathExecutor invia messaggi al BasicRobot per farlo avanzare verso la destinazione. 
 		La logica di spostamento è stata prima spiegata nella sezione <a href="#Sec-4">Logica di Navigazione</a>.</p>
 		
+		<pre><code>
+		Aggiungere gli if dei percorsi del QAK
+		</pre></code>
+		
 		<p>Una volta che il BasicRobot arriva a destinazione, il CustomPathExecutor comunica al 
 		TransportTrolley tramite una risposta (Reply).</p>
+		
+		<pre><code>
+		Inserire stato di PathDone
+		</pre></code>
 		
 		<p>Come già anticipato,andrà aggiunto questo nuovo componente custom nel contesto <i>ctxwasteservice</i> che fa da tramite per l'interazione tra <b>TransportTrolley</b> e <b>BasicRobot</b> 
 		e l'architettura risulterà come segue:</p>
