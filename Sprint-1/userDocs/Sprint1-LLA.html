@@ -494,7 +494,7 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 <!---->
-        <h4>Logica di Navigazione</h4>
+        <h4 id="Sec-4">Logica di Navigazione</h4>
             <p>Data la scelta di adottare un sistema senza coordinate, nasce il problema della navigazione del <i>Robot</i> tra le 4 posizioni salienti.</p>
             <p>Visti i percorsi effettuabili nello <a>Sprint-0</a></p>
             <img src="img/ServiceAreaPosition-Routes3.png" alt="" style="width: 450px">
@@ -591,184 +591,37 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
     </div>
 
 
-
-
-<!--  -----------6--------------  -->
-	<h3 id="sec-6">CustomPathExecutor e BasicRobot22</h3>
-    <div class="remark">
-	 <p>Il <b>TransportTrolley</b> si occuperà di far muovere il robot per il carico/scarico dei rifiuti. Per la messa in azione del robot è possibile 
-		riutilizzare il software già sviluppato per eseguire il path trovato (unibo.pathexecutor) e quindi il <b>TransportTrolley</b> incaricherà il robot 
-		del percorso da compiere mediante il riutilizzo di questo software.
-
-		
-		Il <b>TransportTrolley</b> è a conoscenza della posizione iniziale e della destinazione del <b>BasicRobot</b> e manda una Request ad un nuovo componente customizzato <b>CustomPathExecutor</b> e quest'ultimo si 
-		occuperà di far arrivare il <b>BasicRobot</b> a destinazione mediante l'invio di messaggi seguendo la logica di spostamento sul perimetro e gestendo le collisioni con le pareti.
-		Il <b>CustomPathExecutor</b> sarà in grado di comunicare tramite una Reply al <b>TransportTrolley</b> quando il <b>BasicRobot</b> arriva a destinazione.
-		<br>
-		
-		
-		Come già anticipato,andrà aggiunto questo nuovo componente custom nel contesto <i>ctxwasteservice</i> che fa da tramite per l'interazione tra <b>TransportTrolley</b> e <b>BasicRobot</b> e l'architettura risulterà come segue:
-
-        <div class="note">
-            <ul>
-                <li>Il <b>CustomPathExecutor</b> invierà le mosse da fare al <b>BasicRobot22</b> tramite la <i>dispatch</i> <code>cmd(MOVE)</code></li>
-                <li>Il <b>CustomPathExecutor</b> si registrerà all'attore <b>BasicRobot22</b> come risorsa osservabile e gestirà i messaggi di tipo <code>ResourceUpdate</code> per capire quando esso incontra un ostacolo</li>
-            </ul>
-        </div>
-		<img src="img/CustomPathExecutor.png" alt="" style="width: 160px">
-		<img src="img/CustomPathExecutor_Interaction.png" alt="" style="width: 600px">
-        <img src="img/Logical_Architecture_Sprint1-3.png" alt="" style="width: 1000px;">
-
-    </div>
 	
 	<!--  -----------6-------------- V2  -->
 	<h3 id="sec-6">CustomPathExecutor e BasicRobot22 - V2</h3>
     <div class="remark">
 
-		<p>Il TransportTrolley ha il compito di gestire il movimento del robot durante le operazioni di carico/scarico dei rifiuti. Per avviare il robot, sarà possibile utilizzare il software 
-		esistente per calcolare il percorso (unibo.pathexecutor). Di conseguenza, il TransportTrolley assegnerà al robot il percorso da seguire, sfruttando il suddetto software.</p>
-
-		<p>Il TransportTrolley è consapevole della posizione iniziale e della destinazione del BasicRobot. Invia una richiesta (Request) a un nuovo componente personalizzato chiamato CustomPathExecutor,
-		il quale si prende l'incarico di guidare il BasicRobot verso la destinazione. Utilizzando una logica di spostamento sul perimetro e gestendo eventuali collisioni con le pareti, 
-		il CustomPathExecutor invia messaggi al BasicRobot per farlo avanzare verso la destinazione. Una volta che il BasicRobot arriva a destinazione, il CustomPathExecutor comunica al 
+		<p>Il TransportTrolley ha il compito di gestire il movimento del robot durante le operazioni di carico/scarico dei rifiuti.Il TransportTrolley è consapevole della posizione iniziale e della destinazione del BasicRobot. Invia una richiesta (Request) a un nuovo componente personalizzato chiamato CustomPathExecutor,
+		il quale si prende l'incarico di guidare il BasicRobot verso la destinazione. 
+		
+		<pre><code>
+		//CustomPathExecutor - BasicRobot22
+		Dispatch cmd       	: cmd(MOVE)
+		
+		//COAP UPDATE
+		Dispatch coapUpdate	: coapUpdate(RESOURCE, VALUE)
+		Event coapUpdateEvent : coapUpdateEvent(RESOURCE, VALUE)
+		</pre></code>
+		
+		<p>Utilizzando una logica di spostamento sul perimetro e gestendo eventuali collisioni con le pareti,il CustomPathExecutor invia messaggi al BasicRobot per farlo avanzare verso la destinazione. 
+		La logica di spostamento è stata prima spiegata nella sezione <a href="#Sec-4">Logica di Navigazione</a>.</p>
+		
+		<p>Una volta che il BasicRobot arriva a destinazione, il CustomPathExecutor comunica al 
 		TransportTrolley tramite una risposta (Reply).</p>
 		
 		<p>Come già anticipato,andrà aggiunto questo nuovo componente custom nel contesto <i>ctxwasteservice</i> che fa da tramite per l'interazione tra <b>TransportTrolley</b> e <b>BasicRobot</b> 
 		e l'architettura risulterà come segue:</p>
 
-    <pre><code>
- 	//CustomPathExecutor - BasicRobot22
- 	Dispatch cmd       	: cmd(MOVE)
- 	
- 	//COAP UPDATE
- 	Dispatch coapUpdate	: coapUpdate(RESOURCE, VALUE)
- 	Event coapUpdateEvent : coapUpdateEvent(RESOURCE, VALUE)
-	
-	QActor custompathexecutor context ctxwasteservice {
-	[# 
-		val name = "CustomPathExecutor"
-		val version = "1"
-		
-		
-		var Pos = ""
-		var NewPos = ""
 
-		var pathToDo = ""
-		var pathStep = 0
-		var pathLenght = -1
-	#]
 	
-	
-	
-	State s0 initial{
-		println("\t $name: Started! $version") color blue
-	}
-	Goto waiting
-	
-	State waiting {
-		println("\t $name: waiting for move requests!")
-	}
-	Transition t0 whenRequest move -> handleMoveRequest
-	
-	
-	State handleMoveRequest {
-		onMsg(move : move(Pos, NewPos)){
-			[# 
-				Pos = payloadArg(0)
-				NewPos = payloadArg(1)
-				pathStep = 0
-			#]
-			
-			println("\t $name: doing move($Pos, $NewPos)")
-			//MOVING LOGIC
-			
-			if[# Pos == "home"  && NewPos == "indoor" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# Pos == "indoor"  && NewPos == "plasticbox" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# Pos == "indoor"  && NewPos == "glassbox" #]{
-				[# pathToDo = "wlwl" #]
-			}
-			if[# Pos == "plasticbox"  && NewPos == "home" #]{
-				[# pathToDo = "wlwl" #]
-			}
-			if[# Pos == "glassbox"  && NewPos == "home" #]{
-				[# pathToDo = "wl" #]
-			}
-			
-			//Turn Around
-			if[# Pos == "glassbox"  && NewPos == "indoor" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# Pos == "plasticbox"  && NewPos == "indoor" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# NewPos == "indoor" && Pos == "platicbox" #]{
-				[# pathToDo = "lwll" #]
-			}
-			if[# NewPos == "indoor" && Pos == "glassbox" #]{
-				[# pathToDo = "lwrwll" #]
-			} 
-			[# pathLenght = pathToDo.lastIndex #]
-		}
-	}
-	Goto working
-	
-	State working {
-		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
-			[#
-				val Resource = payloadArg(0)
-				val Value = payloadArg(1)
-				if(Value.contains("obstacle"))
-					pathStep++
-			#]
-			println("\t $name: coapUpdate($Resource, $Value)")
-		}
-		if[# pathStep <= pathLenght #]{
-			[#
-				val CMD = pathToDo.get(pathStep)
-			#]
-			println("\t $name: Forwarding to BasicRobot cmd($CMD)")
-			if[# CMD == 'w' #]{
-				forward basicrobot -m cmd : cmd($CMD)
-			}
-			if[# CMD == 'l' || CMD == 'r' #]{
-				forward basicrobot -m cmd : cmd($CMD)
-				delay 1000
-				[# pathStep++ #]
-			}
-		}
-	}
-	Transition t1 	whenTime 2000 -> working
-					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> working 
-					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> pathDone
-					whenInterrupt stop -> stop
-	
-	
-	State pathDone {
-		println("\t $name: Path done in $NewPos")
-		replyTo move with moveDone : moveDone($NewPos) caller==transporttrolley
-	}
-	Goto waiting
-	
-	//FUTURE FUNCTION
-	State stop {
-		
-		//Advanced future function
-		onMsg(goBack : goBack(ARG)){
-			[# pathToDo = "llwr"#]
-		}
-		
-	}
-}
-	
-	</pre></code>
-	
-	<p>Nel codice QAK sopra, viene definito l'agente <b>CustomPathExecutor</b> che invia le mosse da fare al <b>BasicRobot22</b> tramite la dispatch <b>cmd(MOVE)</b>. 
-	L'agente si registra come risorsa osservabile al <b>BasicRobot22</b> e gestisce i messaggi di tipo <b>ResourceUpdate</b> ricevuti. La funzione <b>moveToDestination()</b> invia le mosse al <b>BasicRobot22</b>, 
-	mentre la funzione <b>handleResourceUpdate(basicRobotPos, obstacle)</b> gestisce i messaggi di aggiornamento delle risorse, incluso il rilevamento degli ostacoli.</p>
+	<p>Viene definito l'agente <b>CustomPathExecutor</b> che invia le mosse da fare al <b>BasicRobot22</b> tramite la dispatch <b>cmd(MOVE)</b>. 
+	L'agente si registra come risorsa osservabile al <b>BasicRobot22</b> e gestisce i messaggi di tipo <b>ResourceUpdate</b> ricevuti. Nello stato di <b>working</b> invia le mosse al <b>BasicRobot22</b>, 
+	mentre quando gli arriva <b>onMsg coapUpdate</b> gestisce i messaggi di aggiornamento delle risorse, incluso il rilevamento degli ostacoli.</p>
 	
 	
 	
