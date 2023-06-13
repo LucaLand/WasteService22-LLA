@@ -45,15 +45,15 @@
      <p>Una più dettagliata analisi insieme alle osservazioni qui presentate ci consente di delineare in modo più preciso il comportamento che il robot e il LED devono assumere in caso di allarmi:</p>
 	
 <ol>
-	<li>In caso di allarme, il robot deve fermarsi immediatamente a causa di un'emergenza, pertanto è opportuno interrompere, per quanto possibile, tutte le operazioni in corso. Tuttavia, abbiamo ricevuto indicazioni dal committente che il robot non deve essere interrotto mentre è in movimento.
+	<li>In caso di allarme, il robot deve fermarsi immediatamente a causa di un'emergenza, pertanto è opportuno interrompere, per quanto possibile, tutte le operazioni in corso. Tuttavia, abbiamo ricevuto indicazioni dal committente che il robot deve essere interrotto mentre è in movimento.
 		Di conseguenza, possiamo dedurre che le operazioni da interrompere e successivamente riprendere sono il prelievo (Pickup), il deposito (Dropout) e l'avanzamento (move forward).</li>
-	<li>Il LED serve a segnalare il potenziale pericolo derivante dai movimenti del robot durante l'esecuzione di un'azione di deposito (Deposit action). Pertanto, il LED deve segnalare quando il robot è in movimento o, più in generale, quando sta svolgendo un'operazione.</li>
+	<li>Il LED deve segnalare quando il robot è in movimento o, più in generale, quando sta svolgendo un'operazione.</li>
 </ol>
 		<ol>Da ciò si deduce che il LED:
 			<li>Deve lampeggiare quando il robot sta svolgendo (o ha svolto e sta tornando alla posizione di partenza) un'azione di deposito, segnalando che il robot può muoversi.</li>
 			<li>Inoltre, se il robot si trova nella posizione di partenza (HOME) ma è in movimento (ad esempio, per riposizionarsi dopo aver completato un'azione di deposito), il LED deve comunque lampeggiare.</li>
 			<li>Il LED rimarrà acceso solo se l'azione di deposito viene interrotta da un allarme.</li>
-			<li>Il LED rimarrà spento solo quando non ci sarà più nulla da gestire (e quindi il robot si troverà nella posizione di partenza, HOME).</li>
+			<li>Il LED rimarrà spento quando sarà fermi in HOME</li>
 		</ol>
     </div>
 
