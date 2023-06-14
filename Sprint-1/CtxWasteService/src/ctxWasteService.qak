@@ -15,10 +15,11 @@ System ctxwasteservice
     Request move		:	move(CurrentPos, NewPos)
  	Reply   moveDone	:	moveDone(NewPos)
  	Request goBack		:	goBack(ARG)
- 	Dispatch stop		:	stop(ARG)
+ 	Dispatch toggleStop :	toggleStop(ARG)
  	
  	//CustomPathExecutor - BasicRobot22
  	Dispatch cmd       	: cmd(MOVE)
+ 	Event 	posEvent	: posEvent(POS)
  	
  	//COAP UPDATE
  	Dispatch coapUpdate	: coapUpdate(RESOURCE, VALUE)
@@ -221,8 +222,6 @@ QActor transporttrolley context ctxwasteservice {
 			request custompathexecutor -m move : move($Pos, glassbox)
 		}
 		
-		//println("MaterialType = $MaterialType")
-		
 	}
 	Transition t1 whenReply moveDone -> depositDone
 	
@@ -231,7 +230,7 @@ QActor transporttrolley context ctxwasteservice {
 	State depositDone {
 		onMsg(moveDone : moveDone(NewPos)){
 			[# val Arg = payloadArg(0) #]
-			if[# Arg == "plasticbox" || Arg == "glassbox"#]{
+			if[# Arg == "plasticbox" || Arg == "glassbox" || Arg == "2" || Arg == "3"#]{
 				[# Pos = Arg #]
 				println("\t $name: Depositing $MaterialType!") color blue
 				delay 6000
@@ -252,12 +251,10 @@ QActor transporttrolley context ctxwasteservice {
      	println("\t $name: Going home") color blue
 		request custompathexecutor -m move : move($Pos, home)
 	}
-	Transition t3 whenReply moveDone -> waiting
+	Transition t3 	whenReply moveDone -> waiting
+					whenRequest pickupReq -> handlePickupReq
      
 }
-
-
-
 
 QActor custompathexecutor context ctxwasteservice {
 	[# 
@@ -265,12 +262,31 @@ QActor custompathexecutor context ctxwasteservice {
 		val version = "1"
 		
 		
-		var Pos = ""
-		var NewPos = ""
-
+		var Pos = 0
+		var PosToGo = 0
+		
+//		enum class positions(val v : String) = {home(0), indoor(1), plasticbox(2), glassbox(3)}
+		
+//		enum class routes(val v : Int) = {
+//			HI(1),
+//			IP(1),
+//			IG(2),
+//			PI(-1),
+//			GI(-2),
+//			PH(2),
+//			GH(1)
+//		}
+		
+		var stepToDo = 0
 		var pathToDo = ""
 		var pathStep = 0
 		var pathLenght = -1
+		var turnBack = false
+		
+		val IncPosPath = "wl"
+		val DecPosPath = "lwrr"
+		val goBackPath = "hllwrr"
+		val goBackPath2 = "hllwrrr" 
 	#]
 	
 	
@@ -289,55 +305,79 @@ QActor custompathexecutor context ctxwasteservice {
 	State handleMoveRequest {
 		onMsg(move : move(Pos, NewPos)){
 			[# 
-				Pos = payloadArg(0)
-				NewPos = payloadArg(1)
+				val NewPos = payloadArg(1)
 				pathStep = 0
 			#]
-			
+			if[# NewPos == "home" #]{
+				[# PosToGo = 0 #]
+			}
+			if[# NewPos == "indoor" #]{
+				[# PosToGo = 1 #]
+			}
+			if[# NewPos == "plasticbox" #]{
+				[# PosToGo = 2 #]
+			}
+			if[# NewPos == "glassbox" #]{
+				[# PosToGo = 3 #]
+			}
 			println("\t $name: doing move($Pos, $NewPos)")
-			//MOVING LOGIC
-			
-			if[# Pos == "home"  && NewPos == "indoor" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# Pos == "indoor"  && NewPos == "plasticbox" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# Pos == "indoor"  && NewPos == "glassbox" #]{
-				[# pathToDo = "wlwl" #]
-			}
-			if[# Pos == "plasticbox"  && NewPos == "home" #]{
-				[# pathToDo = "wlwl" #]
-			}
-			if[# Pos == "glassbox"  && NewPos == "home" #]{
-				[# pathToDo = "wl" #]
-			}
-			
-			//Turn Around
-			if[# Pos == "glassbox"  && NewPos == "indoor" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# Pos == "plasticbox"  && NewPos == "indoor" #]{
-				[# pathToDo = "wl" #]
-			}
-			if[# NewPos == "indoor" && Pos == "platicbox" #]{
-				[# pathToDo = "lwll" #]
-			}
-			if[# NewPos == "indoor" && Pos == "glassbox" #]{
-				[# pathToDo = "lwrwll" #]
-			} 
-			[# pathLenght = pathToDo.lastIndex #]
 		}
+		
+		[# 
+			stepToDo = PosToGo - Pos 
+			if(stepToDo <= -3 ){
+				stepToDo += 4
+			}else if(stepToDo >= 3){
+				stepToDo += -4
+			}
+		#]
+		
+		println("\t $name: stepToDo=$stepToDo")
 	}
 	Goto working
 	
+	
 	State working {
+		[# pathStep = 0 
+			var backPath = ""
+		#]
+		
+		if[# stepToDo > 0 #]{
+			[# pathToDo = IncPosPath 
+				backPath = goBackPath
+			#]
+		}
+		if[# stepToDo < 0 #]{
+			[# pathToDo = DecPosPath 
+				backPath = goBackPath2
+			#]
+		}
+		
+		if[# turnBack #]{
+			[# pathToDo = backPath.plus(pathToDo) #]
+		}
+		
+		[# pathLenght = pathToDo.lastIndex #]
+	}
+	Goto execStep if[# stepToDo != 0 #] else pathDone
+					
+					
+					
+					
+	State execStep {
+		onMsg(toggleStop : toggleStop(ARG)){
+			//REPLY Inutile
+			//replyTo stopReq with stopRepl : stopRepl(Resumed)
+			println("\t $name: RESUMED!")
+		}
+		
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			[#
 				val Resource = payloadArg(0)
 				val Value = payloadArg(1)
-				if(Value.contains("obstacle"))
+				if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w'){
 					pathStep++
+				}
 			#]
 			println("\t $name: coapUpdate($Resource, $Value)")
 		}
@@ -349,32 +389,81 @@ QActor custompathexecutor context ctxwasteservice {
 			if[# CMD == 'w' #]{
 				forward basicrobot -m cmd : cmd($CMD)
 			}
-			if[# CMD == 'l' || CMD == 'r' #]{
+			if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
 				forward basicrobot -m cmd : cmd($CMD)
 				delay 1000
 				[# pathStep++ #]
 			}
+		}else{
+			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
+		}
+	
+	}
+	Transition t1 	whenTime 1200 -> execStep
+					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> execStep 
+					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> stepDone
+					//whenRequest move -> handleMoveRequestInMovement
+					whenMsg toggleStop -> stopped
+	
+	
+	
+
+	
+	
+	
+	State stepDone {
+		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
+			
+			
+			if[# stepToDo > 0 && !turnBack #]{
+				[# 
+					stepToDo-- 
+					Pos = (Pos+1)%4
+				#]
+			}
+			if[# stepToDo < 0  && !turnBack #]{
+				[# 
+					stepToDo++ 
+					Pos = (Pos-1)%4
+				#]
+			}
+			if[# turnBack #]{
+				[# turnBack = false #]
+				println("\t $name: Turned Back! - Pos: $Pos")
+			}
+			
+			println("\t $name: StepDone! - Pos: $Pos")
+			emit posEvent : posEvent($Pos)
+			
 		}
 	}
-	Transition t1 	whenTime 2000 -> working
-					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> working 
-					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> pathDone
-					whenInterrupt stop -> stop
+	Transition t2 	whenTime 100 -> working
+					whenRequest move -> handleMoveRequest
 	
 	
 	State pathDone {
-		println("\t $name: Path done in $NewPos")
-		replyTo move with moveDone : moveDone($NewPos) caller==transporttrolley
+		println("\t $name: Path done in $Pos")
+		replyTo move with moveDone : moveDone($Pos) caller==transporttrolley
 	}
 	Goto waiting
 	
-	//FUTURE FUNCTION
-	State stop {
-		
-		//Advanced future function
-		onMsg(goBack : goBack(ARG)){
-			[# pathToDo = "llwr"#]
+	State stopped {
+		onMsg(toggleStop : toggleStop(ARG)){
+			//REPLY Inutile
+			//replyTo stopReq with stopRepl : stopRepl(Stopped)
+			forward basicrobot -m cmd : cmd(h)
+			delay 100
+			println("\t $name: STOPPED!")
 		}
-		
 	}
+	Transition t3 	whenMsg toggleStop -> execStep
+	
+	
+	//Optional implementation
+	State handleMoveRequestInMovement {
+		//Attahc to path the normal path, the go back path
+		[# turnBack = true #]
+	}
+	Goto handleMoveRequest
+	
 }
