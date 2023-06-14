@@ -15,8 +15,7 @@ System ctxwasteservice
     Request move		:	move(CurrentPos, NewPos)
  	Reply   moveDone	:	moveDone(NewPos)
  	Request goBack		:	goBack(ARG)
- 	Request stopReq		:	stopReq(ARG)
- 	Reply	stopRepl 	:	stopRepl(ARG)
+ 	Dispatch toggleStop :	toggleStop(ARG)
  	
  	//CustomPathExecutor - BasicRobot22
  	Dispatch cmd       	: cmd(MOVE)
@@ -337,12 +336,6 @@ QActor custompathexecutor context ctxwasteservice {
 	}
 	Goto working
 	
-	State handleMoveRequestInMovement {
-		//Attahc to path the normal path, the go back path
-		[# turnBack = true #]
-	}
-	Goto handleMoveRequest
-	
 	
 	State working {
 		[# pathStep = 0 
@@ -372,6 +365,12 @@ QActor custompathexecutor context ctxwasteservice {
 					
 					
 	State execStep {
+		onMsg(toggleStop : toggleStop(ARG)){
+			//REPLY Inutile
+			//replyTo stopReq with stopRepl : stopRepl(Resumed)
+			println("\t $name: RESUMED!")
+		}
+		
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			[#
 				val Resource = payloadArg(0)
@@ -404,7 +403,7 @@ QActor custompathexecutor context ctxwasteservice {
 					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> execStep 
 					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> stepDone
 					//whenRequest move -> handleMoveRequestInMovement
-					//whenRequest stopReq -> stopped
+					whenMsg toggleStop -> stopped
 	
 	
 	
@@ -448,139 +447,23 @@ QActor custompathexecutor context ctxwasteservice {
 	}
 	Goto waiting
 	
+	State stopped {
+		onMsg(toggleStop : toggleStop(ARG)){
+			//REPLY Inutile
+			//replyTo stopReq with stopRepl : stopRepl(Stopped)
+			forward basicrobot -m cmd : cmd(h)
+			delay 100
+			println("\t $name: STOPPED!")
+		}
+	}
+	Transition t3 	whenMsg toggleStop -> execStep
+	
+	
+	//Optional implementation
+	State handleMoveRequestInMovement {
+		//Attahc to path the normal path, the go back path
+		[# turnBack = true #]
+	}
+	Goto handleMoveRequest
 	
 }
-
-
-//QActor custompathexecutor context ctxwasteservice {
-//	[# 
-//		val name = "CustomPathExecutor"
-//		val version = "1"
-//		
-//		
-//		var Pos = ""
-//		var NewPos = ""
-//
-//		var pathToDo = ""
-//		var pathStep = 0
-//		var pathLenght = -1
-//	#]
-//	
-//	
-//	
-//	State s0 initial{
-//		println("\t $name: Started! $version") color blue
-//	}
-//	Goto waiting
-//	
-//	State waiting {
-//		println("\t $name: waiting for move requests!")
-//	}
-//	Transition t0 whenRequest move -> handleMoveRequest
-//	
-//	
-//	State handleMoveRequest {
-//		onMsg(move : move(Pos, NewPos)){
-//			[# 
-//				Pos = payloadArg(0)
-//				NewPos = payloadArg(1)
-//				pathStep = 0
-//			#]
-//			
-//			println("\t $name: doing move($Pos, $NewPos)")
-//			//MOVING LOGIC
-//			
-//			
-//			if[# Pos == "home"  && NewPos == "indoor" #]{	//HI
-//				[# pathToDo = "wl" #]
-//			}
-//			if[# Pos == "indoor"  && NewPos == "plasticbox" #]{		//IP
-//				[# pathToDo = "wl" #]
-//			}
-//			if[# Pos == "plasticbox"  && NewPos == "glassbox" #]{	//PG
-//				[# pathToDo = "wl" #]
-//			}
-//			if[# Pos == "glassbox"  && NewPos == "home" #]{			//GH
-//				[# pathToDo = "wl" #]
-//			}
-//			
-//			//Doppia
-//			if[# Pos == "indoor"  && NewPos == "glassbox" #]{
-//				[# pathToDo = "wlwl" #]
-//			}
-//			//Togliere
-//			if[# Pos == "plasticbox"  && NewPos == "home" #]{
-//				[# pathToDo = "wlwl" #]
-//			}
-//			
-//			
-//			//Turn Around
-//			if[# Pos == "plasticbox"  && NewPos == "indoor" #]{		//PI
-//				[# pathToDo = "lwll" #]
-//			}
-//			if[# Pos == "glassbox"  && NewPos == "plasticbox" #]{	//GP
-//				[# pathToDo = "lwll" #]
-//			}
-//			
-//			//Doppia
-//			if[# Pos == "glassbox"  && NewPos == "indoor" #]{
-//				[# pathToDo = "lwrwll" #]
-//			}
-//			
-//			//Turn
-//			if[# NewPos == "goBack"#]{
-//				[# pathToDo = "llwrr" #]
-//			}
-//			
-//			[# pathLenght = pathToDo.lastIndex #]
-//		}
-//	}
-//	Goto working
-//	
-//	State working {
-//		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
-//			[#
-//				val Resource = payloadArg(0)
-//				val Value = payloadArg(1)
-//				if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w')
-//					pathStep++
-//			#]
-//			println("\t $name: coapUpdate($Resource, $Value)")
-//		}
-//		if[# pathStep <= pathLenght #]{
-//			[#
-//				val CMD = pathToDo.get(pathStep)
-//			#]
-//			println("\t $name: Forwarding to BasicRobot cmd($CMD)")
-//			if[# CMD == 'w' #]{
-//				forward basicrobot -m cmd : cmd($CMD)
-//			}
-//			if[# CMD == 'l' || CMD == 'r' #]{
-//				forward basicrobot -m cmd : cmd($CMD)
-//				delay 1000
-//				[# pathStep++ #]
-//			}
-//		} else {
-//			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, pathDone)
-//		}
-//	}
-//	Transition t1 	whenTime 2000 -> working
-//					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> working 
-//					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> pathDone
-//					whenRequest stopReq -> stopped
-//	
-//	
-//	State pathDone {
-//		println("\t $name: Path done in $NewPos")
-//		replyTo move with moveDone : moveDone($NewPos) caller==transporttrolley
-//	}
-//	Goto waiting
-//	
-//	State stopped {
-//		forward basicrobot -m cmd : cmd(h)
-//		replyTo stopReq with stopRepl : stopReply(stopped)
-//	}
-//	Transition t2 whenRequest stopReq -> working
-//}
-//
-//
