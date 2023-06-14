@@ -105,16 +105,6 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					}	 	 
 					 transition( edgeName="goto",targetState="working", cond=doswitch() )
 				}	 
-				state("handleMoveRequestInMovement") { //this:State
-					action { //it:State
-						 turnBack = true  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition( edgeName="goto",targetState="handleMoveRequest", cond=doswitch() )
-				}	 
 				state("working") { //this:State
 					action { //it:State
 						 pathStep = 0 
@@ -143,6 +133,10 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("execStep") { //this:State
 					action { //it:State
+						if( checkMsgContent( Term.createTerm("toggleStop(ARG)"), Term.createTerm("toggleStop(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outblack("	 $name: RESUMED!")
+						}
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
@@ -181,6 +175,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					}))
 					transition(edgeName="t112",targetState="stepDone",cond=whenDispatchGuarded("coapUpdate",{ pathStep > pathLenght  
 					}))
+					transition(edgeName="t113",targetState="stopped",cond=whenDispatch("toggleStop"))
 				}	 
 				state("stepDone") { //this:State
 					action { //it:State
@@ -210,8 +205,8 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				 	 		stateTimer = TimerActor("timer_stepDone", 
 				 	 					  scope, context!!, "local_tout_custompathexecutor_stepDone", 100.toLong() )
 					}	 	 
-					 transition(edgeName="t213",targetState="working",cond=whenTimeout("local_tout_custompathexecutor_stepDone"))   
-					transition(edgeName="t214",targetState="handleMoveRequest",cond=whenRequest("move"))
+					 transition(edgeName="t214",targetState="working",cond=whenTimeout("local_tout_custompathexecutor_stepDone"))   
+					transition(edgeName="t215",targetState="handleMoveRequest",cond=whenRequest("move"))
 				}	 
 				state("pathDone") { //this:State
 					action { //it:State
@@ -223,6 +218,31 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					sysaction { //it:State
 					}	 	 
 					 transition( edgeName="goto",targetState="waiting", cond=doswitch() )
+				}	 
+				state("stopped") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("toggleStop(ARG)"), Term.createTerm("toggleStop(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								forward("cmd", "cmd(h)" ,"basicrobot" ) 
+								delay(100) 
+								CommUtils.outblack("	 $name: STOPPED!")
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t316",targetState="execStep",cond=whenDispatch("toggleStop"))
+				}	 
+				state("handleMoveRequestInMovement") { //this:State
+					action { //it:State
+						 turnBack = true  
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="handleMoveRequest", cond=doswitch() )
 				}	 
 			}
 		}
