@@ -1,0 +1,71 @@
+System raspberry
+
+
+//TransportTrolley
+Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
+
+
+
+
+
+Context ctxraspberry ip[host="localhost" port=8076]
+
+//---- Led
+QActor led context ctxraspberry {
+	[#
+		val name = "LedActor"
+		val version = "V1.0"
+
+		var ledState = "off"
+	#]
+
+	State s0 initial {
+		println("\t $name: Started! $version") color red
+	}
+	Goto handleRobotStateEvent
+
+
+	State handleRobotStateEvent {
+        println("\t $name: Handling RobotState change!") color red
+        [#
+            val robotState = "null"
+        #]
+        onMsg(robotStateEvent : robotStateEvent(STATE)){
+        	[# robotState = payloadArg(0) #]
+        
+
+	        //Handling example
+	        if[# robotState == "athome" #]{
+	            [# ledState = "LedOff" #]
+	        }
+	        if[# robotState == "moving" #]{
+	            [# ledState = "LedBlink" #]
+	        }
+	        if[# robotState == "stopped" #]{
+	            [# ledState = "LedOn" #]
+	        }
+	
+			println("\t $name: Led state- $ledState") color red
+		}
+	}
+	Transition t0	whenEvent robotStateEvent -> handleRobotStateEvent
+
+}
+
+
+
+
+
+//----- SONAR
+QActor sonarqak22 context ctxraspberry {
+	[#
+		val name = "SonarQak22"
+		val version = "V1.0"
+	#]
+	
+	State s0 initial {
+		
+	}
+	
+	
+}
