@@ -20,6 +20,7 @@
         <li><a href="../../Sprint-0/userDocs/Sprint0-LLA.html">sprint0</a></li>
         <li><a href="../../Sprint-1/userDocs/Sprint1-LLA.html">sprint1</a></li>
 		<li><a href="./Sprint2-LLA.html">sprint2</a></li>
+		<li><a href="../../Sprint-3/userDocs/Sprint3-LLA.html">sprint3</a></li>
     </ul>
 </nav>
 </div>
@@ -104,38 +105,49 @@
 
     <h3>1 - Sonar</h3>
     <div class="remark">
+	<h3>Dallo Sprint0</h3>
+    <p>Strumento connesso in input al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
+    <p>Il <b>Sonar</b> è un dispositivo che emette informazioni sulla presenza di oggetti a lui davanti e sulla loro distanza.</p>
+
+	<h4>Come prendiamo i dati dal Sonar fisico?</h4>
+	<p>L’attore che ci è stato fornito già si occupa di interfacciarsi con il sonar fisico infatti il Software per 
+	l'utilizzo del <i>Sonar fisico</i> installato sul <c>Raspberry</c> viene fornito dal committente 
+	nel progetto <a href="https://github.com/anatali/issLab2022/tree/main/unibo.sonarqak22">SonarActor22.</a></p>
+
+
 	<h4>Che informazioni invia il sonar?</h4>
 	
-<p>Il sonar dovrà emettere un evento quando ad ogni nuova misurazione</p>
-	<ul>Può emettere un'informazione del tipo: </ul> 
-	<li>DISTANZA RILEVATA (CI SERVE?)</li>
-	<li>EVENTO NOTIFICA ( currentDist < o > DLIMIT)</li>
+	<p>Il sonar riprende l'evento già fornito dal committente all'interno della documentazione prima citata e 
+	dovrà emettere un evento ad ogni nuova misurazione con la misurazione della distanza rilevata in quel momento.</p>
+	<pre><code>
+Event sonardata  :  sonardata(distance)
+	</code></pre>
 	
-	<ul> ANALIZZARE SE EFFETTIVAMENTE CI SERVE LA DISTANZA MISURATA perchè se deve rilevare una collisione ci basterà che il sonar si attiva a parete rilevata e quindi ci interessa 
-	soltanto</ul>
-	<li>RILEVAZIONE DELL'ALLARME</li>
+
+	<h4>Come bloccare il robot? </h4>
+	<h5>Come gestire le rilevazioni del Sonar? </h5>
+	<p>Il sonar emette l'evento <code>sonardata</code> che verrà gestito da un nuovo componente custom che chiameremo 
+	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello
+	Sprint0.</p>
 	
 	<pre><code>
-	Event alarm       : alarm(_)
-	Event alarmstop : alarmstop(_)   Ci interessa anche allarme cessato??  
+In QAK si potrebbe aggiungere lo stato del SonarDataHandler in cui avvengono le verifiche tra la variabile sonardata
+e il valore DLIMIT.
 	</code></pre>
-
 	
-<p>L'allarme viene inviato al sistema -> è il fatto che dicemmo qakruntime?? COME SI FA AD INVIARLO AL SISTEMA? c'è un  componente dedicato?</p>
+
+	<h5>Che messaggi invia per notificare il blocco il robot (/bloccare il robot?  Va bene? Perchè non è che blocca 
+	il robot ma da l'allarme al TT) e a chi inviarli?</h5>
+<p>Il componente <b>SonarDataHandler</b>,una volta effettuate le verifiche,in caso di esito negativo emetterà degli eventi 
+del tipo: </p>
 	
 	<pre><code>
-		-----	
+Event alarm       : alarm(_)
+Event alarmstop : alarmstop(_)
 	</code></pre>
-
-	<p>Per implementare il componente sarà quindi opportuno modificare il Sonar di unibo.sonarqak22, tale componente lo chiameremo sonarLLA.</p>
 	
-	<h4>Chi riceve le informazioni del sonar e gestisce l'halt?</h4>
-	
-	
-	<h4>Chi riceve le informazioni del sonar e gestisce il LED?</h4>
-	
-	
-	<b>HALT e LED vengono gestisti dallo stesso componente che riceve l'info e manda halt e azione al LED???????</b>
+<p>Questi eventi vengono recepiti e gestiti dal <b>TransportTrolley</b> che sarà delegato dell'immediato blocco operazionale
+del robot. </p>
 	
     </div>
 
@@ -143,23 +155,36 @@
     <div class="remark">
 
 <h4>Come calcolare lo stato del Led?</h4>
-<ul>Lo stato del Led dipende:</ul>
+<pre><code>
+enum LedState = {LedOff, LedOn, LedBlink};
+</code></pre>
+<ul>Lo stato del Led dipende dal:</ul>
 
-<li>Dal fatto che il robot si trovi o meno in HOME .</li>
-<li>Dal fatto che il robot sia in movimento (o che comunque stia operando) piuttosto che si trovi invece bloccato da un allarme.
-Dunque potrà essere creato una specie di controller che ossreva questi attori e che invia messaggi al Led.
+<li>Il robot che si trova o meno in HOME e quindi <code>LedState = LedOn</code></li>
+<li>Il robot che sia in movimento (o che comunque stia operando) e quindi <code>LedState = LedBlink</code>.
+<li>Il robot che si trova bloccato e quindi <code>LedState = LedOff</code>.</li>
 
 <h4>Come interagire con il componente Led?</h4>
-Il componente Led può ricevere gli aggiornamenti di stato tramite eventi. 
-Inoltre lo stato del Led sulla gui potrà essere aggiornato facendo uso del medesimo evento.
-
+Il componente Led può ricevere gli aggiornamenti di stato tramite un evento.
 <pre><code>
-Event    update_led 	  : update_led(LEDSTATE) // LEDSTATE = ON | OFF | BLINK
+Event 	RobotStateEvent	:	RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED
 </code></pre>
+L'aggiornamento per mezzo di questo evento gli arriva dal <b>TransportTrolley</b> e il componente LED potrà gestire 
+questo evento e avrà a disposizione l'informazione sullo stato da assumere.
 
+<h4>Come interagire con il LED fisico su Raspberry?</h4>
     </div>
 
-
+    <h3>3 - TransportTrolley</h3>
+    <div class="remark">
+	<h4>EVOLUZIONE TRANSPORT TROLLEY SPRINT2</h4>
+	<h4>Come gestiamo i messaggi di allarme per bloccare il robot?</h4>
+	<p>In virtù di quanto spiegato, il componente <b>TransportTrolley</b> necessita di alcune modifiche rispetto a come era stato
+	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire gli eventi di allarme che gli arrivano dal
+	<b>SonarDataHandler</b> e dovrà emettere l'evento <code>RobotStateEvent</code> per notificare il <b>LED</b>. 
+	Invece per far bloccare il movimento del robot ordinerà la dispatch <code>toggleStop :	toggleStop(ARG)</code> 
+	che già è stata dichiarata negli sprint precedenti.</p>
+	</div>
 <!-- ------------------------------------------------------ -->
 <h2>Modello Eseguibile</h2>
 <div class="remark">
