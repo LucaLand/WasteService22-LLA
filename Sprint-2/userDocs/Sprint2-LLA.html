@@ -160,9 +160,9 @@ enum LedState = {LedOff, LedOn, LedBlink};
 </code></pre>
 <ul>Lo stato del Led dipende dal:</ul>
 
-<li>Il robot che si trova o meno in HOME e quindi <code>LedState = LedOn</code></li>
-<li>Il robot che sia in movimento (o che comunque stia operando) e quindi <code>LedState = LedBlink</code>.
-<li>Il robot che si trova bloccato e quindi <code>LedState = LedOff</code>.</li>
+<li>Robot che si trova o meno in HOME e quindi <code>LedState = LedOn</code></li>
+<li>Robot che sia in movimento (o che comunque stia operando) e quindi <code>LedState = LedBlink</code>.
+<li>Robot che si trova bloccato e quindi <code>LedState = LedOff</code>.</li>
 
 <h4>Come interagire con il componente Led?</h4>
 Il componente Led può ricevere gli aggiornamenti di stato tramite un evento.
@@ -177,13 +177,20 @@ questo evento e avrà a disposizione l'informazione sullo stato da assumere.
 
     <h3>3 - TransportTrolley</h3>
     <div class="remark">
-	<h4>EVOLUZIONE TRANSPORT TROLLEY SPRINT2</h4>
+
 	<h4>Come gestiamo i messaggi di allarme per bloccare il robot?</h4>
 	<p>In virtù di quanto spiegato, il componente <b>TransportTrolley</b> necessita di alcune modifiche rispetto a come era stato
 	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire gli eventi di allarme che gli arrivano dal
 	<b>SonarDataHandler</b> e dovrà emettere l'evento <code>RobotStateEvent</code> per notificare il <b>LED</b>. 
 	Invece per far bloccare il movimento del robot ordinerà la dispatch <code>toggleStop :	toggleStop(ARG)</code> 
 	che già è stata dichiarata negli sprint precedenti.</p>
+	
+	<h4>EVOLUZIONE TRANSPORT TROLLEY SPRINT2</h4>
+	<pre><code>
+In QAK si potrebbe aggiungere le evoluzioni e le modifiche effettuate.
+	</code></pre>
+	
+	
 	</div>
 <!-- ------------------------------------------------------ -->
 <h2>Modello Eseguibile</h2>
