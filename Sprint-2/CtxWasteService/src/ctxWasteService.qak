@@ -29,6 +29,9 @@ System ctxwasteservice
  	Dispatch alarm 		: 	alarm(ARG)
  	Dispatch alarmStop 	: 	alarmStop(ARG)
  	
+ 	//TransportTrolley - Led
+	Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
+ 	
  	
  	
 
@@ -165,6 +168,8 @@ QActor transporttrolley context ctxwasteservice {
 
 	State waiting {
 		[# Pos = "home" #]
+		emit robotStateEvent : robotStateEvent(moving)
+		
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
 
 		println("\t $name: ready and waiting for pickupRequest!") color blue
@@ -188,6 +193,8 @@ QActor transporttrolley context ctxwasteservice {
 	
 	
 	State goPickUp {
+		emit robotStateEvent : robotStateEvent(athome)
+		
 		//Sending messages to BasicRobot22
 		println("\t $name: Going to Indoor!") color blue
 		println("\t $name: Robot going from $Pos to Indoor") color blue
@@ -203,7 +210,7 @@ QActor transporttrolley context ctxwasteservice {
 	
 	State pickupDone {
 		[# Pos = "indoor" #]
-
+		
 		println("\t $name: Picking up...") color blue
 		delay 5000
 		//Sending pikcup finished
@@ -272,6 +279,7 @@ QActor transporttrolley context ctxwasteservice {
 		onMsg(alarm : alarm(ARG)){
 			println("\t $name: Robot Stopped!") color blue
 			forward custompathexecutor -m toggleStop : toggleStop(stop)
+			emit robotStateEvent : robotStateEvent(stopped)
 		}
 	}
 	Transition t3	whenMsg alarmStop -> resume
@@ -280,6 +288,7 @@ QActor transporttrolley context ctxwasteservice {
 		onMsg(alarmStop : alarmStop(ARG)){
 			println("\t $name: Resumed execution!") color blue
 			forward custompathexecutor -m toggleStop : toggleStop(resume)
+			emit robotStateEvent : robotStateEvent(athome)
 		}
 		returnFromInterrupt
 	}
@@ -500,6 +509,8 @@ QActor custompathexecutor context ctxwasteservice {
 
 
 
+
+//MOCK OBECT to test new stopping semantic in Trasport Trolley
 QActor alarmsimulator context ctxwasteservice {
 	State s0 initial{
 		delay 10000
