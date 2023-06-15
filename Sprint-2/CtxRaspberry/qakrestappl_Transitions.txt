@@ -1,0 +1,4 @@
+{"actor":"sonarqak22", "msgType":"dispatch", "curstate":"s0", "nextstate":"activateTheSonar", "msgId":"sonaractivate"}
+{"actor":"sonarqak22", "msgType":"dispatch", "curstate":"s0", "nextstate":"deactivateTheSonar", "msgId":"sonardeactivate"}
+{"actor":"sonarqak22", "msgType":"dispatch", "curstate":"activateTheSonar", "nextstate":"deactivateTheSonar", "msgId":"sonardeactivate"}
+{"actor":"sonarqak22", "msgType":"dispatch", "curstate":"handleSonarData", "nextstate":"deactivateTheSonar", "msgId":"sonardeactivate"}
