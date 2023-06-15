@@ -5,11 +5,14 @@ System raspberry
 Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
 
 
-//SonarQak22
-Dispatch sonaractivate   : info(ARG)
-Dispatch sonardeactivate : info(ARG)
-Event    sonar           : distance( V )   //emitted by sonarSimulator or sonardatasource	
-Event    sonardata       : distance( V )   //for the application level
+	//SonarQak23
+	Event sonardata : distance(D)   //emitted  by distancefilter
+	Event obstacle  : obstacle(D)   //emitted as stream by distancefilter
+	Dispatch coapUpdate: coapUpdate(RESOURCE, VALUE)
+	Event alarm           : alarm(X)
+
+	//SonarData Appl
+	Event sonardataAppl : distance(D)   //emitted  by sonarqak23
 
 	//Sonar - TransportTrolley
  	Dispatch alarm 		: 	alarm(ARG)
@@ -22,18 +25,16 @@ Context ctxwasteservice ip[host="127.0.0.1" port=8072]
 
 Context ctxraspberry ip[host="localhost" port=8076]
 
-//DATA SOURCES
-CodedQActor sonarsimulator  context ctxraspberry className "sonarSimulator"  
-CodedQActor sonardatasource context ctxraspberry className "sonarHCSR04Support2021"
 
-/*
- * Actors for the sonar-data handling pipe
- * NOTE : we do not use the it.unibo`.radarSystem22.domain
- * we could do it by introducing an observer that emits the event
- */
-//CodedQActor datalogger     context ctxsonaronrasp className "dataLogger"
-CodedQActor datacleaner    context ctxraspberry className "dataCleaner"
-//CodedQActor distancefilter context ctxsonaronrasp className "distanceFilter"
+
+
+
+CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
+    //CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
+//CodedQActor datalogger     context ctxraspberry className "rx.dataLogger"
+CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
+CodedQActor distancefilter context ctxraspberry className "rx.distanceFilter"
+
 
 
 ExternalQActor transporttrolley context ctxwasteservice
@@ -86,62 +87,52 @@ QActor led context ctxraspberry {
 
 
 //----- SONAR
-QActor sonarqak22 context ctxraspberry{
-	[# val simulate       = true
-	   val sonarActorName = "sonarqak22"
-	   val usingDomain    = false
-	#]
-	State s0 initial {
-		//printCurrentMessage
-		run  sonarConfig.configureTheSonar(simulate, sonarActorName, usingDomain)
-		 
-		//ASSUMPTION: the sonar subsystem emits the event sonar:distance(V)
+QActor sonar23 context ctxraspberry{ 
+	[# var  ApplAlso = sysUtil.getActor("appl") != null #]
+	State s0 initial{  
+		println("sonar23 | start with appl: $ApplAlso") 
+		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 	}
-	Transition t0 whenMsg sonaractivate   -> activateTheSonar
-			      whenMsg sonardeactivate -> deactivateTheSonar
+	Goto work
+	 
+	State work{
+		//println("sonar23 | waits ... ") 		
+		updateResource [# "sonar23 waiting ..." #]
+	}
+	Transition t0 whenEvent sonardata -> handlesonardata
+	              whenEvent obstacle  -> handleobstacle
 	
-	State activateTheSonar{
+	State handlesonardata{
 		printCurrentMessage
-		if[#  `it.unibo`.radarSystem22.domain.utils.DomainSystemConfig.simulation #]{
-			forward sonarsimulator -m sonaractivate : info(ok) 
-			//run sonarConfig.activateSonarSimulated() //usingDomain
-		}else {
-			 forward sonardatasource -m sonaractivate : info(ok)  
+		updateResource [# "sonar23 handles $currentMsg" #]
+		onMsg(sonardata : distance(D)){
+			[# val D = payloadArg(0) #]
+			emit sonardataAppl : distance($D)
 		}
-	}
-	Transition t0  whenEvent sonar         -> handleSonarData  
-	               whenMsg sonardeactivate -> deactivateTheSonar
-	
-	State deactivateTheSonar{
-		printCurrentMessage
-	}
-	Goto end
- 
-  	State handleSonarData{
-  		 onMsg( sonar : distance(D) ){
-   		 	[# val D = payloadArg(0) #]  
-  		    //println("%%%%%%%%%%%%%%%%%%%%%%%%%%% emit %%%%%%%%%%%%%%% ${D}")
-  		 	emit sonardata : distance($D) //for the application
-  		 }
-  	}
-   	Transition t0 whenEvent sonar -> handleSonarData
-   				  whenMsg sonardeactivate -> deactivateTheSonar
-   		
-	State end{ 
-		println("sonarqak22 BYE")
-		[# System.exit(0) #]
-	}
-}
-
-
-QActor sonardatahandler context ctxraspberry{
-	
-	[# 
 		
+	}
+	Goto work 
+	
+	State handleobstacle{
+		onMsg( obstacle : obstacle(D)){			
+			println("$name handleobstacle ALARM ${payloadArg(0)}") color magenta
+			emit alarm : alarm(obstacle)			
+		}
+		
+	}
+	Goto sonar23 if [# ApplAlso == true #]  else work  
+	
+	State sonar23{
+		println("$name BYE")
+	}
+}   
+
+//SonarDataHandler
+QActor sonardatahandler context ctxraspberry{
+	[# 
 		val DLIMIT = 10
 		var stopped = false
 	#]
-	
 	
 	State s0 initial {
 		
@@ -150,7 +141,7 @@ QActor sonardatahandler context ctxraspberry{
 	
 	
 	State handleSonarData{
-		onMsg(sonardata : distance( V )){
+		onMsg(sonardataAppl : distance(D)){
 			[# val distance = payloadArg(0) #]
 			
 			if[# distance.toInt() <= DLIMIT && stopped == false #]{
@@ -166,25 +157,9 @@ QActor sonardatahandler context ctxraspberry{
 			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 		}
 	}
-	Transition t0	whenEvent sonardata -> handleSonarData
+	Transition t0	whenEvent sonardataAppl -> handleSonarData
 	
 }
-
-QActor sonarsimulator context ctxraspberry {
-	State s0 initial{
-		forward sonarqak22 -m sonaractivate : info(ok)
-	}
-}
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -19,7 +19,6 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				
 				val DLIMIT = 10
 				var stopped = false
 		return { //this:ActionBasciFsm
@@ -34,7 +33,7 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("handleSonarData") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("distance(V)"), Term.createTerm("distance(V)"), 
+						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val distance = payloadArg(0)  
 								if(  distance.toInt() <= DLIMIT && stopped == false  
@@ -52,7 +51,7 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t07",targetState="handleSonarData",cond=whenEvent("sonardata"))
+					 transition(edgeName="t03",targetState="handleSonarData",cond=whenEvent("sonardataAppl"))
 				}	 
 			}
 		}

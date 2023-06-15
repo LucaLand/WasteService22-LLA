@@ -23,19 +23,17 @@ with Diagram('raspberryArch', show=False, outformat='png', graph_attr=graphattr)
           transporttrolley=Custom('transporttrolley(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxraspberry', graph_attr=nodeattr):
           led=Custom('led','./qakicons/symActorSmall.png')
-          sonarqak22=Custom('sonarqak22','./qakicons/symActorSmall.png')
+          sonar23=Custom('sonar23','./qakicons/symActorSmall.png')
           sonardatahandler=Custom('sonardatahandler','./qakicons/symActorSmall.png')
-          sonarsimulator=Custom('sonarsimulator','./qakicons/symActorSmall.png')
-          sonarsimulator=Custom('sonarsimulator(coded)','./qakicons/codedQActor.png')
-          sonardatasource=Custom('sonardatasource(coded)','./qakicons/codedQActor.png')
+          sonar=Custom('sonar(coded)','./qakicons/codedQActor.png')
           datacleaner=Custom('datacleaner(coded)','./qakicons/codedQActor.png')
+          distancefilter=Custom('distancefilter(coded)','./qakicons/codedQActor.png')
      sys >> Edge(color='red', style='dashed', xlabel='robotStateEvent', fontcolor='red') >> led
-     sonarqak22 >> Edge(color='blue', style='solid', xlabel='sonaractivate', fontcolor='blue') >> sonarsimulator
-     sonarqak22 >> Edge(color='blue', style='solid', xlabel='sonaractivate', fontcolor='blue') >> sonardatasource
-     sys >> Edge(color='red', style='dashed', xlabel='sonar', fontcolor='red') >> sonarqak22
-     sonarqak22 >> Edge( xlabel='sonardata', **eventedgeattr, fontcolor='red') >> sys
+     sys >> Edge(color='red', style='dashed', xlabel='sonardata', fontcolor='red') >> sonar23
+     sys >> Edge(color='red', style='dashed', xlabel='obstacle', fontcolor='red') >> sonar23
+     sonar23 >> Edge( xlabel='sonardataAppl', **eventedgeattr, fontcolor='red') >> sys
+     sonar23 >> Edge( xlabel='alarm', **eventedgeattr, fontcolor='red') >> sys
      sonardatahandler >> Edge(color='blue', style='solid', xlabel='alarm', fontcolor='blue') >> transporttrolley
      sonardatahandler >> Edge(color='blue', style='solid', xlabel='alarmStop', fontcolor='blue') >> transporttrolley
-     sys >> Edge(color='red', style='dashed', xlabel='sonardata', fontcolor='red') >> sonardatahandler
-     sonarsimulator >> Edge(color='blue', style='solid', xlabel='sonaractivate', fontcolor='blue') >> sonarqak22
+     sys >> Edge(color='red', style='dashed', xlabel='sonardataAppl', fontcolor='red') >> sonardatahandler
 diag
