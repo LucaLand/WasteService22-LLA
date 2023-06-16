@@ -131,15 +131,49 @@ Event sonardata  :  sonardata(distance)
 	Sprint0.</p>
 	
 	<pre><code>
-In QAK si potrebbe aggiungere lo stato del SonarDataHandler in cui avvengono le verifiche tra la variabile sonardata
-e il valore DLIMIT.
+QActor sonardatahandler context ctxraspberry{
+	[# 
+		val DLIMIT = 10
+		var stopped = false
+	#]
+	
+	State s0 initial {
+		
+	}
+	Goto handleSonarData
+	
+	
+	State handleSonarData{
+		onMsg(sonardataAppl : distance(D)){
+			[# val distance = payloadArg(0) #]
+			
+			if[# distance.toInt() <= DLIMIT && stopped == false #]{
+				forward transporttrolley -m alarm : alarm(stop)
+				println("\t $name: Sending toggleStop(stop)!")
+			}
+			
+			if[# distance.toInt() > DLIMIT && stopped == true #]{
+				forward transporttrolley -m alarmStop : alarmStop(resume)
+				println("\t $name: Sending toggleStop(resume)!")
+			}
+			
+			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
+		}
+	}
+	Transition t0	whenEvent sonardataAppl -> handleSonarData
+	
+}
 	</code></pre>
+	<img src="" alt="SonarDataHandler">
+
+	
 	
 
 	<h5>Che messaggi invia per notificare il blocco il robot (/bloccare il robot?  Va bene? Perchè non è che blocca 
 	il robot ma da l'allarme al TT) e a chi inviarli?</h5>
-<p>Il componente <b>SonarDataHandler</b>,una volta effettuate le verifiche,in caso di esito negativo emetterà degli eventi 
-del tipo: </p>
+<p>Il componente <b>SonarDataHandler</b>,una volta effettuate le verifiche,in caso di condizione verificata emetterà degli eventi 
+di allarme e si prevede anche un evento per bloccare l'allarme non appena la
+distanza torna ad essere minore del valore <i>DLIMIT</i>: </p>
 	
 	<pre><code>
 Event alarm       : alarm(_)
@@ -150,8 +184,59 @@ Event alarmstop : alarmstop(_)
 del robot. </p>
 	
     </div>
+    <h3>2 - TransportTrolley</h3>
+    <div class="remark">
 
-    <h3>2 - Led </h3>
+	<h4>Come gestiamo i messaggi di allarme per bloccare il robot?</h4>
+	<p>In virtù di quanto spiegato, il componente <b>TransportTrolley</b> necessita di alcune modifiche rispetto a come era stato
+	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire gli eventi di allarme che gli arrivano dal
+	<b>SonarDataHandler</b> e dovrà emettere l'evento <code>RobotStateEvent</code> per notificare il <b>LED</b>. 
+	Invece per far bloccare il movimento del robot ordinerà la dispatch <code>toggleStop :	toggleStop(ARG)</code> 
+	che già è stata dichiarata negli sprint precedenti.</p>
+	
+	<h4>Evoluzione TransportTrolley - Sprint-2</h4>
+<p>Il <b>TransportTrolley</b> è stato modificato aggiungendo in quasi tutti gli stati 
+la transizione <code>whenInterrupt</code> in modo da abilitare questo componente a gestire i messaggi di allarme 
+che arrivano dal <b>SonarDataHandler</b>.</p>
+	<pre><code>
+whenInterrupt alarm -> handleAlarm
+	</code></pre>
+
+
+
+ <p>Sono stati aggiunti due nuovi stati
+<code>handleAlarm</code> per quando arriva <code>alarm</code> e lo stato <code>resume</code> 
+per quando arriva <code>alarmstop</code> e in entrambi i casi il <b>TransportTrolley</b> delegherà il 
+<b>CustomPathExecutor</b> rispettivamente di bloccare o riprendere l'esecuzione
+e cambierà lo stato dell'evento <i>robotStateEvent</i>. Il robot quando esce dallo stato 
+di <code>resume</code> torna a quello che stava facendo prima
+grazie alla <i>returnFromInterrupt</i>.
+</p>	
+	<pre><code>
+	//Sonar Alarm
+	State handleAlarm {
+		onMsg(alarm : alarm(ARG)){
+			println("\t $name: Robot Stopped!") color blue
+			forward custompathexecutor -m toggleStop : toggleStop(stop)
+			emit robotStateEvent : robotStateEvent(stopped)
+		}
+	}
+	Transition t3	whenMsg alarmStop -> resume
+	
+	State resume {
+		onMsg(alarmStop : alarmStop(ARG)){
+			println("\t $name: Resumed execution!") color blue
+			forward custompathexecutor -m toggleStop : toggleStop(resume)
+			emit robotStateEvent : robotStateEvent(athome)
+		}
+		returnFromInterrupt
+	}
+	</code></pre>
+	
+	
+	</div>
+	
+    <h3>3 - Led </h3>
     <div class="remark">
 
 <h4>Come calcolare lo stato del Led?</h4>
@@ -175,23 +260,7 @@ questo evento e avrà a disposizione l'informazione sullo stato da assumere.
 <h4>Come interagire con il LED fisico su Raspberry?</h4>
     </div>
 
-    <h3>3 - TransportTrolley</h3>
-    <div class="remark">
 
-	<h4>Come gestiamo i messaggi di allarme per bloccare il robot?</h4>
-	<p>In virtù di quanto spiegato, il componente <b>TransportTrolley</b> necessita di alcune modifiche rispetto a come era stato
-	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire gli eventi di allarme che gli arrivano dal
-	<b>SonarDataHandler</b> e dovrà emettere l'evento <code>RobotStateEvent</code> per notificare il <b>LED</b>. 
-	Invece per far bloccare il movimento del robot ordinerà la dispatch <code>toggleStop :	toggleStop(ARG)</code> 
-	che già è stata dichiarata negli sprint precedenti.</p>
-	
-	<h4>EVOLUZIONE TRANSPORT TROLLEY SPRINT2</h4>
-	<pre><code>
-In QAK si potrebbe aggiungere le evoluzioni e le modifiche effettuate.
-	</code></pre>
-	
-	
-	</div>
 <!-- ------------------------------------------------------ -->
 <h2>Modello Eseguibile</h2>
 <div class="remark">
