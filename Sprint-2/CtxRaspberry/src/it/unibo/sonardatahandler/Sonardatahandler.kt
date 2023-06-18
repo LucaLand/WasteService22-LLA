@@ -37,12 +37,14 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val distance = payloadArg(0)  
 								if(  distance.toInt() <= DLIMIT && stopped == false  
-								 ){forward("alarm", "alarm(stop)" ,"transporttrolley" ) 
-								CommUtils.outblack("	 $name: Sending toggleStop(stop)!")
+								 ){ stopped = true  
+								forward("alarm", "alarm(stop)" ,"transporttrolley" ) 
+								CommUtils.outblack("	 $name: Sending alarm(stop)!")
 								}
 								if(  distance.toInt() > DLIMIT && stopped == true  
-								 ){forward("alarmStop", "alarmStop(resume)" ,"transporttrolley" ) 
-								CommUtils.outblack("	 $name: Sending toggleStop(resume)!")
+								 ){ stopped = false  
+								forward("alarmStop", "alarmStop(resume)" ,"transporttrolley" ) 
+								CommUtils.outblack("	 $name: Sending alarmStop(resume)!")
 								}
 								CommUtils.outblack("	 $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 						}

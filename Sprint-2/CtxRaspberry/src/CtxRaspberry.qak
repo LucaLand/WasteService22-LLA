@@ -145,13 +145,15 @@ QActor sonardatahandler context ctxraspberry{
 			[# val distance = payloadArg(0) #]
 			
 			if[# distance.toInt() <= DLIMIT && stopped == false #]{
+				[# stopped = true #]
 				forward transporttrolley -m alarm : alarm(stop)
-				println("\t $name: Sending toggleStop(stop)!")
+				println("\t $name: Sending alarm(stop)!")
 			}
 			
 			if[# distance.toInt() > DLIMIT && stopped == true #]{
+				[# stopped = false #]
 				forward transporttrolley -m alarmStop : alarmStop(resume)
-				println("\t $name: Sending toggleStop(resume)!")
+				println("\t $name: Sending alarmStop(resume)!")
 			}
 			
 			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
