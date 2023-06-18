@@ -53,7 +53,7 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handleSonarData",cond=whenEvent("sonardataAppl"))
+					 transition(edgeName="t04",targetState="handleSonarData",cond=whenEvent("sonardataAppl"))
 				}	 
 			}
 		}
