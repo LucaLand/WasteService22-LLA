@@ -218,16 +218,14 @@ grazie alla <i>returnFromInterrupt</i>.
 		onMsg(alarm : alarm(ARG)){
 			println("\t $name: Robot Stopped!") color blue
 			forward custompathexecutor -m toggleStop : toggleStop(stop)
-			emit robotStateEvent : robotStateEvent(stopped)
 		}
 	}
 	Transition t3	whenMsg alarmStop -> resume
-	
+
 	State resume {
 		onMsg(alarmStop : alarmStop(ARG)){
 			println("\t $name: Resumed execution!") color blue
 			forward custompathexecutor -m toggleStop : toggleStop(resume)
-			emit robotStateEvent : robotStateEvent(athome)
 		}
 		returnFromInterrupt
 	}
@@ -254,8 +252,33 @@ Il componente Led può ricevere gli aggiornamenti di stato tramite un evento.
 <pre><code>
 Event 	RobotStateEvent	:	RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED
 </code></pre>
-L'aggiornamento per mezzo di questo evento gli arriva dal <b>TransportTrolley</b> e il componente LED potrà gestire 
+L'aggiornamento per mezzo di questo evento gli arriva dal <r>TransportTrolley</r> e il componente LED potrà gestire
 questo evento e avrà a disposizione l'informazione sullo stato da assumere.
+
+		<h4>Evoluzione del <r>TransportTrolley</r></h4>
+		<p>Il <r>TransportTrolley</r> si occuperà dunque di notificare al sistema i propri cambi di stato.</p>
+		<p>La notifica e l'aggiornamento dello stato vengono così gestite:</p>
+		<pre><code>
+State handleAlarm {
+		[#  PreviusState = State
+			RobotState = "stopped" #]
+		onMsg(alarm : alarm(ARG)){
+			...
+			<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+		}
+	} Transition t3	whenMsg alarmStop -> resume
+
+
+State resume {
+		[# RobotState = PreviusState #]
+		onMsg(alarmStop : alarmStop(ARG)){
+			...
+			<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+		}
+		returnFromInterrupt
+	}
+		</code></pre>
+
 
 <h4>Come interagire con il LED fisico su Raspberry?</h4>
     </div>
@@ -316,7 +339,7 @@ questo evento e avrà a disposizione l'informazione sullo stato da assumere.
     <div style="display: block; margin: 0 15vw;">
         <img src="./img/img_luca.png"   style="float: left; width: 19vw; height: 20vw">
         <img src="./img/img_anto.jpg"   style="float: left; width: 19vw; height: 20vw">
-        <img src="./img/img_lude.JPG"   style="float: left; width: 22vw; height: 20vw">
+        <img src="./img/img_lude.JPG"   style="float: left; width: 19vw; height: 20vw">
     </div>
 </div>
 
