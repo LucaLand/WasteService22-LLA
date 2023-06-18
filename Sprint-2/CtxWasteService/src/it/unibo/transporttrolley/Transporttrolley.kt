@@ -52,7 +52,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t02",targetState="handlePickupReq",cond=whenRequest("pickupReq"))
-					interrupthandle(edgeName="t03",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
 				}	 
 				state("handlePickupReq") { //this:State
 					action { //it:State
@@ -86,8 +85,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t14",targetState="pickupDone",cond=whenReply("moveDone"))
-					interrupthandle(edgeName="t15",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t13",targetState="pickupDone",cond=whenReply("moveDone"))
+					interrupthandle(edgeName="t14",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
 				}	 
 				state("pickupDone") { //this:State
 					action { //it:State
@@ -103,8 +102,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				 	 		stateTimer = TimerActor("timer_pickupDone", 
 				 	 					  scope, context!!, "local_tout_transporttrolley_pickupDone", 100.toLong() )
 					}	 	 
-					 transition(edgeName="t26",targetState="goDeposit",cond=whenTimeout("local_tout_transporttrolley_pickupDone"))   
-					interrupthandle(edgeName="t27",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t25",targetState="goDeposit",cond=whenTimeout("local_tout_transporttrolley_pickupDone"))   
+					interrupthandle(edgeName="t26",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
 				}	 
 				state("goDeposit") { //this:State
 					action { //it:State
@@ -122,8 +121,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t18",targetState="depositDone",cond=whenReply("moveDone"))
-					interrupthandle(edgeName="t19",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t17",targetState="depositDone",cond=whenReply("moveDone"))
+					interrupthandle(edgeName="t18",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
 				}	 
 				state("depositDone") { //this:State
 					action { //it:State
@@ -147,9 +146,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				 	 		stateTimer = TimerActor("timer_depositDone", 
 				 	 					  scope, context!!, "local_tout_transporttrolley_depositDone", 100.toLong() )
 					}	 	 
-					 transition(edgeName="t210",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositDone"))   
-					transition(edgeName="t211",targetState="handlePickupReq",cond=whenRequest("pickupReq"))
-					interrupthandle(edgeName="t212",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t29",targetState="goHome",cond=whenTimeout("local_tout_transporttrolley_depositDone"))   
+					transition(edgeName="t210",targetState="handlePickupReq",cond=whenRequest("pickupReq"))
+					interrupthandle(edgeName="t211",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
 				}	 
 				state("goHome") { //this:State
 					action { //it:State
@@ -161,9 +160,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t313",targetState="waiting",cond=whenReply("moveDone"))
-					transition(edgeName="t314",targetState="handlePickupReq",cond=whenRequest("pickupReq"))
-					interrupthandle(edgeName="t315",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t312",targetState="waiting",cond=whenReply("moveDone"))
+					transition(edgeName="t313",targetState="handlePickupReq",cond=whenRequest("pickupReq"))
+					interrupthandle(edgeName="t314",targetState="handleAlarm",cond=whenDispatch("alarm"),interruptedStateTransitions)
 				}	 
 				state("handleAlarm") { //this:State
 					action { //it:State
@@ -178,7 +177,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t316",targetState="resume",cond=whenDispatch("alarmStop"))
+					 transition(edgeName="t315",targetState="resume",cond=whenDispatch("alarmStop"))
 				}	 
 				state("resume") { //this:State
 					action { //it:State

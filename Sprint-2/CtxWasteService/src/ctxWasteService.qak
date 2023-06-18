@@ -34,7 +34,7 @@ System ctxwasteservice
  	
  	
  	
-
+Context ctxraspberry ip[host="127.0.0.1" port=8076]
 Context ctxsmartdevice ip[host="127.0.0.1" port=8074] 	//Solo a scopo di architettura (caller==)
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
 
@@ -43,6 +43,8 @@ Context ctxwasteservice ip[host="localhost" port=8072]
 
 ExternalQActor smartdevice context ctxsmartdevice		//Solo a scopo di architettura (caller==)
 ExternalQActor basicrobot context ctxbasicrobot
+//ExternalQActor led context ctxraspberry
+
 
 
 
@@ -179,7 +181,6 @@ QActor transporttrolley context ctxwasteservice {
 		println("\t $name: ready and waiting for pickupRequest!") color blue
 	}
     Transition t0 whenRequest pickupReq -> handlePickupReq
-    				whenInterrupt alarm -> handleAlarm
 
 
 	State handlePickupReq {
@@ -517,17 +518,23 @@ QActor custompathexecutor context ctxwasteservice {
 
 //MOCK OBECT to test new stopping semantic in Trasport Trolley
 QActor alarmsimulator context ctxwasteservice {
+	[# val ActiveMock = false #]
 	State s0 initial{
+		
+	}
+	Goto s1 if[# ActiveMock #] else s0
+	
+	State s1 {
 		delay 10000
 		println("AlarmSimulated: ALARM - Stopping TransportTrolley!") color red
 		forward transporttrolley -m alarm : alarm(stop)
 	}
-	Transition t0 whenTime 8000 -> s1
+	Transition t0 whenTime 8000 -> s2
 
-	State s1 {
+	State s2 {
 		delay 3000
 		println("AlarmSimulated: alarm stopped - Resuming TransportTrolley!") color red
 		forward transporttrolley -m alarmStop : alarmStop(resume)
 	}
-	Transition t0 whenTime 12000 -> s0
+	Transition t0 whenTime 12000 -> s1
 }

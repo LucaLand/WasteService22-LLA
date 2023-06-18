@@ -67,7 +67,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="handleMoveRequest",cond=whenRequest("move"))
+					 transition(edgeName="t016",targetState="handleMoveRequest",cond=whenRequest("move"))
 				}	 
 				state("handleMoveRequest") { //this:State
 					action { //it:State
@@ -170,12 +170,12 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				 	 		stateTimer = TimerActor("timer_execStep", 
 				 	 					  scope, context!!, "local_tout_custompathexecutor_execStep", 1200.toLong() )
 					}	 	 
-					 transition(edgeName="t118",targetState="execStep",cond=whenTimeout("local_tout_custompathexecutor_execStep"))   
-					transition(edgeName="t119",targetState="execStep",cond=whenDispatchGuarded("coapUpdate",{ pathStep <= pathLenght  
+					 transition(edgeName="t117",targetState="execStep",cond=whenTimeout("local_tout_custompathexecutor_execStep"))   
+					transition(edgeName="t118",targetState="execStep",cond=whenDispatchGuarded("coapUpdate",{ pathStep <= pathLenght  
 					}))
-					transition(edgeName="t120",targetState="stepDone",cond=whenDispatchGuarded("coapUpdate",{ pathStep > pathLenght  
+					transition(edgeName="t119",targetState="stepDone",cond=whenDispatchGuarded("coapUpdate",{ pathStep > pathLenght  
 					}))
-					transition(edgeName="t121",targetState="stopped",cond=whenDispatch("toggleStop"))
+					transition(edgeName="t120",targetState="stopped",cond=whenDispatch("toggleStop"))
 				}	 
 				state("stepDone") { //this:State
 					action { //it:State
@@ -205,8 +205,8 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				 	 		stateTimer = TimerActor("timer_stepDone", 
 				 	 					  scope, context!!, "local_tout_custompathexecutor_stepDone", 100.toLong() )
 					}	 	 
-					 transition(edgeName="t222",targetState="working",cond=whenTimeout("local_tout_custompathexecutor_stepDone"))   
-					transition(edgeName="t223",targetState="handleMoveRequest",cond=whenRequest("move"))
+					 transition(edgeName="t221",targetState="working",cond=whenTimeout("local_tout_custompathexecutor_stepDone"))   
+					transition(edgeName="t222",targetState="handleMoveRequest",cond=whenRequest("move"))
 				}	 
 				state("pathDone") { //this:State
 					action { //it:State
@@ -232,7 +232,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t324",targetState="execStep",cond=whenDispatch("toggleStop"))
+					 transition(edgeName="t323",targetState="execStep",cond=whenDispatch("toggleStop"))
 				}	 
 				state("handleMoveRequestInMovement") { //this:State
 					action { //it:State

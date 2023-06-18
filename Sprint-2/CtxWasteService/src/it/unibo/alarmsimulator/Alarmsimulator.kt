@@ -18,8 +18,21 @@ class Alarmsimulator ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
+		 val ActiveMock = false  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition( edgeName="goto",targetState="s1", cond=doswitchGuarded({ ActiveMock  
+					}) )
+					transition( edgeName="goto",targetState="s0", cond=doswitchGuarded({! ( ActiveMock  
+					) }) )
+				}	 
+				state("s1") { //this:State
 					action { //it:State
 						delay(10000) 
 						CommUtils.outred("AlarmSimulated: ALARM - Stopping TransportTrolley!")
@@ -28,12 +41,12 @@ class Alarmsimulator ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_s0", 
-				 	 					  scope, context!!, "local_tout_alarmsimulator_s0", 8000.toLong() )
+				 	 		stateTimer = TimerActor("timer_s1", 
+				 	 					  scope, context!!, "local_tout_alarmsimulator_s1", 8000.toLong() )
 					}	 	 
-					 transition(edgeName="t025",targetState="s1",cond=whenTimeout("local_tout_alarmsimulator_s0"))   
+					 transition(edgeName="t024",targetState="s2",cond=whenTimeout("local_tout_alarmsimulator_s1"))   
 				}	 
-				state("s1") { //this:State
+				state("s2") { //this:State
 					action { //it:State
 						delay(3000) 
 						CommUtils.outred("AlarmSimulated: alarm stopped - Resuming TransportTrolley!")
@@ -42,10 +55,10 @@ class Alarmsimulator ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_s1", 
-				 	 					  scope, context!!, "local_tout_alarmsimulator_s1", 12000.toLong() )
+				 	 		stateTimer = TimerActor("timer_s2", 
+				 	 					  scope, context!!, "local_tout_alarmsimulator_s2", 12000.toLong() )
 					}	 	 
-					 transition(edgeName="t026",targetState="s0",cond=whenTimeout("local_tout_alarmsimulator_s1"))   
+					 transition(edgeName="t025",targetState="s1",cond=whenTimeout("local_tout_alarmsimulator_s2"))   
 				}	 
 			}
 		}

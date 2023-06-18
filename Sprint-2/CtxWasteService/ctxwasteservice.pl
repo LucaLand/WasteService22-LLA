@@ -1,6 +1,7 @@
 %====================================================================================
 % ctxwasteservice description   
 %====================================================================================
+context(ctxraspberry, "127.0.0.1",  "TCP", "8076").
 context(ctxsmartdevice, "127.0.0.1",  "TCP", "8074").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
 context(ctxwasteservice, "localhost",  "TCP", "8072").
