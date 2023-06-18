@@ -215,18 +215,15 @@ grazie alla <i>returnFromInterrupt</i>.
 	<pre><code>
 	//Sonar Alarm
 	State handleAlarm {
-		onMsg(alarm : alarm(ARG)){
-			println("\t $name: Robot Stopped!") color blue
-			forward custompathexecutor -m toggleStop : toggleStop(stop)
-		}
+		println("\t $name: Robot Stopped!") color blue
+		forward custompathexecutor -m toggleStop : toggleStop(stop)
 	}
 	Transition t3	whenMsg alarmStop -> resume
 
 	State resume {
-		onMsg(alarmStop : alarmStop(ARG)){
-			println("\t $name: Resumed execution!") color blue
-			forward custompathexecutor -m toggleStop : toggleStop(resume)
-		}
+		println("\t $name: Resumed execution!") color blue
+		forward custompathexecutor -m toggleStop : toggleStop(resume)
+
 		returnFromInterrupt
 	}
 	</code></pre>
@@ -259,29 +256,54 @@ questo evento e avrà a disposizione l'informazione sullo stato da assumere.
 		<p>Il <r>TransportTrolley</r> si occuperà dunque di notificare al sistema i propri cambi di stato.</p>
 		<p>La notifica e l'aggiornamento dello stato vengono così gestite:</p>
 		<pre><code>
-State handleAlarm {
-		[#  PreviusState = State
-			RobotState = "stopped" #]
-		onMsg(alarm : alarm(ARG)){
-			...
-			<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
-		}
-	} Transition t3	whenMsg alarmStop -> resume
+State waiting {
+	[# RobotState = "athome" #]
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+	...
+}
 
+State goPickUp {
+	[# RobotState = "moving" #]
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+	...
+}
+
+State handleAlarm {
+	[#  PreviusState = RobotState
+		RobotState = "stopped" #]
+	...
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+} Transition t3	whenMsg alarmStop -> resume
 
 State resume {
-		[# RobotState = PreviusState #]
-		onMsg(alarmStop : alarmStop(ARG)){
-			...
-			<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
-		}
-		returnFromInterrupt
-	}
+	[# RobotState = PreviusState #]
+	...
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+
+	returnFromInterrupt
+}
 		</code></pre>
 
 
-<h4>Come interagire con il LED fisico su Raspberry?</h4>
-    </div>
+	<h4>Come interagire con il LED fisico su Raspberry?</h4>
+		<p>Per poter controllare il led fisico collegato al Raspberry, innanzitutto il <i>Led</i> va collegato seguendo  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab23/main/iss23Material/html/RaspBasicCode.html">questa guida</a> collegandolo al <i>GPIO25</i>.</p>
+    	<p>La nostra <i>Software House</i> dispone di due file <i>.bash</i> per l'accensione e lo spegnimento del Led.</p>
+		<ul>
+			<li><a href="../CtxRaspberry/resources/led25GpioTurnOn.sh"><i>led25GpioTurnOn.sh</i></a></li>
+			<li><a href="../CtxRaspberry/resources/led25GpioTurnOff.sh"><i>led25GpioTurnOff.sh</i></a></li>
+		</ul>
+
+		<p>Dunque il nostro Led sarà così gestito:</p>
+
+
+		<pre><code>
+
+		</code></pre>
+
+
+
+
+	</div>
 
 
 <!-- ------------------------------------------------------ -->

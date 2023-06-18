@@ -25,6 +25,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				var ID = ""
 				var MaterialType = ""
 				var Pos = "" 		//Pos : home, indoor, plasticbox, glassbox
+				
+				var RobotState = "athome"
+				var PreviusState = ""
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -39,6 +42,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("waiting") { //this:State
 					action { //it:State
 						 Pos = "home"  
+						 RobotState = "athome"  
+						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
 						CommUtils.outblue("	 $name: TransportTrolley at Home!")
 						CommUtils.outblue("	 $name: ready and waiting for pickupRequest!")
 						//genTimer( actor, state )
@@ -71,6 +76,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("goPickUp") { //this:State
 					action { //it:State
+						 RobotState = "moving"  
+						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
 						CommUtils.outblue("	 $name: Going to Indoor!")
 						CommUtils.outblue("	 $name: Robot going from $Pos to Indoor")
 						request("move", "move($Pos,indoor)" ,"custompathexecutor" )  
@@ -160,10 +167,12 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("handleAlarm") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("alarm(ARG)"), Term.createTerm("alarm"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								forward("toggleStop", "toggleStop(stop)" ,"custompathexecutor" ) 
-						}
+						 
+									PreviusState = RobotState 
+									RobotState = "stopped"
+						CommUtils.outblue("	 $name: Robot Stopped!")
+						forward("toggleStop", "toggleStop(stop)" ,"custompathexecutor" ) 
+						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -173,10 +182,10 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("resume") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("alarm(ARG)"), Term.createTerm("alarm"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								forward("toggleStop", "toggleStop(resume)" ,"custompathexecutor" ) 
-						}
+						 RobotState = PreviusState  
+						CommUtils.outblue("	 $name: Resumed execution!")
+						forward("toggleStop", "toggleStop(resume)" ,"custompathexecutor" ) 
+						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
 						returnFromInterrupt(interruptedStateTransitions)
 						//genTimer( actor, state )
 					}

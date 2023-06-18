@@ -282,26 +282,23 @@ QActor transporttrolley context ctxwasteservice {
 	//Sonar Alarm
 	State handleAlarm {
 		[# 
-			PreviusState = State 
+			PreviusState = RobotState 
 			RobotState = "stopped"
 		#]
-		onMsg(alarm : alarm(ARG)){
-			println("\t $name: Robot Stopped!") color blue
-			forward custompathexecutor -m toggleStop : toggleStop(stop)
-			emit robotStateEvent : robotStateEvent($RobotState)
-		}
+		
+		println("\t $name: Robot Stopped!") color blue
+		forward custompathexecutor -m toggleStop : toggleStop(stop)
+		emit robotStateEvent : robotStateEvent($RobotState)
 	}
 	Transition t3	whenMsg alarmStop -> resume
 	
 	State resume {
-		[# 
-			RobotState = PreviusState
-		#]
-		onMsg(alarmStop : alarmStop(ARG)){
-			println("\t $name: Resumed execution!") color blue
-			forward custompathexecutor -m toggleStop : toggleStop(resume)
-			emit robotStateEvent : robotStateEvent($RobotState)
-		}
+		[# RobotState = PreviusState #]
+		
+		println("\t $name: Resumed execution!") color blue
+		forward custompathexecutor -m toggleStop : toggleStop(resume)
+		emit robotStateEvent : robotStateEvent($RobotState)
+		
 		returnFromInterrupt
 	}
      
