@@ -159,6 +159,9 @@ QActor transporttrolley context ctxwasteservice {
 		var ID = ""
 		var MaterialType = ""
 		var Pos = "" 		//Pos : home, indoor, plasticbox, glassbox
+		
+		var RobotState = "athome"
+		var PreviusState = ""
 	#]
 
 	State s0 initial{
@@ -168,7 +171,8 @@ QActor transporttrolley context ctxwasteservice {
 
 	State waiting {
 		[# Pos = "home" #]
-		emit robotStateEvent : robotStateEvent(moving)
+		[# RobotState = "athome" #]
+		emit robotStateEvent : robotStateEvent($RobotState)
 		
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
 
@@ -193,7 +197,8 @@ QActor transporttrolley context ctxwasteservice {
 	
 	
 	State goPickUp {
-		emit robotStateEvent : robotStateEvent(athome)
+		[# RobotState = "moving" #]
+		emit robotStateEvent : robotStateEvent($RobotState)
 		
 		//Sending messages to BasicRobot22
 		println("\t $name: Going to Indoor!") color blue
@@ -276,19 +281,26 @@ QActor transporttrolley context ctxwasteservice {
 					
 	//Sonar Alarm
 	State handleAlarm {
+		[# 
+			PreviusState = State 
+			RobotState = "stopped"
+		#]
 		onMsg(alarm : alarm(ARG)){
 			println("\t $name: Robot Stopped!") color blue
 			forward custompathexecutor -m toggleStop : toggleStop(stop)
-			emit robotStateEvent : robotStateEvent(stopped)
+			emit robotStateEvent : robotStateEvent($RobotState)
 		}
 	}
 	Transition t3	whenMsg alarmStop -> resume
 	
 	State resume {
+		[# 
+			RobotState = PreviusState
+		#]
 		onMsg(alarmStop : alarmStop(ARG)){
 			println("\t $name: Resumed execution!") color blue
 			forward custompathexecutor -m toggleStop : toggleStop(resume)
-			emit robotStateEvent : robotStateEvent(athome)
+			emit robotStateEvent : robotStateEvent($RobotState)
 		}
 		returnFromInterrupt
 	}
@@ -405,8 +417,6 @@ QActor custompathexecutor context ctxwasteservice {
 					
 	State execStep {
 		onMsg(toggleStop : toggleStop(ARG)){
-			//REPLY Inutile
-			//replyTo stopReq with stopRepl : stopRepl(Resumed)
 			println("\t $name: RESUMED!")
 		}
 		
@@ -488,8 +498,6 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	State stopped {
 		onMsg(toggleStop : toggleStop(ARG)){
-			//REPLY Inutile
-			//replyTo stopReq with stopRepl : stopRepl(Stopped)
 			forward basicrobot -m cmd : cmd(h)
 			delay 100
 			println("\t $name: STOPPED!")

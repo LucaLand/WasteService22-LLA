@@ -39,7 +39,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("waiting") { //this:State
 					action { //it:State
 						 Pos = "home"  
-						emit("robotStateEvent", "robotStateEvent(moving)" ) 
 						CommUtils.outblue("	 $name: TransportTrolley at Home!")
 						CommUtils.outblue("	 $name: ready and waiting for pickupRequest!")
 						//genTimer( actor, state )
@@ -72,7 +71,6 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("goPickUp") { //this:State
 					action { //it:State
-						emit("robotStateEvent", "robotStateEvent(athome)" ) 
 						CommUtils.outblue("	 $name: Going to Indoor!")
 						CommUtils.outblue("	 $name: Robot going from $Pos to Indoor")
 						request("move", "move($Pos,indoor)" ,"custompathexecutor" )  
@@ -162,11 +160,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("handleAlarm") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("alarm(ARG)"), Term.createTerm("alarm(ARG)"), 
+						if( checkMsgContent( Term.createTerm("alarm(ARG)"), Term.createTerm("alarm"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outblue("	 $name: Robot Stopped!")
 								forward("toggleStop", "toggleStop(stop)" ,"custompathexecutor" ) 
-								emit("robotStateEvent", "robotStateEvent(stopped)" ) 
 						}
 						//genTimer( actor, state )
 					}
@@ -177,11 +173,9 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("resume") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("alarmStop(ARG)"), Term.createTerm("alarmStop(ARG)"), 
+						if( checkMsgContent( Term.createTerm("alarm(ARG)"), Term.createTerm("alarm"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outblue("	 $name: Resumed execution!")
 								forward("toggleStop", "toggleStop(resume)" ,"custompathexecutor" ) 
-								emit("robotStateEvent", "robotStateEvent(athome)" ) 
 						}
 						returnFromInterrupt(interruptedStateTransitions)
 						//genTimer( actor, state )

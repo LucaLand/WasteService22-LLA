@@ -9,4 +9,3 @@ context(ctxwasteservice, "localhost",  "TCP", "8072").
   qactor( wasteservice, ctxwasteservice, "it.unibo.wasteservice.Wasteservice").
   qactor( transporttrolley, ctxwasteservice, "it.unibo.transporttrolley.Transporttrolley").
   qactor( custompathexecutor, ctxwasteservice, "it.unibo.custompathexecutor.Custompathexecutor").
-  qactor( alarmsimulator, ctxwasteservice, "it.unibo.alarmsimulator.Alarmsimulator").
