@@ -123,6 +123,8 @@
 Event sonardata  :  sonardata(distance)
 	</code></pre>
 	
+	<p>Nonostante l'evento <i>sonardata</i> venga gestito soltanto dal <b>SonarDataHandler</b>, è stato pensato di non modificare il tipo di messaggio dato che il componente <b>Sonar</b>
+	ci è stato già fornito dalla nostra <i>Software House</i> e presenta già dei messaggi predefiniti.</p>
 
 	<h4>Come bloccare il robot? </h4>
 	<h5>Come gestire le rilevazioni del Sonar? </h5>
@@ -170,30 +172,31 @@ QActor sonardatahandler context ctxraspberry{
 	
 
 	<h5>Che messaggi invia per bloccare il TransportTrolley?</h5>
-<p>Il componente <b>SonarDataHandler</b>,una volta effettuate le verifiche,in caso di condizione verificata emetterà degli eventi 
-di allarme e si prevede anche un evento per bloccare l'allarme non appena la
+<p>Il componente <b>SonarDataHandler</b>,una volta effettuate le verifiche,in caso di condizione verificata emetterà un allarme e si prevede anche un allarme non appena la
 distanza torna ad essere minore del valore <i>DLIMIT</i>: </p>
 	
 	<pre><code>
-Event alarm       : alarm(_)
-Event alarmstop : alarmstop(_)
+Dispatch alarm       : alarm(_)
+Dispatch alarmstop : alarmstop(_)
 	</code></pre>
 	
-<p>Questi eventi vengono recepiti e gestiti dal <b>TransportTrolley</b> che sarà delegato dell'immediato blocco operazionale
-del robot. </p>
+<p> Il componente <b>SonarDataHandler</b>,una volta arrivata l'informazione dal <b>Sonar</b> provvede subito ad effettuare le verifiche e, in seguito, è 
+stato pensato di inviare delle <i>Dispatch</i> per comunicare l'inizio e lo stop dell'allarme perchè queste notificano soltanto un componente ed inviare degli eventi potrebbe influire
+in termini di prestazioni e di utilità. 
+Le <i>Dispatch</i> vengono recepite e gestite dal <b>TransportTrolley</b> che sarà delegato dell'immediato blocco operazionale del robot. </p>
 	
     </div>
-    <h3>2 - TransportTrolley</h3>
+    <h3>TransportTrolley</h3>
     <div class="remark">
 
 	<h4>Come gestiamo i messaggi di allarme per bloccare il robot?</h4>
 	<p>In virtù di quanto spiegato, il componente <b>TransportTrolley</b> necessita di alcune modifiche rispetto a come era stato
-	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire gli eventi di allarme che gli arrivano dal
-	<b>SonarDataHandler</b> e dovrà emettere l'evento <code>RobotStateEvent</code> per notificare il <b>LED</b>. 
+	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire le <i>Dispatch</i> di allarme che gli arrivano dal
+	<b>SonarDataHandler</b>. 
 	Invece per far bloccare il movimento del robot ordinerà la dispatch <code>toggleStop :	toggleStop(ARG)</code> 
 	che già è stata dichiarata negli sprint precedenti.</p>
 	
-	<h4>Evoluzione TransportTrolley - Sprint-2</h4>
+	<h4>Evoluzione TransportTrolley - Sprint-2 per Sonar</h4>
 <p>Il <b>TransportTrolley</b> è stato modificato aggiungendo in quasi tutti gli stati 
 la transizione <code>whenInterrupt</code> in modo da abilitare questo componente a gestire i messaggi di allarme 
 che arrivano dal <b>SonarDataHandler</b>.</p>
@@ -227,10 +230,9 @@ grazie alla <i>returnFromInterrupt</i>.
 	}
 	</code></pre>
 	
-	
 	</div>
 	
-    <h3>3 - Led </h3>
+    <h3>2 - Led </h3>
     <div class="remark">
 
 <h4>Come calcolare lo stato del Led?</h4>
@@ -244,12 +246,12 @@ enum LedState = {LedOff, LedOn, LedBlink};
 <li>Robot che si trova bloccato e quindi <code>LedState = LedOff</code>.</li>
 
 <h4>Come interagire con il componente Led?</h4>
-Il componente Led può ricevere gli aggiornamenti di stato tramite un evento.
-<pre><code>
-Event 	RobotStateEvent	:	RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED
-</code></pre>
+<p>Il componente Led può ricevere gli aggiornamenti di stato tramite un evento.</p>
+
+<p>
+È stato pensato di 
 L'aggiornamento per mezzo di questo evento gli arriva dal <r>TransportTrolley</r> e il componente LED potrà gestire
-questo evento e avrà a disposizione l'informazione sullo stato da assumere.
+questo evento e avrà a disposizione l'informazione sullo stato da assumere.</p>
 
 		<h4>Evoluzione del <r>TransportTrolley</r></h4>
 		<p>Il <r>TransportTrolley</r> si occuperà dunque di notificare al sistema i propri cambi di stato.</p>
@@ -333,12 +335,26 @@ State handleRobotStateEvent {
 		whenEvent robotStateEvent -> handleRobotStateEvent
 		</code></pre>
 
-
-
-
 	</div>
+	
+	    <h3>TransportTrolley</h3>
+    <div class="remark">
+	<h4>Evoluzione TransportTrolley - Sprint-2 per LED</h4>
+<p>Il <b>TransportTrolley</b> è stato modificato aggiungendo l'emissione di un evento che notifica il nuovo stato del robot e questa informazione sarà fruibile dal 
+<b>LED</b> per aggiornare il suo tipo di comportamento.</p>
+<pre><code>
+Event 	RobotStateEvent	:	RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED
+</code></pre>
 
+<p>La notifica dello stato del robot <i>RobotStateEvent</i> è stato pensato come un evento perchè è un dato utile non solo al componente <b>LED</b> ma anche a componenti successivi.
+<r>(NON è PREMATURO ANTICIPARE L'ESISTENZA DI UN EVENTUALE GUI O QUALCHE ALTRO COMPONENTE??????????????????????????????????????)</r></p>
 
+<p>Un'altra possibile implementazione può essere data sfruttando le <i>updateResources</i> e l'apertura di un canale di comunicazione <i>CoaP</i>. L' <i>updateResources</i> 
+rappresenta un'azione di aggiornamento delle risorse in un sistema o un'applicazione, mentre CoAP è un protocollo di comunicazione leggero e efficiente che può essere utilizzato 
+per consentire la comunicazione tra dispositivi con risorse limitate.</p>
+
+</div>
+	
 <!-- ------------------------------------------------------ -->
 <h2>Modello Eseguibile</h2>
 <div class="remark">
