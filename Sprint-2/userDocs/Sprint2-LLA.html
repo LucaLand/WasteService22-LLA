@@ -297,7 +297,41 @@ State resume {
 
 
 		<pre><code>
+State handleRobotStateEvent {
 
+        onMsg(robotStateEvent : robotStateEvent(STATE)){
+        	println("\t $name: Handling RobotState change!") color red
+        	[# robotState = payloadArg(0) #]
+        	if[# robotState == "athome" #]{
+        		[# ledState = "LedOff" #]
+        	}
+        	if[# robotState == "moving" #]{
+        		[# ledState = "LedBlink" #]
+        	}
+        	if[# robotState == "stopped" #]{
+        		[# ledState = "LedOn" #]
+        	}
+			println("\t $name: Led state- $ledState") color red
+	}
+
+
+        if[# ledState = "LedOff" #]{
+            //Spegni
+		<q>[# runtime.exec("sudo bash led25GpioTurnOff.sh") #]</q>
+        }
+        if[# ledState = "LedBlink" #]{
+            //Accendi
+		<q>[# runtime.exec("sudo bash led25GpioTurnOn.sh") #]</q>
+            delay 100
+            //Spegni
+		<q>[# runtime.exec("sudo bash led25GpioTurnOff.sh") #]</q>
+        }
+        if[# ledState = "LedOn" #]{
+            //Accendi
+		<q>[# runtime.exec("sudo bash led25GpioTurnOn.sh") #]</q>
+        }
+}Transition t0	whenTime 100 -> handleRobotStateEvent
+		whenEvent robotStateEvent -> handleRobotStateEvent
 		</code></pre>
 
 
