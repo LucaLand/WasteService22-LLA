@@ -19,8 +19,8 @@
     <ul>
         <li><a href="../../Sprint-0/userDocs/Sprint0-LLA.html">sprint0</a></li>
         <li><a href="../../Sprint-1/userDocs/Sprint1-LLA.html">sprint1</a></li>
-		<li><a href="./Sprint2-LLA.html">sprint2</a></li>
-		<li><a href="../../Sprint-3/userDocs/Sprint3-LLA.html">sprint3</a></li>
+		<li><a href="../../Sprint2-LLA.html">sprint2</a></li>
+		<li><a href="./Sprint-3/userDocs/Sprint3-LLA.html">sprint3</a></li>
     </ul>
 </nav>
 </div>
@@ -43,7 +43,16 @@
 	
     <h2>Requirements analysis</h2>
     <div class="remark">
-     
+    <p>La <b>WasteServiceStatusGUI</b> deve permettere al <b>Service-manager</b> di monitorare:
+	 <ul>
+        <lI>La <b>Position</b> del <b>Transport trolley</b></lI>
+        <lI>Il <b>Transporttrolleystate</b>, ossia lo stato attuale del <b>Transport trolley</b>.
+            <code><pre>enum class Transporttrolleystate = { IDLE, MOVING, PICKINGUP, DROPPINGOUT, HALT };</pre></code></lI>
+        <lI>Il peso corrente <b>contPB</b> e <b>contGB</b> del materiale contenuto in <b>PLASTICBOX</b> e in <b>GLASSBOX</b></lI>
+        <lI>Lo stato corrente del <b>LED</b>.
+			 <code><pre>enum LedState = { LedOff, LedOn, LedBlink};</pre></code></lI>
+    </ul>
+	</p>
     </div>
 
     <!----------------------- REQUIREMENT ANALYSIS --------------------------->
@@ -51,12 +60,12 @@
     <h2>Scrum Goal and Work Plan</h2>
     <div class="remark">
 	<h4>Scrum goal:</h4>
-	<p>Obiettivo dello SPRINT3 è estendere la demo dello SPRINT2</p> 
+	<p>Obiettivo dello SPRINT3 è estendere la demo dello SPRINT2 per realizzare il requisito riguardante la <b>WasteServiceStatusGUI</b> specificata dal committente.</p> 
 	<h4>Work plan:</h4>
 	<ul>
-		<li>Studio del problema relativo a chi e in che modo riceve le informazioni riguardanti un allarme al fine di implementare l'interruzione (halt) del robot.</li>
-		<li>Analisi del problema riguardante chi e in che modo riceve le informazioni per aggiornare lo stato del LED.</li>
-		<li>Sviluppo o adattamento dei componenti necessari per affrontare le suddette problematiche.</li>
+		<li>Analisi del problema riguardo la tipologia di GUI da implementare</li>
+		<li>Analisi del problema riguardante il passaggio di informazioni alla GUI</li>
+		<li>Sviluppo componenti necessari?</li>
 		<li>Creazione di un modello eseguibile utilizzando il metamodello QAK.</li>
 		<li>Elaborazione di un piano di test più completo per il modello realizzato.</li>
     </ul>
