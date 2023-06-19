@@ -24,8 +24,6 @@ with Diagram('generalarchitecturesprint2Arch', show=False, outformat='png', grap
           sonar23=Custom('sonar23','./qakicons/symActorSmall.png')
           sonardatahandler=Custom('sonardatahandler','./qakicons/symActorSmall.png')
           sonar=Custom('sonar(coded)','./qakicons/codedQActor.png')
-          datacleaner=Custom('datacleaner(coded)','./qakicons/codedQActor.png')
-          distancefilter=Custom('distancefilter(coded)','./qakicons/codedQActor.png')
      with Cluster('ctxsmartdevice', graph_attr=nodeattr):
           smartdevice=Custom('smartdevice(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
@@ -34,7 +32,6 @@ with Diagram('generalarchitecturesprint2Arch', show=False, outformat='png', grap
           wasteservice=Custom('wasteservice','./qakicons/symActorSmall.png')
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
           custompathexecutor=Custom('custompathexecutor','./qakicons/symActorSmall.png')
-          alarmsimulator=Custom('alarmsimulator','./qakicons/symActorSmall.png')
      wasteservice >> Edge(color='darkgreen', style='dashed', xlabel='loadrejecetd', fontcolor='darkgreen') >> smartdevice
      wasteservice >> Edge(color='magenta', style='solid', xlabel='pickupReq', fontcolor='magenta') >> transporttrolley
      transporttrolley >> Edge( xlabel='robotStateEvent', **eventedgeattr, fontcolor='red') >> sys
@@ -45,8 +42,6 @@ with Diagram('generalarchitecturesprint2Arch', show=False, outformat='png', grap
      custompathexecutor >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> custompathexecutor
      custompathexecutor >> Edge( xlabel='posEvent', **eventedgeattr, fontcolor='red') >> sys
      custompathexecutor >> Edge(color='darkgreen', style='dashed', xlabel='moveDone', fontcolor='darkgreen') >> transporttrolley
-     alarmsimulator >> Edge(color='blue', style='solid', xlabel='alarm', fontcolor='blue') >> transporttrolley
-     alarmsimulator >> Edge(color='blue', style='solid', xlabel='alarmStop', fontcolor='blue') >> transporttrolley
      sys >> Edge(color='red', style='dashed', xlabel='robotStateEvent', fontcolor='red') >> led
      sys >> Edge(color='red', style='dashed', xlabel='sonardata', fontcolor='red') >> sonar23
      sys >> Edge(color='red', style='dashed', xlabel='obstacle', fontcolor='red') >> sonar23

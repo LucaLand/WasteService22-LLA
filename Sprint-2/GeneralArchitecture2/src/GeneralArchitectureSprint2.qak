@@ -44,22 +44,19 @@ System generalarchitecturesprint2
 
 
 
-Context ctxraspberry ip[host="127.0.0.1" port=8076]
-Context ctxsmartdevice ip[host="127.0.0.1" port=8074] 	//Solo a scopo di architettura (caller==)
+Context ctxraspberry ip[host="localhots" port=8076]
+Context ctxsmartdevice ip[host="localhots" port=8074] 	//Solo a scopo di architettura (caller==)
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
     //CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
-//CodedQActor datalogger     context ctxraspberry className "rx.dataLogger"
-CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
-CodedQActor distancefilter context ctxraspberry className "rx.distanceFilter"
 
 
 ExternalQActor smartdevice context ctxsmartdevice		//Solo a scopo di architettura (caller==)
 ExternalQActor basicrobot context ctxbasicrobot
-//ExternalQActor led context ctxraspberry
+
 
 
 
@@ -528,34 +525,6 @@ QActor custompathexecutor context ctxwasteservice {
 	Goto handleMoveRequest
 
 }
-
-
-
-
-//MOCK OBECT to test new stopping semantic in Trasport Trolley
-QActor alarmsimulator context ctxwasteservice {
-	[# val ActiveMock = false #]
-	State s0 initial{
-
-	}
-	Goto s1 if[# ActiveMock #] else s0
-
-	State s1 {
-		delay 10000
-		println("AlarmSimulated: ALARM - Stopping TransportTrolley!") color red
-		forward transporttrolley -m alarm : alarm(stop)
-	}
-	Transition t0 whenTime 8000 -> s2
-
-	State s2 {
-		delay 3000
-		println("AlarmSimulated: alarm stopped - Resuming TransportTrolley!") color red
-		forward transporttrolley -m alarmStop : alarmStop(resume)
-	}
-	Transition t0 whenTime 12000 -> s1
-}
-
-
 
 
 //---- Led
