@@ -610,9 +610,10 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
             <li>Vi è una variabile pos <code>Pos</code> che mantiene il valore della posizione corrente</li>
             <pre><code> var Pos = 0 </code></pre>
             <li>Il contatore viene incrementato quando ci si sposta all'angolo successivo in senso antiorario</li>
-            <img src="img/ServiceArea-PositionMovement+1.png" alt="Service Area Increment Position">
+            <img src="img/ServiceArea-PositionMovement+1.png" alt="Service Area Increment Position" style="width: 450px;">
             <li>Il contatore viene decrementato quando ci si sposta all'angolo precedente, cioè in senso orario</li>
-            <img src="img/ServiceArea-PositionMovement-1.png" alt="Service Area Decrement Position">
+            <img src="img/ServiceArea-PositionMovement-1.png" alt="Service Area Decrement Position" style="width: 450px;">
+            <li>Il conteggio è effettuato in modulo 4</li>
             <li>Ad ogni angolo viene inviata una notifica della posizione raggiunta</li>
             <pre><code>
  Event 	posEvent	: posEvent(POS)
@@ -625,12 +626,13 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
         <p>La logica che permette il calcolo automatico del <i>Path</i> più breve è implementata da una <b>funzione matematica</b>:</p>
         <pre><code>
-            stepToDo = PosToGo - Pos
-			if(stepToDo <= -3 ){
-				stepToDo += 4
-			}else if(stepToDo >= 3){
-				stepToDo += -4
-			}
+    stepToDo = PosToGo - Pos
+
+    if(stepToDo <= -3 ){
+        stepToDo += 4
+    }else if(stepToDo >= 3){
+        stepToDo += -4
+    }
         </code></pre>
         <p>Dove:</p>
         <ul>
