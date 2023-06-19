@@ -29,13 +29,13 @@ System generalarchitecturesprint1
  	
  	
 
-Context ctxsmartdevice ip[host="127.0.0.1" port=8074] 	//Solo a scopo di architettura (caller==)
-Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
+Context ctxsmartdevice ip[host="localhost" port=8074]
+Context ctxbasicrobot ip [host="localhost" port=8020]  
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 
-ExternalQActor smartdevice context ctxsmartdevice		//Solo a scopo di architettura (caller==)
+
 ExternalQActor basicrobot context ctxbasicrobot
 
 

@@ -21,7 +21,6 @@ with Diagram('generalarchitecturesprint1Arch', show=False, outformat='png', grap
      sys = Custom('','./qakicons/system.png')
      with Cluster('ctxsmartdevice', graph_attr=nodeattr):
           smartdevice=Custom('smartdevice','./qakicons/symActorSmall.png')
-          smartdevice=Custom('smartdevice(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxwasteservice', graph_attr=nodeattr):
