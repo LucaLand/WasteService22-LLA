@@ -3,7 +3,7 @@
 
 
 <head>
-    <title>Iss2023-LLA-Sprint2</title>
+    <title>Iss2023-LLA-Sprint3</title>
     <link href="./defaultStyle.css" rel="stylesheet">
 	<link href="./menuCss.css" rel="stylesheet">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--  To solve accent problems  -->
@@ -43,19 +43,7 @@
 	
     <h2>Requirements analysis</h2>
     <div class="remark">
-     <p>Una più dettagliata analisi insieme alle osservazioni qui presentate ci consente di delineare in modo più preciso il comportamento che il robot e il LED devono assumere in caso di allarmi:</p>
-	
-<ol>
-	<li>In caso di allarme, il robot deve fermarsi immediatamente a causa di un'emergenza, pertanto è opportuno interrompere, per quanto possibile, tutte le operazioni in corso. Tuttavia, abbiamo ricevuto indicazioni dal committente che il robot deve essere interrotto mentre è in movimento.
-		Di conseguenza, possiamo dedurre che le operazioni da interrompere e successivamente riprendere sono il prelievo (Pickup), il deposito (Dropout) e l'avanzamento (move forward).</li>
-	<li>Il LED deve segnalare quando il robot è in movimento o, più in generale, quando sta svolgendo un'operazione.</li>
-</ol>
-		<ol>Da ciò si deduce che il LED:
-			<li>Deve lampeggiare quando il robot sta svolgendo (o ha svolto e sta tornando alla posizione di partenza) un'azione di deposito, segnalando che il robot può muoversi.</li>
-			<li>Inoltre, se il robot si trova nella posizione di partenza (HOME) ma è in movimento (ad esempio, per riposizionarsi dopo aver completato un'azione di deposito), il LED deve comunque lampeggiare.</li>
-			<li>Il LED rimarrà acceso solo se l'azione di deposito viene interrotta da un allarme.</li>
-			<li>Il LED rimarrà spento quando sarà fermo in HOME</li>
-		</ol>
+     
     </div>
 
     <!----------------------- REQUIREMENT ANALYSIS --------------------------->
@@ -63,7 +51,7 @@
     <h2>Scrum Goal and Work Plan</h2>
     <div class="remark">
 	<h4>Scrum goal:</h4>
-	<p>Obiettivo dello SPRINT2 è estendere la demo dello SPRINT1 per soddisfare i requisiti relativi al LED e al Sonar indicati dal committente. Questa parte è considerata più significativa e sostanziale rispetto all'interfaccia grafica (GUI).</p>
+	<p>Obiettivo dello SPRINT3 è estendere la demo dello SPRINT2</p> 
 	<h4>Work plan:</h4>
 	<ul>
 		<li>Studio del problema relativo a chi e in che modo riceve le informazioni riguardanti un allarme al fine di implementare l'interruzione (halt) del robot.</li>
@@ -85,8 +73,8 @@
             <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
             <br>
 
-            <h4>Focus Sprint-2</h4>
-            <p>Nello Sprint-2 si vedrà dunque un focus sui seguenti componenti e sui loro modelli.</p>
+            <h4>Focus Sprint-3</h4>
+            <p>Nello Sprint-3 si vedrà dunque un focus sui seguenti componenti e sui loro modelli.</p>
             <img src="" alt="Architecture Focus Sprint-1" style="width: 80%">
             <span>Sprint-0:
                 <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak">SmartDevice.qak</a>  ||
@@ -103,207 +91,6 @@
 
 
 
-    <h3>1 - Sonar</h3>
-    <div class="remark">
-	<h3>Dallo Sprint0</h3>
-    <p>Strumento connesso in input al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
-    <p>Il <b>Sonar</b> è un dispositivo che emette informazioni sulla presenza di oggetti a lui davanti e sulla loro distanza.</p>
-
-	<h4>Come prendiamo i dati dal Sonar fisico?</h4>
-	<p>L’attore che ci è stato fornito già si occupa di interfacciarsi con il sonar fisico infatti il Software per 
-	l'utilizzo del <i>Sonar fisico</i> installato sul <c>Raspberry</c> viene fornito dal committente 
-	nel progetto <a href="https://github.com/anatali/issLab2022/tree/main/unibo.sonarqak22">SonarActor22.</a></p>
-
-
-	<h4>Che informazioni invia il sonar?</h4>
-	
-	<p>Il sonar riprende l'evento già fornito dal committente all'interno della documentazione prima citata e 
-	dovrà emettere un evento ad ogni nuova misurazione con la misurazione della distanza rilevata in quel momento.</p>
-	<pre><code>
-Event sonardata  :  sonardata(distance)
-	</code></pre>
-	
-
-	<h4>Come bloccare il robot? </h4>
-	<h5>Come gestire le rilevazioni del Sonar? </h5>
-	<p>Il sonar emette l'evento <code>sonardata</code> che verrà gestito da un nuovo componente custom che chiameremo 
-	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello
-	Sprint0.</p>
-	
-	<pre><code>
-QActor sonardatahandler context ctxraspberry{
-	[# 
-		val DLIMIT = 10
-		var stopped = false
-	#]
-	
-	State s0 initial {
-		
-	}
-	Goto handleSonarData
-	
-	
-	State handleSonarData{
-		onMsg(sonardataAppl : distance(D)){
-			[# val distance = payloadArg(0) #]
-			
-			if[# distance.toInt() <= DLIMIT && stopped == false #]{
-				forward transporttrolley -m alarm : alarm(stop)
-				println("\t $name: Sending toggleStop(stop)!")
-			}
-			
-			if[# distance.toInt() > DLIMIT && stopped == true #]{
-				forward transporttrolley -m alarmStop : alarmStop(resume)
-				println("\t $name: Sending toggleStop(resume)!")
-			}
-			
-			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
-		}
-	}
-	Transition t0	whenEvent sonardataAppl -> handleSonarData
-	
-}
-	</code></pre>
-	<img src="./img/raspberry_Arch.png" alt="SonarDataHandler">
-
-	
-	
-
-	<h5>Che messaggi invia per notificare il blocco il robot (/bloccare il robot?  Va bene? Perchè non è che blocca 
-	il robot ma da l'allarme al TT) e a chi inviarli?</h5>
-<p>Il componente <b>SonarDataHandler</b>,una volta effettuate le verifiche,in caso di condizione verificata emetterà degli eventi 
-di allarme e si prevede anche un evento per bloccare l'allarme non appena la
-distanza torna ad essere minore del valore <i>DLIMIT</i>: </p>
-	
-	<pre><code>
-Event alarm       : alarm(_)
-Event alarmstop : alarmstop(_)
-	</code></pre>
-	
-<p>Questi eventi vengono recepiti e gestiti dal <b>TransportTrolley</b> che sarà delegato dell'immediato blocco operazionale
-del robot. </p>
-	
-    </div>
-    <h3>2 - TransportTrolley</h3>
-    <div class="remark">
-
-	<h4>Come gestiamo i messaggi di allarme per bloccare il robot?</h4>
-	<p>In virtù di quanto spiegato, il componente <b>TransportTrolley</b> necessita di alcune modifiche rispetto a come era stato
-	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire gli eventi di allarme che gli arrivano dal
-	<b>SonarDataHandler</b> e dovrà emettere l'evento <code>RobotStateEvent</code> per notificare il <b>LED</b>. 
-	Invece per far bloccare il movimento del robot ordinerà la dispatch <code>toggleStop :	toggleStop(ARG)</code> 
-	che già è stata dichiarata negli sprint precedenti.</p>
-	
-	<h4>Evoluzione TransportTrolley - Sprint-2</h4>
-<p>Il <b>TransportTrolley</b> è stato modificato aggiungendo in quasi tutti gli stati 
-la transizione <code>whenInterrupt</code> in modo da abilitare questo componente a gestire i messaggi di allarme 
-che arrivano dal <b>SonarDataHandler</b>.</p>
-	<pre><code>
-whenInterrupt alarm -> handleAlarm
-	</code></pre>
-
-
-
- <p>Sono stati aggiunti due nuovi stati
-<code>handleAlarm</code> per quando arriva <code>alarm</code> e lo stato <code>resume</code> 
-per quando arriva <code>alarmstop</code> e in entrambi i casi il <b>TransportTrolley</b> delegherà il 
-<b>CustomPathExecutor</b> rispettivamente di bloccare o riprendere l'esecuzione
-e cambierà lo stato dell'evento <i>robotStateEvent</i>. Il robot quando esce dallo stato 
-di <code>resume</code> torna a quello che stava facendo prima
-grazie alla <i>returnFromInterrupt</i>.
-</p>	
-	<pre><code>
-	//Sonar Alarm
-	State handleAlarm {
-		println("\t $name: Robot Stopped!") color blue
-		forward custompathexecutor -m toggleStop : toggleStop(stop)
-	}
-	Transition t3	whenMsg alarmStop -> resume
-
-	State resume {
-		println("\t $name: Resumed execution!") color blue
-		forward custompathexecutor -m toggleStop : toggleStop(resume)
-
-		returnFromInterrupt
-	}
-	</code></pre>
-	
-	
-	</div>
-	
-    <h3>3 - Led </h3>
-    <div class="remark">
-
-<h4>Come calcolare lo stato del Led?</h4>
-<pre><code>
-enum LedState = {LedOff, LedOn, LedBlink};
-</code></pre>
-<ul>Lo stato del Led dipende dal:</ul>
-
-<li>Robot che si trova o meno in HOME e quindi <code>LedState = LedOn</code></li>
-<li>Robot che sia in movimento (o che comunque stia operando) e quindi <code>LedState = LedBlink</code>.
-<li>Robot che si trova bloccato e quindi <code>LedState = LedOff</code>.</li>
-
-<h4>Come interagire con il componente Led?</h4>
-Il componente Led può ricevere gli aggiornamenti di stato tramite un evento.
-<pre><code>
-Event 	RobotStateEvent	:	RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED
-</code></pre>
-L'aggiornamento per mezzo di questo evento gli arriva dal <r>TransportTrolley</r> e il componente LED potrà gestire
-questo evento e avrà a disposizione l'informazione sullo stato da assumere.
-
-		<h4>Evoluzione del <r>TransportTrolley</r></h4>
-		<p>Il <r>TransportTrolley</r> si occuperà dunque di notificare al sistema i propri cambi di stato.</p>
-		<p>La notifica e l'aggiornamento dello stato vengono così gestite:</p>
-		<pre><code>
-State waiting {
-	[# RobotState = "athome" #]
-	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
-	...
-}
-
-State goPickUp {
-	[# RobotState = "moving" #]
-	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
-	...
-}
-
-State handleAlarm {
-	[#  PreviusState = RobotState
-		RobotState = "stopped" #]
-	...
-	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
-} Transition t3	whenMsg alarmStop -> resume
-
-State resume {
-	[# RobotState = PreviusState #]
-	...
-	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
-
-	returnFromInterrupt
-}
-		</code></pre>
-
-
-	<h4>Come interagire con il LED fisico su Raspberry?</h4>
-		<p>Per poter controllare il led fisico collegato al Raspberry, innanzitutto il <i>Led</i> va collegato seguendo  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab23/main/iss23Material/html/RaspBasicCode.html">questa guida</a> collegandolo al <i>GPIO25</i>.</p>
-    	<p>La nostra <i>Software House</i> dispone di due file <i>.bash</i> per l'accensione e lo spegnimento del Led.</p>
-		<ul>
-			<li><a href="../CtxRaspberry/resources/led25GpioTurnOn.sh"><i>led25GpioTurnOn.sh</i></a></li>
-			<li><a href="../CtxRaspberry/resources/led25GpioTurnOff.sh"><i>led25GpioTurnOff.sh</i></a></li>
-		</ul>
-
-		<p>Dunque il nostro Led sarà così gestito:</p>
-
-
-		<pre><code>
-
-		</code></pre>
-
-
-
-
-	</div>
 
 
 <!-- ------------------------------------------------------ -->
