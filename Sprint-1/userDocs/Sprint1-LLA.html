@@ -750,14 +750,93 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 <h2>Test-Unit</h2>
 <div class="remark">
-<tt><p>Implementare una test unit generale automatizzata che vada a simulare tutti i possibili <b>casi critici</b> del nostro sistema.</br>
-Possibili casi critici:</p>
-<!--<ul>-->
-<!--	<li>Il <b>WasteService</b> potrebbe accettare una richiesta anche se il <b>DDR</b> non ha effettuato l'azione di <i>drop</i>, quindi, le variabili non sono state ancora aggiornate</li>-->
-<!--	<li>Il <b>DDR</b> smette di funzionare(a livello proprio tecnologico,non so se ci interessa)</li>-->
-<!--	<li>Possibilità di errore durante lo scarico dei rifiuti(soluzione con warning)</li>-->
-<!--</ul>-->
-</tt>
+    <tt><p>Implementare una test unit generale automatizzata che vada a simulare tutti i possibili <b>casi critici</b> del nostro sistema.</p>
+    <p>La nostra <i>SoftwareHouse</i> ci fornisce la classe <a href="../CtxWasteService/test/coapobs/CoapTestObserver.kt">CoapTestObserver</a> per la registrazione di <i>Observer Coap</i> agli attori del nostro sistema.</p>
+    <p>Alla classe sono state apporatte delle aggiunte per il salvataggio degli aggiornamenti in una lista di <i>Stati</i></p></tt>
+
+
+    <h4>Possibili casi critici:</h4>
+    <ul>
+        <li>Il <b>WasteService</b> riceve una richiesta mentre il <b>TransportTrolley</b> sta ancora scaricando</li>
+        <li>Il <b>WasteService</b> riceve una richiesta di scarico mentre il <b>TransportTrolley</b> sta tornando alla <i>Home</i></li>
+        <li>Il <b>WasteService</b> rifiuta una richiesta di scarico a causa della mancanza di spazio sufficiente anche mentre il <b>TransportTrolley</b> deve ancora scaricare la richiesta precedente che ha riempito però o box</li>
+    </ul>
+
+    <h4>Come riproduciamo le situazioni:</h4>
+    <p>Per riprodurre questi 3 casi critici si seguiranno i seguenti passi:</p>
+    <ul>
+        <li>Invio di una richiesta <code>depositRequest(plastic, 20)</code></li>
+            <ul><li>Attesa e controllo della risposta (<code>requestAccepted</code>)</li></ul>
+        <li>Attesa di circa 18s (per permettere al robot di scaricare e avviarsi alla <i>Home</i>)</li>
+        <li>Invio di una <b>seconda</b> <code>depositRequest(plastic, 20)</code></li>
+            <ul><li>Attesa e controllo della risposta (<code>requestAccepted</code>)</li></ul>
+        <li>Invio di una <b>terza</b> <code>depositRequest</code> con parametri <code>(plastic, 70)</code></li>
+            <ul>
+                <li>Attesa della risposta (rejected)</li>
+                <li>Siccome il <code>PBMAX</code> è a <i>100</i> e le due precedenti richieste hanno riempito fino a 40.</li>
+                <li><i>70</i> non dovrà essere accettato anche se ancora non ha scaricato la precedente richiesta</li>
+            </ul>
+    </ul>
+
+    <h4>Controllo del corretto funzionamento</h4>
+    <p>Il controllo avviene tramite la connessione dei <code>CoapTestObserver</code> sui 3 attori del <c>ctxwasetservice</c>.<br>
+        Questi prendono le <i>CoapUpdate</i> effettuate dagli attori, come implementate nel <i>modello qak</i> di <i>Test</i> <a href="../CtxWasteService/src/ctxWasteService_Test.qakq" type="text" >ctxWasteService_Test.qakq</a> e ne salvano la storia in una lista.</p>
+    <p>Il <i>controllo</i> avverrà dunque proprio sulla <b>storia degli stati</b> che gli attori assumeranno durante l'esecuzione.</p>
+    <p>Gli stati attesi sono:</p>
+
+    <b>WasteService:</b>
+    <ul style="margin-left: 30px">
+        <li>requesthandling</li>
+        <li>requestAccepted</li>
+        <li>pickingUp</li>
+        <li>pickupOk</li>
+        <li>requesthandling</li>
+        <li>requestAccepted</li>
+        <li>pickingUp</li>
+        <li>pickupOk</li>
+        <li>requesthandling</li>
+        <li>requestRejected</li>
+    </ul>
+
+    <br>
+    <b>TransportTrolley:</b>
+    <ul style="margin-left: 30px">
+        <li>handlePickupReq</li>
+        <li>goPickUp</li>
+        <li>pickupDone</li>
+        <li>goDeposit</li>
+        <li>depositDone</li>
+        <li>goHome</li>
+        <li>handlePickupReq</li>
+        <li>goPickUp</li>
+        <li>pickupDone</li>
+        <li>goDeposit</li>
+    </ul>
+
+    <br>
+    <b>CustomPathExecutor:</b>
+    <ul style="margin-left: 30px">
+        <li>handleMoveRequest</li>
+        <li>stepDone(1)</li>
+        <li>pathDone(1)</li>
+        <li>handleMoveRequest</li>
+        <li>stepDone(2)</li>
+        <li>pathDone(2)</li>
+        <li>handleMoveRequest</li>
+        <li>stepDone(1)</li>
+        <li>handleMoveRequest</li>
+        <li>pathDone(1)</li>
+        <li>handleMoveRequest</li>
+    </ul>
+
+    <h4>Configurazione del test</h4>
+    <p>Per poter runnare il test è necessario:</p>
+    <ul>
+        <li>buildare il <i>modello qak</i> <a href="../CtxWasteService/src/ctxWasteService_Test.qakq" type="text" >ctxWasteService_Test.qakq</a></i></li>
+        <li>Avviare il <i>docker container</i> del <i>VirtualRobot23Disi</i></li>
+        <li>Runnare il progetto <i>it.unibo.basicRobot22</i> modded dello Sprint-1</li>
+        <li>Avviare lo <i>Unit-Test</i> <a href="../CtxWasteService/test/unibo.testwasteservice/TestWasteServiceApplicationQak.kt">TestWasteServiceApplicationQak.kt</a></li>
+    </ul>
 
 
 </div>
