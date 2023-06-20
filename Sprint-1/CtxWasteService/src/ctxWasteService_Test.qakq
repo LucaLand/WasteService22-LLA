@@ -71,7 +71,7 @@ QActor wasteservice context ctxwasteservice {
 
 	State waiting{
 		//Test CoapUpdate
-		updateResource [# "wasteserviceState(waiting)" #]
+		//updateResource [# "wasteserviceState(waiting)" #]
 		
 		println("\t $name: ready and waiting for deposit request...") color green
 	}
@@ -175,7 +175,7 @@ QActor transporttrolley context ctxwasteservice {
 
 	State waiting {
 		//Test CoapUpdate
-		updateResource [# "transporttrolleyState(waiting)" #]
+		//updateResource [# "transporttrolleyState(waiting)" #]
 		
 		[# Pos = "home" #]
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position

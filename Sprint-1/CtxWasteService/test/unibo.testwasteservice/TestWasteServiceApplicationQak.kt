@@ -32,6 +32,7 @@ class TestWasteServiceApplicationQak {
 
     private val material = Material.plastic
     private val weight = 20
+    private val weight3 = 70
 
     private val StateHistoryWasteService = LinkedList<String>()
     private val StateHistoryTransportTrolley = LinkedList<String>()
@@ -149,18 +150,19 @@ class TestWasteServiceApplicationQak {
     }
 
     fun populateStateHistoryList(){
-        StateHistoryWasteService.add("wasteserviceState(waiting)")
         StateHistoryWasteService.add("wasteserviceState(requesthandling)")
         StateHistoryWasteService.add("wasteserviceState(requestAccepted)")
         StateHistoryWasteService.add("wasteserviceState(pickingUp)")
         StateHistoryWasteService.add("wasteserviceState(pickupOk)")
-        StateHistoryWasteService.add("wasteserviceState(waiting)")
         StateHistoryWasteService.add("wasteserviceState(requesthandling)")
         StateHistoryWasteService.add("wasteserviceState(requestAccepted)")
         StateHistoryWasteService.add("wasteserviceState(pickingUp)")
+        StateHistoryWasteService.add("wasteserviceState(pickupOk)")
+        StateHistoryWasteService.add("wasteserviceState(requesthandling)")
+        StateHistoryWasteService.add("wasteserviceState(requestRejected)")
+
 
         //TT
-        StateHistoryTransportTrolley.add("transporttrolleyState(waiting)")
         StateHistoryTransportTrolley.add("transporttrolleyState(handlePickupReq)")
         StateHistoryTransportTrolley.add("transporttrolleyState(goPickUp)")
         StateHistoryTransportTrolley.add("transporttrolleyState(pickupDone)")
@@ -170,6 +172,7 @@ class TestWasteServiceApplicationQak {
         StateHistoryTransportTrolley.add("transporttrolleyState(handlePickupReq)")
         StateHistoryTransportTrolley.add("transporttrolleyState(goPickUp)")
         StateHistoryTransportTrolley.add("transporttrolleyState(pickupDone)")
+        StateHistoryTransportTrolley.add("transporttrolleyState(goDeposit)")
 
         //CustomPathExecutor
         StateHistoryCustomPathExecutor.add("custompathexecutorState(handleMoveRequest)")
@@ -182,6 +185,8 @@ class TestWasteServiceApplicationQak {
         StateHistoryCustomPathExecutor.add("custompathexecutorState(stepDone(1))")
         StateHistoryCustomPathExecutor.add("custompathexecutorState(handleMoveRequest)")
         StateHistoryCustomPathExecutor.add("custompathexecutorState(pathDone(1))")
+        StateHistoryCustomPathExecutor.add("custompathexecutorState(handleMoveRequest)")
+
     }
 
     @Test
@@ -190,7 +195,7 @@ class TestWasteServiceApplicationQak {
         CommUtils.delay(5000)
         var asw = ""
 
-        val depositRequest = "msg(depositRequest, request, testunit, wasteservice, depositRequest($material, $weight),1)"
+        var depositRequest = "msg(depositRequest, request, testunit, wasteservice, depositRequest($material, $weight),1)"
         println("Testapplication	|	testaccept on message: $depositRequest")
         try {
             asw = conn.request(depositRequest)
@@ -200,7 +205,8 @@ class TestWasteServiceApplicationQak {
         assertTrue(asw.contains("loadaccept"))
 
         println("Testapplication	|	testStateHistory on message: $depositRequest N2")
-        //TODO. La seconda rixhiesta deve arrivare mentr eil trolley sta andando in home
+
+        //La seconda richiesta deve arrivare mentr eil trolley sta andando in home
         println("Testapplication	|	Delay 15000.......")
         CommUtils.delay(18000)
         println("Testapplication	|	.......finish")
@@ -211,7 +217,21 @@ class TestWasteServiceApplicationQak {
         }
 
         assertTrue(asw.contains("loadaccept"))
+
+        CommUtils.delay(1000)
+        depositRequest = "msg(depositRequest, request, testunit, wasteservice, depositRequest($material, $weight3),1)"
+        println("Testwasteservice	|	testrejected on message: $depositRequest")
+
+        try {
+            asw = conn.request(depositRequest)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        assertTrue(asw.contains("loadrejecetd"))
+
         println("Testapplication	|	FINISHED")
+
+        CommUtils.delay(500)
 
         println("WasteService StateHistory: ${obsWasteService.getStateHistory()}")
         println("TransportTrolley StateHistory: ${obsTransporttrolley.getStateHistory()}")
@@ -221,21 +241,6 @@ class TestWasteServiceApplicationQak {
         assertEquals(StateHistoryTransportTrolley, obsTransporttrolley.getStateHistory())
         assertEquals(StateHistoryCustomPathExecutor, obsCustompathexecutor.getStateHistory())
         CommUtils.delay(500)
-    }
-
-    @Test
-    fun testRejected() {
-        CommUtils.delay(3000)
-        val prevState =obsWasteService.currState
-        val depositRequest = "msg(depositRequest, request, testunit, wasteservice, depositRequest($material, 2000),1)"
-        println("Testwasteservice	|	testrejected on message: $depositRequest")
-        var asw = ""
-        try {
-            asw = conn.request(depositRequest)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        assertTrue(asw.contains("loadrejecetd"))
     }
 
 
