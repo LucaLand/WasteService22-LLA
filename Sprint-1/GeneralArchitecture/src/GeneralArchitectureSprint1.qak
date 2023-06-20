@@ -396,7 +396,7 @@ QActor custompathexecutor context ctxwasteservice {
 				[# pathStep++ #]
 			}
 		}else{
-			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
+			//forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 		}
 	
 	}
@@ -527,4 +527,35 @@ QActor smartdevice context ctxsmartdevice{
 		println("\t $name: Il Truck può andare!") color yellow
 	}
 	Transition t3 whenTime 1000 -> idle  //Un po' di attesa per simulare il via del camion
+}
+
+
+QActor coapdispatcher context ctxbasicrobot{
+ 	State s0 initial { 	 
+ 		println("envsonarhandler | START")
+ 		//observeResource basicrobot
+	}	
+	Goto waiting
+	
+	
+	State waiting {
+		println("Waiting Coap Updates")
+	}
+	Transition t0   whenMsg coapUpdate -> dispatchingUpdates
+					
+					
+	
+	State dispatchingUpdates {
+		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
+			[# 
+				val Res = payloadArg(0)
+				val Val = payloadArg(1)			
+			#]
+			println("Res: $Res -- Val: $Val")
+			if[# Val.contains("obstacle") || Val.contains("(l)") || Val.contains("(r)")#]{
+				forward custompathexecutor -m coapUpdate : coapUpdate($Res, $Val)
+			}
+		}
+	}
+	Goto waiting
 }

@@ -22,6 +22,7 @@ with Diagram('generalarchitecturesprint1Arch', show=False, outformat='png', grap
      with Cluster('ctxsmartdevice', graph_attr=nodeattr):
           smartdevice=Custom('smartdevice','./qakicons/symActorSmall.png')
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
+          coapdispatcher=Custom('coapdispatcher','./qakicons/symActorSmall.png')
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxwasteservice', graph_attr=nodeattr):
           wasteservice=Custom('wasteservice','./qakicons/symActorSmall.png')
@@ -36,4 +37,5 @@ with Diagram('generalarchitecturesprint1Arch', show=False, outformat='png', grap
      custompathexecutor >> Edge( xlabel='posEvent', **eventedgeattr, fontcolor='red') >> sys
      custompathexecutor >> Edge(color='darkgreen', style='dashed', xlabel='moveDone', fontcolor='darkgreen') >> transporttrolley
      smartdevice >> Edge(color='magenta', style='solid', xlabel='depositRequest', fontcolor='magenta') >> wasteservice
+     coapdispatcher >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> custompathexecutor
 diag
