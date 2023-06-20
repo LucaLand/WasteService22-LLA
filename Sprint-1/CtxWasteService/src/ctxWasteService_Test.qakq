@@ -70,11 +70,17 @@ QActor wasteservice context ctxwasteservice {
 	Goto waiting
 
 	State waiting{
+		//Test CoapUpdate
+		updateResource [# "wasteserviceState(waiting)" #]
+		
 		println("\t $name: ready and waiting for deposit request...") color green
 	}
 	Transition t0 whenRequest depositRequest -> requestHandling
 
 	State requestHandling {
+		//Test CoapUpdate
+		updateResource [# "wasteserviceState(requesthandling)" #]
+		
 		println("\t $name: Deposit Request arrived!") color green
 		[# 
 			accepted = false 
@@ -105,6 +111,9 @@ QActor wasteservice context ctxwasteservice {
 	Goto requestAccepted if[# accepted == true #] else requestRejected
 	
 	State requestAccepted {
+		//Test CoapUpdate
+		updateResource [# "wasteserviceState(requestAccepted)" #]
+		
 		println("\t $name: Request -$ID- Accepted!") color green
 		if[# Type == "plastic" #]{
 			[# CurrentPB += TruckLoad #]
@@ -118,12 +127,18 @@ QActor wasteservice context ctxwasteservice {
 	Goto pickingUp
 
 	State requestRejected {
+		//Test CoapUpdate
+		updateResource [# "wasteserviceState(requestRejected)" #]
+		
 		replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
 		println("\t $name: Request -$ID- Refused!") color green
 	}
 	Goto waiting
 
 	State pickingUp {
+		//Test CoapUpdate
+		updateResource [# "wasteserviceState(pickingUp)" #]
+		
 		//Requesting PickUp to TransportTrolley
 		println("\t $name: Requesting Picking Up...") color green
 		request transporttrolley -m pickupReq : pickupReq($ID, $Type)
@@ -131,6 +146,9 @@ QActor wasteservice context ctxwasteservice {
 	Transition t1 whenReply pickupOk -> pickupOk
 
 	State pickupOk {
+		//Test CoapUpdate
+		updateResource [# "wasteserviceState(pickupOk)" #]
+		
         println("\t $name: Pickup finished! Truck ($ID) can go away!") color green
         replyTo depositRequest with loadaccept : loadaccept($ID)
 	}
@@ -156,6 +174,9 @@ QActor transporttrolley context ctxwasteservice {
 	Goto waiting
 
 	State waiting {
+		//Test CoapUpdate
+		updateResource [# "transporttrolleyState(waiting)" #]
+		
 		[# Pos = "home" #]
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
 
@@ -165,6 +186,9 @@ QActor transporttrolley context ctxwasteservice {
 
 
 	State handlePickupReq {
+		//Test CoapUpdate
+		updateResource [# "transporttrolleyState(handlePickupReq)" #]
+		
 		[# MaterialType =  "null" #]
 		
         onMsg(pickupReq : pickupReq(ID, TYPE)){
@@ -179,6 +203,9 @@ QActor transporttrolley context ctxwasteservice {
 	
 	
 	State goPickUp {
+		//Test CoapUpdate
+		updateResource [# "transporttrolleyState(goPickUp)" #]
+		
 		//Sending messages to BasicRobot22
 		println("\t $name: Going to Indoor!") color blue
 		println("\t $name: Robot going from $Pos to Indoor") color blue
@@ -192,6 +219,9 @@ QActor transporttrolley context ctxwasteservice {
 	
 	
 	State pickupDone {
+		//Test CoapUpdate
+		updateResource [# "transporttrolleyState(pickupDone)" #]
+		
 		[# Pos = "indoor" #]
 
 		println("\t $name: Picking up...") color blue
@@ -205,6 +235,9 @@ QActor transporttrolley context ctxwasteservice {
 
 
 	State goDeposit {
+		//Test CoapUpdate
+		updateResource [# "transporttrolleyState(goDeposit)" #]
+		
 		discardMsg Off
 		
 		if[# MaterialType == "plastic" #]{
@@ -225,6 +258,9 @@ QActor transporttrolley context ctxwasteservice {
 	
 	
 	State depositDone {
+		//Test CoapUpdate
+		updateResource [# "transporttrolleyState(depositDone)" #]
+		
 		onMsg(moveDone : moveDone(NewPos)){
 			[# val Arg = payloadArg(0) #]
 			if[# Arg == "plasticbox" || Arg == "glassbox" || Arg == "2" || Arg == "3"#]{
@@ -244,6 +280,9 @@ QActor transporttrolley context ctxwasteservice {
 
 
 	State goHome {
+		//Test CoapUpdate
+		updateResource [# "transporttrolleyState(goHome)" #]
+		
 		discardMsg Off
      	println("\t $name: Going home") color blue
 		request custompathexecutor -m move : move($Pos, home)
@@ -294,12 +333,18 @@ QActor custompathexecutor context ctxwasteservice {
 	Goto waiting
 	
 	State waiting {
+		//Test CoapUpdate
+		//updateResource [# "custompathexecutorState(waiting)" #]
+		
 		println("\t $name: waiting for move requests!")
 	}
 	Transition t0 whenRequest move -> handleMoveRequest
 	
 	
 	State handleMoveRequest {
+		//Test CoapUpdate
+		updateResource [# "custompathexecutorState(handleMoveRequest)" #]
+		
 		onMsg(move : move(Pos, NewPos)){
 			[# 
 				val NewPos = payloadArg(1)
@@ -335,6 +380,9 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	
 	State working {
+		//Test CoapUpdate
+		//updateResource [# "custompathexecutorState(working)" #]
+		
 		[# pathStep = 0 
 			var backPath = ""
 		#]
@@ -363,8 +411,6 @@ QActor custompathexecutor context ctxwasteservice {
 					
 	State execStep {
 		onMsg(toggleStop : toggleStop(ARG)){
-			//REPLY Inutile
-			//replyTo stopReq with stopRepl : stopRepl(Resumed)
 			println("\t $name: RESUMED!")
 		}
 		
@@ -391,6 +437,10 @@ QActor custompathexecutor context ctxwasteservice {
 				delay 1000
 				[# pathStep++ #]
 			}
+			
+			//Test CoapUpdate
+			//updateResource [# "execStep($CMD)" #]
+			
 		}else{
 			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 		}
@@ -405,6 +455,8 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	
 	State stepDone {
+		
+		
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			
 			
@@ -428,6 +480,10 @@ QActor custompathexecutor context ctxwasteservice {
 			println("\t $name: StepDone! - Pos: $Pos")
 			emit posEvent : posEvent($Pos)
 			
+			//Test CoapUpdate
+			updateResource [# "custompathexecutorState(stepDone($Pos))" #]
+			//updateResource [# "custompathexecutor(Pos($Pos))" #]
+			
 		}
 	}
 	Transition t2 	whenTime 100 -> working
@@ -435,15 +491,20 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	
 	State pathDone {
+		//Test CoapUpdate
+		updateResource [# "custompathexecutorState(pathDone($Pos))" #]
+		//updateResource [# "custompathexecutor(Pos($Pos))" #]
+		
 		println("\t $name: Path done in $Pos")
 		replyTo move with moveDone : moveDone($Pos) caller==transporttrolley
 	}
 	Goto waiting
 	
 	State stopped {
+		//Test CoapUpdate
+		updateResource [# "custompathexecutorState(stopped)" #]
+		
 		onMsg(toggleStop : toggleStop(ARG)){
-			//REPLY Inutile
-			//replyTo stopReq with stopRepl : stopRepl(Stopped)
 			forward basicrobot -m cmd : cmd(h)
 			delay 100
 			println("\t $name: STOPPED!")
@@ -454,6 +515,9 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	//Optional implementation
 	State handleMoveRequestInMovement {
+		//Test CoapUpdate
+		updateResource [# "custompathexecutorState(handleMoveRequestInMovement)" #]
+		
 		//Attahc to path the normal path, the go back path
 		[# turnBack = true #]
 	}
