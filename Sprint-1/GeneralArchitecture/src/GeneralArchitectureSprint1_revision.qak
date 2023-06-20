@@ -1,0 +1,527 @@
+System generalarchitecturesprint1
+
+
+	
+	// Smart Device - WasteService
+	Request depositRequest : depositRequest(Type, TruckLoad)	//TYPE : "plastic", "glass"
+	Reply loadaccept : loadaccept(ARG)
+	Reply loadrejecetd : loadrejecetd(ARG)
+	
+	
+	//WasteService - TransportTrolley
+    Request pickupReq	:	pickupReq(ID, TYPE)		//Richiesta di pickup di un relativo materiale
+ 	Reply   pickupOk	:	pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
+ 	
+ 	//TransportTrolley - CustomPathExecutor
+    Request move		:	move(CurrentPos, NewPos)
+ 	Reply   moveDone	:	moveDone(NewPos)
+ 	Dispatch toggleStop :	toggleStop(ARG)
+ 	
+ 	//CustomPathExecutor - BasicRobot22
+ 	Dispatch cmd       	: cmd(MOVE)
+ 	
+ 	//COAP UPDATE
+ 	Dispatch coapUpdate	: coapUpdate(RESOURCE, VALUE)
+ 	
+ 	
+ 	
+
+Context ctxsmartdevice ip[host="localhost" port=8074]
+Context ctxbasicrobot ip [host="localhost" port=8020]  
+
+Context ctxwasteservice ip[host="localhost" port=8072]
+
+
+
+ExternalQActor basicrobot context ctxbasicrobot
+
+
+
+
+
+
+QActor wasteservice context ctxwasteservice {
+	[#
+		val name = "WasteService"
+		val version = "0"
+
+		//Only one Request at time
+		var accepted = false;
+		var ID = 0
+		var Type = ""
+		var TruckLoad = 0
+		
+		
+		val MAXPB = 100;
+		val MAXGB = 100;
+		var CurrentPB = 0;
+		var CurrentGB = 0;
+		var oldPB = 0;
+		var oldGB = 0;
+	#]
+
+	State s0 initial {
+		println("\t $name: Started! $version") color green
+		//Initialiting variables
+		[#
+			CurrentPB = 0;
+			CurrentGB = 0;
+		#]
+	}
+	Goto waiting
+
+	State waiting{
+		println("\t $name: ready and waiting for deposit request...") color green
+	}
+	Transition t0 whenRequest depositRequest -> requestHandling
+
+	State requestHandling {
+		println("\t $name: Deposit Request arrived!") color green
+		[# 
+			accepted = false 
+			ID++	
+		#]
+
+		onMsg(depositRequest : depositRequest(T, L)){
+			[#
+				Type = payloadArg(0)
+				TruckLoad = payloadArg(1).toInt()
+			#]
+			println("Request: ($Type, $TruckLoad)") color green
+			if[# Type == "plastic" #]{
+				if[# (CurrentPB + TruckLoad) < MAXPB #]{
+					[# accepted = true #]
+				}
+			}
+			if[# Type == "glass" #]{
+				if[# (CurrentGB + TruckLoad) < MAXGB #]{
+					[# accepted = true #]
+				}
+			}
+			if[# Type != "glass" && Type != "plastic" #]{
+				[# accepted = false #]
+			}
+		}
+	}
+	Goto requestAccepted if[# accepted == true #] else requestRejected
+	
+	State requestAccepted {
+		println("\t $name: Request -$ID- Accepted!") color green
+		if[# Type == "plastic" #]{
+			[# CurrentPB += TruckLoad #]
+		}
+		if[# Type == "glass" #]{
+			[# CurrentGB += TruckLoad #]
+		}
+		println("\t CurrentPB = $CurrentPB") color green
+		println("\t CurrentGB = $CurrentGB") color green
+	}
+	Goto pickingUp
+
+	State requestRejected {
+		replyTo depositRequest with loadrejecetd : loadrejecetd($ID) caller==smartdevice
+		println("\t $name: Request -$ID- Refused!") color green
+	}
+	Goto waiting
+
+	State pickingUp {
+		//Requesting PickUp to TransportTrolley
+		println("\t $name: Requesting Picking Up...") color green
+		request transporttrolley -m pickupReq : pickupReq($ID, $Type)
+	}
+	Transition t1 whenReply pickupOk -> pickupOk
+
+	State pickupOk {
+        println("\t $name: Pickup finished! Truck ($ID) can go away!") color green
+        replyTo depositRequest with loadaccept : loadaccept($ID) caller==smartdevice
+	}
+	Goto waiting
+	//Ritorna a Waiting per attendere nuove richieste, anche se il trolley sta ancora depositando
+}
+
+
+
+QActor transporttrolley context ctxwasteservice {
+	[#
+		val name = "TransportTrolley"
+		val version = "V1.0"
+
+		var ID = ""
+		var MaterialType = ""
+		var Pos = "" 		//Pos : home, indoor, plasticbox, glassbox
+	#]
+
+	State s0 initial{
+		println("\t $name: Started! $version") color blue
+	}
+	Goto waiting
+
+	State waiting {
+		[# Pos = "home" #]
+		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
+
+		println("\t $name: ready and waiting for pickupRequest!") color blue
+	}
+    Transition t0 whenRequest pickupReq -> handlePickupReq
+
+
+	State handlePickupReq {
+		[# MaterialType =  "null" #]
+		
+        onMsg(pickupReq : pickupReq(ID, TYPE)){
+            [# 
+            	ID = payloadArg(0)
+            	MaterialType = payloadArg(1) 
+        	#]
+			println("\t $name: pickupRequest received! ($ID, $MaterialType)") color blue
+        }
+	}
+	Goto waiting if[# MaterialType == "null" #] else goPickUp 
+	
+	
+	State goPickUp {
+		//Sending messages to BasicRobot22
+		println("\t $name: Going to Indoor!") color blue
+		println("\t $name: Robot going from $Pos to Indoor") color blue
+
+		//Robot Moving
+		request custompathexecutor -m move : move($Pos, indoor)
+		
+	}
+	Transition t1 whenReply moveDone -> pickupDone
+	
+	
+	
+	State pickupDone {
+		[# Pos = "indoor" #]
+
+		println("\t $name: Picking up...") color blue
+		delay 5000
+		//Sending pikcup finished
+		println("\t $name: Pickup Finished!") color blue
+		replyTo pickupReq with pickupOk : pickupOk(0) caller== wasteservice
+	}
+	Goto goDeposit
+	
+
+
+	State goDeposit {
+		discardMsg Off
+		
+		if[# MaterialType == "plastic" #]{
+			//Goto PlasticBox
+			println("\t $name: Going to PlasticBox!") color blue
+			request custompathexecutor -m move : move($Pos, plasticbox)
+		}
+		
+		if[# MaterialType == "glass" #]{
+			//Goto GlassBox
+			println("\t $name: Going to GlassBox!") color blue
+			request custompathexecutor -m move : move($Pos, glassbox)
+		}
+		
+	}
+	Transition t1 whenReply moveDone -> depositDone
+	
+	
+	
+	State depositDone {
+		onMsg(moveDone : moveDone(NewPos)){
+			[# val Arg = payloadArg(0) #]
+			if[# Arg == "plasticbox" || Arg == "glassbox" || Arg == "2" || Arg == "3"#]{
+				[# Pos = Arg #]
+				println("\t $name: Depositing $MaterialType!") color blue
+				delay 6000
+				println("\t $name: DepositDone in $Pos!") color blue
+			}else{
+				println("$name: ERROR! [State: depositDone (ARG=$Arg)]!") color blue
+			}
+		}
+		
+	}
+	Transition t2 	whenTime 100 -> goHome
+					whenRequest pickupReq -> handlePickupReq //TEstare le richieste multiple (testare la coda)
+
+
+
+	State goHome {
+		discardMsg Off
+     	println("\t $name: Going home") color blue
+		request custompathexecutor -m move : move($Pos, home)
+	}
+	Transition t3 	whenReply moveDone -> waiting
+					whenRequest pickupReq -> handlePickupReq
+     
+}
+
+
+
+QActor custompathexecutor context ctxwasteservice {
+	[# 
+		val name = "CustomPathExecutor"
+		val version = "1"
+		
+		
+		var Pos = 0
+		var PosToGo = 0
+		
+//		enum class positions(val v : String) = {home(0), indoor(1), plasticbox(2), glassbox(3)}
+		
+//		enum class routes(val v : Int) = {
+//			HI(1),
+//			IP(1),
+//			IG(2),
+//			PI(-1),
+//			GI(-2),
+//			PH(2),
+//			GH(1)
+//		}
+		
+		var stepToDo = 0
+		var pathToDo = ""
+		var pathStep = 0
+		var pathLenght = -1
+		var turnBack = false
+		
+		val IncPosPath = "wl"
+		val DecPosPath = "lwrr"
+		val goBackPath = "hllwrr"
+		val goBackPath2 = "hllwrrr" 
+	#]
+	
+	
+	
+	State s0 initial{
+		println("\t $name: Started! $version") color blue
+		observeResource basicrobot
+	}
+	Goto waiting
+	
+	State waiting {
+		//println("\t $name: waiting for move requests!")
+	}
+	Transition t0 whenRequest move -> handleMoveRequest
+	
+	
+	State handleMoveRequest {
+		onMsg(move : move(Pos, NewPos)){
+			[# 
+				val NewPos = payloadArg(1)
+				pathStep = 0
+			#]
+			if[# NewPos == "home" #]{
+				[# PosToGo = 0 #]
+			}
+			if[# NewPos == "indoor" #]{
+				[# PosToGo = 1 #]
+			}
+			if[# NewPos == "plasticbox" #]{
+				[# PosToGo = 2 #]
+			}
+			if[# NewPos == "glassbox" #]{
+				[# PosToGo = 3 #]
+			}
+			println("\t $name: doing move($Pos, $NewPos)")
+		}
+		
+		[# 
+			stepToDo = PosToGo - Pos 
+			if(stepToDo <= -3 ){
+				stepToDo += 4
+			}else if(stepToDo >= 3){
+				stepToDo += -4
+			}
+		#]
+		
+		println("\t $name: stepToDo=$stepToDo")
+	}
+	Goto working
+	
+	
+	State working {
+		[# pathStep = 0 
+			var backPath = ""
+		#]
+		
+		if[# stepToDo > 0 #]{
+			[# pathToDo = IncPosPath 
+				backPath = goBackPath
+			#]
+		}
+		if[# stepToDo < 0 #]{
+			[# pathToDo = DecPosPath 
+				backPath = goBackPath2
+			#]
+		}
+		
+		if[# turnBack #]{
+			[# pathToDo = backPath.plus(pathToDo) #]
+		}
+		
+		[# pathLenght = pathToDo.lastIndex #]
+	}
+	Goto execStep if[# stepToDo != 0 #] else pathDone
+					
+					
+					
+					
+	State execStep {
+		onMsg(toggleStop : toggleStop(ARG)){
+			println("\t $name: RESUMED!")
+		}
+		[# var skip = false #]
+		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
+			[#
+				
+				val Resource = payloadArg(0)
+				val Value = payloadArg(1)
+				if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w'){
+					pathStep++
+				}
+				if(Value == "moveactivated(w)"){
+					skip = true
+				}
+			#]
+			//println("\t $name: coapUpdate($Resource, $Value)")
+		}
+		if[# !skip #]{
+			if[# pathStep <= pathLenght #]{
+				[#
+					val CMD = pathToDo.get(pathStep)
+				#]
+				//println("\t $name: Forwarding to BasicRobot cmd($CMD)")
+				if[# CMD == 'w' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+				}
+				if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+					delay 1000
+					[# pathStep++ #]
+				}
+			}else{
+				forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
+			}
+		}
+	
+	}
+	Transition t1 	whenTime 1200 -> execStep
+					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> execStep 
+					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> stepDone
+					//whenRequest move -> handleMoveRequestInMovement
+					whenMsg toggleStop -> stopped
+					
+	
+	
+	State stepDone {
+		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
+			
+			
+			if[# stepToDo > 0 && !turnBack #]{
+				[# 
+					stepToDo-- 
+					Pos = (Pos+1)%4
+				#]
+			}
+			if[# stepToDo < 0  && !turnBack #]{
+				[# 
+					stepToDo++ 
+					Pos = (Pos-1)%4
+				#]
+			}
+			if[# turnBack #]{
+				[# turnBack = false #]
+				println("\t $name: Turned Back! - Pos: $Pos")
+			}
+			
+			println("\t $name: StepDone! - Pos: $Pos")
+			updateResource [# "Pos($Pos)" #]
+		}
+	}
+	Transition t2 	whenTime 100 -> working
+					whenRequest move -> handleMoveRequest
+	
+	
+	State pathDone {
+		println("\t $name: Path done in $Pos")
+		replyTo move with moveDone : moveDone($Pos) caller==transporttrolley
+	}
+	Goto waiting
+	
+	State stopped {
+		onMsg(toggleStop : toggleStop(ARG)){
+			forward basicrobot -m cmd : cmd(h)
+			delay 100
+			println("\t $name: STOPPED!")
+		}
+	}
+	Transition t3 	whenMsg toggleStop -> execStep
+	
+	
+	//Optional implementation
+	State handleMoveRequestInMovement {
+		//Attahc to path the normal path, the go back path
+		[# turnBack = true #]
+	}
+	Goto handleMoveRequest
+	
+}
+
+
+
+
+
+
+
+
+
+//SmartDevice
+QActor smartdevice context ctxsmartdevice{
+	[#
+		val name = "SmartDevice"
+		val version = "V1.0"
+
+		var request_ID = 0
+	#]
+
+	State s0 initial{
+		println("\t $name: Started! $version") color yellow
+	}
+	Goto idle
+
+	State idle {
+		println("\t $name: Waiting for Truck...") color yellow
+		[# request_ID ++ #]
+	}
+	Transition t0 whenTime 1000 -> truckArrived
+
+	State truckArrived {
+		[# val ID = request_ID #]
+		if[# ID.toInt()%3 == 0 #]{
+			delay 20000
+		}
+		println("\t $name: Truck Arrived!")
+		println("\t $name: Sending request -$request_ID-") color yellow
+
+		if[# ID.toInt()%2 == 0 #]{
+			request wasteservice -m depositRequest : depositRequest(plastic, 10)
+		} else {
+			request wasteservice -m depositRequest : depositRequest(glass, 8)
+		}
+	}
+	Transition t1	whenReply loadaccept -> truckGoAway
+					whenReply loadrejecetd -> truckGoAway
+
+
+	State truckGoAway {
+		onMsg(loadrejecetd : loadrejecetd(ARG)){
+			println("\t $name: Carico - $request_ID - Rifiutato!") color yellow
+		}
+
+		onMsg(loadaccept : loadaccept(ARG)){
+			println("\t $name: Scarico - $request_ID - Completato!") color yellow
+		}
+
+		println("\t $name: Il Truck può andare!") color yellow
+	}
+	Transition t3 whenTime 1000 -> idle  //Un po' di attesa per simulare il via del camion
+}

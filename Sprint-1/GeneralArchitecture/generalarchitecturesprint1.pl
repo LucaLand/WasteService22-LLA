@@ -9,4 +9,3 @@ context(ctxwasteservice, "localhost",  "TCP", "8072").
   qactor( transporttrolley, ctxwasteservice, "it.unibo.transporttrolley.Transporttrolley").
   qactor( custompathexecutor, ctxwasteservice, "it.unibo.custompathexecutor.Custompathexecutor").
   qactor( smartdevice, ctxsmartdevice, "it.unibo.smartdevice.Smartdevice").
-  qactor( coapdispatcher, ctxbasicrobot, "it.unibo.coapdispatcher.Coapdispatcher").
