@@ -136,7 +136,7 @@ QActor wasteservice context ctxwasteservice {
 
 	State pickupOk {
         println("\t $name: Pickup finished! Truck ($ID) can go away!") color green
-        replyTo depositRequest with loadaccept : loadaccept($ID)
+        replyTo depositRequest with loadaccept : loadaccept($ID) caller==smartdevice
 	}
 	Goto waiting
 	//Ritorna a Waiting per attendere nuove richieste, anche se il trolley sta ancora depositando

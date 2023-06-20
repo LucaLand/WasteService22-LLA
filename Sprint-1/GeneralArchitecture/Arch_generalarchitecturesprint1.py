@@ -30,6 +30,7 @@ with Diagram('generalarchitecturesprint1Arch', show=False, outformat='png', grap
           custompathexecutor=Custom('custompathexecutor','./qakicons/symActorSmall.png')
      wasteservice >> Edge(color='darkgreen', style='dashed', xlabel='loadrejecetd', fontcolor='darkgreen') >> smartdevice
      wasteservice >> Edge(color='magenta', style='solid', xlabel='pickupReq', fontcolor='magenta') >> transporttrolley
+     wasteservice >> Edge(color='darkgreen', style='dashed', xlabel='loadaccept', fontcolor='darkgreen') >> smartdevice
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='move', fontcolor='magenta') >> custompathexecutor
      transporttrolley >> Edge(color='darkgreen', style='dashed', xlabel='pickupOk', fontcolor='darkgreen') >> wasteservice
      custompathexecutor >> Edge(color='blue', style='solid', xlabel='cmd', fontcolor='blue') >> basicrobot
