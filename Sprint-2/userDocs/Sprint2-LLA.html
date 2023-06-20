@@ -84,17 +84,16 @@
             <img src="./img/LogicalArch_Sprint1.png" alt="General Logical Architecture" style="width: 600px;" >
             <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
             <br>
+			<span>Sprint-1:
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/CtxSmartDevice/src/SmartDevice.qak">SmartDevice</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/CtxWasteService/src/ctxWasteService.qak">WasteService</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/it.unibo.basicrobot22/src/basicrobot22_mod">BasicRobot22_Mod.qak</a>
+            </span>
 
             <h4>Focus Sprint-2</h4>
             <p>Nello Sprint-2 si vedrà dunque un focus sui seguenti componenti e sui loro modelli.</p>
-            <img src="" alt="Architecture Focus Sprint-2" style="width: 80%">
-            <span>Sprint-0:
-                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak">SmartDevice.qak</a>  ||
-                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/WasteService.qak">WasteService.qak</a>  ||
-                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak">TransportTrolley.qak</a>  ||
-				<a href="">CustomPathExecutor.qak</a>
-                <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">BasicRobot22.qak</a>
-            </span>
+            <img src="img/Focus_Sprint-2.png" alt="Architecture Focus Sprint-2" style="width: 36%">
+
         </div>
     </div>
 
@@ -343,7 +342,7 @@ State handleRobotStateEvent {
 <p>Il <b>TransportTrolley</b> è stato modificato aggiungendo l'emissione di un evento che notifica il nuovo stato del robot e questa informazione sarà fruibile dal 
 <b>LED</b> per aggiornare il suo tipo di comportamento.</p>
 <pre><code>
-Event 	RobotStateEvent	:	RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED
+	Event 	RobotStateEvent	:	RobotStateEvent(STATE) 	// STATE = HOME | MOVING | STOPPED
 </code></pre>
 
 <p>La notifica dello stato del robot <i>RobotStateEvent</i> è stato pensato come un evento perchè è un dato utile non solo al componente <b>LED</b> ma anche a componenti successivi.
