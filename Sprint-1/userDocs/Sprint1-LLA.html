@@ -845,6 +845,46 @@ When (Request depositRequest(TYPE, TRUCKLOAD)){
 
 
 <br>
+<h2>Revisione Sprint-1 (Qak Plugin Update)</h2>
+<div class="remark">
+    <h4>Qak Plugin Update - ObserveResource Distributed</h4>
+    <p>Visto l'uscita di una nuova verisione del <i>Plugin</i> per il metamodello <i>Qak</i> <c>(version: 1.3.6)</c>, sono possibili i seguenti aggiornamenti:</p>
+    <ul>
+        <li>La funzione <i><code>observeResources</code></i> effettuta da un attore è ora possibile tra attori in <u>contesti diversi</u></li>
+    </ul>
+
+    <h4>Revisione</h4>
+    <p>Ciò porta alle seguenti modifiche e migliorie:</p>
+    <ul>
+        <li>È possibile eliminare l'attore <b>CoapDispatcher</b> aggiunto nel progetto <c>it.unibo.basicrobot22</c></li>
+        <li>L'attore <b>CustomPathExecutor</b> si registrerà direttamente agli aggiornamenti dell'attore <b>BasicRobot22</b></li>
+        <li>Verrà eliminato l'evento <code>posEvent</code> in favore id una <code>updateResource</code> della variabile <code>Pos($Pos)</code></li>
+    </ul>
+
+    <h4>Vantaggi</h4>
+    <p>Si producono così i seguenti <b>vantaggi</b>:</p>
+    <ul>
+        <li>Il componente <b>BasicRobot22</b> non necessità modifiche o aggiunte di componenti per l'integrazione con il sistema</li>
+        <li>Il contesto del <b>BasicRobot</b> non necessita di essere <i>aware</i> del contesto <b>ctxwasteservice</b></li>
+        <ul><li>Maggior isolamento e modularità dei componenti</li></ul>
+        <li>L'eleiminazione dell'evento porta vantaggi in termini di ottimizzazione in quanto la registrazione solo degli attori interessati alla risorsa è ottimale rispetto a un <i>broadcast</i> dell'evento</li>
+    </ul>
+
+    <h4>Archiettura Risultante Revisione</h4>
+
+    <img src="img/GeneralArchitectureSprint1_revision" alt="GeneralArchitectureSprint1_revision">
+    <p>Nuovo modello:</p>
+    <a href="../CtxWasteService/src/ctxWasteService_revision.qak">CtxWasteService.qak</a>
+    <a href="../it.unibo.basicrobot22/src/basicrobot.qak">basicrobot.qak</a>
+
+
+    <h4>Test-Unit Revision</h4>
+    <p>La test-unit non necessita di modifiche.<br>
+        Il test rimane lo stesso, viene modificato solo il file Qak per il modello di test, per testare le nuove modifiche.</p>
+    <p>Nuovo Qak di test: <a href="../CtxWasteService/src/ctxWasteService_Test_revision.qakq">ctxWasteService_Test_revision.qak</a></p>
+</div>
+
+<br>
 <br>
 <br>
 
