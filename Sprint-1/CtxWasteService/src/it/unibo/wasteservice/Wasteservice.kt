@@ -33,8 +33,6 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				val MAXGB = 100;
 				var CurrentPB = 0;
 				var CurrentGB = 0;
-				var oldPB = 0;
-				var oldGB = 0;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -115,7 +113,7 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				}	 
 				state("requestRejected") { //this:State
 					action { //it:State
-						answer("depositRequest", "loadrejecetd", "loadrejecetd($ID)","smartdevice"   )  
+						answer("depositRequest", "loadrejecetd", "loadrejecetd($ID)"   )  
 						CommUtils.outgreen("	 $name: Request -$ID- Refused!")
 						//genTimer( actor, state )
 					}

@@ -327,6 +327,7 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
+		observeResource basicrobot
 	}
 	Goto waiting
 	
@@ -334,7 +335,7 @@ QActor custompathexecutor context ctxwasteservice {
 		//Test CoapUpdate
 		//updateResource [# "custompathexecutorState(waiting)" #]
 		
-		println("\t $name: waiting for move requests!")
+		//println("\t $name: waiting for move requests!")
 	}
 	Transition t0 whenRequest move -> handleMoveRequest
 	
@@ -411,36 +412,42 @@ QActor custompathexecutor context ctxwasteservice {
 		onMsg(toggleStop : toggleStop(ARG)){
 			println("\t $name: RESUMED!")
 		}
-		
+		[# var skip = false #]
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			[#
+				
 				val Resource = payloadArg(0)
 				val Value = payloadArg(1)
 				if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w'){
 					pathStep++
 				}
+				if(Value == "moveactivated(w)"){
+					skip = true
+				}
 			#]
-			println("\t $name: coapUpdate($Resource, $Value)")
+			//println("\t $name: coapUpdate($Resource, $Value)")
 		}
-		if[# pathStep <= pathLenght #]{
-			[#
-				val CMD = pathToDo.get(pathStep)
-			#]
-			println("\t $name: Forwarding to BasicRobot cmd($CMD)")
-			if[# CMD == 'w' #]{
-				forward basicrobot -m cmd : cmd($CMD)
+		if[# !skip #]{
+			if[# pathStep <= pathLenght #]{
+				[#
+					val CMD = pathToDo.get(pathStep)
+				#]
+				//println("\t $name: Forwarding to BasicRobot cmd($CMD)")
+				if[# CMD == 'w' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+				}
+				if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+					delay 1000
+					[# pathStep++ #]
+				}
+				
+				//Test CoapUpdate
+				//updateResource [# "execStep($CMD)" #]
+				
+			}else{
+				forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 			}
-			if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
-				forward basicrobot -m cmd : cmd($CMD)
-				delay 1000
-				[# pathStep++ #]
-			}
-			
-			//Test CoapUpdate
-			//updateResource [# "execStep($CMD)" #]
-			
-		}else{
-			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 		}
 	
 	}

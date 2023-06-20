@@ -3,4 +3,3 @@
 {"actor":"basicrobot", "msgType":"dispatch", "curstate":"work", "nextstate":"endwork", "msgId":"end"}
 {"actor":"basicrobot", "msgType":"dispatch", "curstate":"doStep", "nextstate":"stepFail", "msgId":"obstacle"}
 {"actor":"envsonarhandler", "msgType":"dispatch", "curstate":"s0", "nextstate":"dontcare", "msgId":"cmd"}
-{"actor":"coapdispatcher", "msgType":"dispatch", "curstate":"waiting", "nextstate":"dispatchingUpdates", "msgId":"coapUpdate"}
