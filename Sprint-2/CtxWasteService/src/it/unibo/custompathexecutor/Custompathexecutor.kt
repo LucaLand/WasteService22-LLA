@@ -133,10 +133,6 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("execStep") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("toggleStop(ARG)"), Term.createTerm("toggleStop(ARG)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outblack("	 $name: RESUMED!")
-						}
 						 var skip = false  
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
@@ -179,7 +175,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					}))
 					transition(edgeName="t119",targetState="stepDone",cond=whenDispatchGuarded("coapUpdate",{ pathStep > pathLenght  
 					}))
-					transition(edgeName="t120",targetState="stopped",cond=whenDispatch("toggleStop"))
+					interrupthandle(edgeName="t120",targetState="stopped",cond=whenDispatch("toggleStop"),interruptedStateTransitions)
 				}	 
 				state("stepDone") { //this:State
 					action { //it:State
@@ -237,7 +233,20 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t323",targetState="execStep",cond=whenDispatch("toggleStop"))
+					 transition(edgeName="t323",targetState="resume",cond=whenDispatch("toggleStop"))
+				}	 
+				state("resume") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("toggleStop(ARG)"), Term.createTerm("toggleStop(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								CommUtils.outblack("	 $name: RESUMED!")
+						}
+						returnFromInterrupt(interruptedStateTransitions)
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 				state("handleMoveRequestInMovement") { //this:State
 					action { //it:State

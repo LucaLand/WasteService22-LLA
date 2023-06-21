@@ -18,11 +18,10 @@ class Sonar23 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		val interruptedStateTransitions = mutableListOf<Transition>()
-		 var  ApplAlso = sysUtil.getActor("appl") != null  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						CommUtils.outblack("sonar23 | start with appl: $ApplAlso")
+						CommUtils.outblack("sonar23 | start")
 						 subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
 						//genTimer( actor, state )
 					}
@@ -42,13 +41,12 @@ class Sonar23 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 				}	 
 				state("handlesonardata") { //this:State
 					action { //it:State
-						updateResourceRep( "sonar23 handles $currentMsg"  
-						)
 						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val D = payloadArg(0)  
-								CommUtils.outblack("	 HandleSonarData($D) - Emitting sonardataAppl($D)")
-								emit("sonardataAppl", "distance($D)" ) 
+								CommUtils.outblack("	 HandleSonarData($D) - updating sonardata($D)")
+								updateResourceRep( "sonardata($D)"  
+								)
 						}
 						//genTimer( actor, state )
 					}
@@ -56,15 +54,6 @@ class Sonar23 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 					sysaction { //it:State
 					}	 	 
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
-				}	 
-				state("sonar23") { //this:State
-					action { //it:State
-						CommUtils.outblack("$name BYE")
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
 				}	 
 			}
 		}

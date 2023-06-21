@@ -27,7 +27,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				var Pos = "" 		//Pos : home, indoor, plasticbox, glassbox
 				
 				var RobotState = "athome"
-				var PreviusState = ""
+				var PreviousState = ""
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -167,7 +167,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("handleAlarm") { //this:State
 					action { //it:State
 						 
-									PreviusState = RobotState 
+									PreviousState = RobotState 
 									RobotState = "stopped"
 						CommUtils.outblue("	 $name: Robot Stopped!")
 						forward("toggleStop", "toggleStop(stop)" ,"custompathexecutor" ) 
@@ -181,7 +181,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("resume") { //this:State
 					action { //it:State
-						 RobotState = PreviusState  
+						 RobotState = PreviousState  
 						CommUtils.outblue("	 $name: Resumed execution!")
 						forward("toggleStop", "toggleStop(resume)" ,"custompathexecutor" ) 
 						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 

@@ -24,6 +24,8 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						CommUtils.outblack("	 sonardatahandler: 	Started")
+						CoapObserverSupport(myself, "127.0.0.1","8076","ctxraspberry","sonar23")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -33,9 +35,11 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				}	 
 				state("handleSonarData") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
+						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 val distance = payloadArg(0)  
+								
+												val Value = payloadArg(1).split("(")[1]
+												val distance = Value.dropLast(1)
 								if(  distance.toInt() <= DLIMIT && stopped == false  
 								 ){ stopped = true  
 								forward("alarm", "alarm(stop)" ,"transporttrolley" ) 
@@ -53,7 +57,7 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t024",targetState="handleSonarData",cond=whenEvent("sonardataAppl"))
+					 transition(edgeName="t024",targetState="handleSonarData",cond=whenDispatch("coapUpdate"))
 				}	 
 			}
 		}
