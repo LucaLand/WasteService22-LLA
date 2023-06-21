@@ -14,26 +14,23 @@ System ctxwasteservice
  	//TransportTrolley - CustomPathExecutor
     Request move		:	move(CurrentPos, NewPos)
  	Reply   moveDone	:	moveDone(NewPos)
- 	Request goBack		:	goBack(ARG)
  	Dispatch toggleStop :	toggleStop(ARG)
  	
  	//CustomPathExecutor - BasicRobot22
  	Dispatch cmd       	: cmd(MOVE)
- 	Event 	posEvent	: posEvent(POS)
+ 	
  	
  	//COAP UPDATE
  	Dispatch coapUpdate	: coapUpdate(RESOURCE, VALUE)
- 	Event coapUpdateEvent : coapUpdateEvent(RESOURCE, VALUE)
  	
  	
 
-Context ctxsmartdevice ip[host="127.0.0.1" port=8074] 	//Solo a scopo di architettura (caller==)
+
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 
-ExternalQActor smartdevice context ctxsmartdevice		//Solo a scopo di architettura (caller==)
 ExternalQActor basicrobot context ctxbasicrobot
 
 
@@ -58,8 +55,6 @@ QActor wasteservice context ctxwasteservice {
 		val MAXGB = 100;
 		var CurrentPB = 0;
 		var CurrentGB = 0;
-		var oldPB = 0;
-		var oldGB = 0;
 	#]
 
 	State s0 initial {
@@ -121,7 +116,7 @@ QActor wasteservice context ctxwasteservice {
 	Goto pickingUp
 
 	State requestRejected {
-		replyTo depositRequest with loadrejecetd : loadrejecetd($ID) caller==smartdevice
+		replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
 		println("\t $name: Request -$ID- Refused!") color green
 	}
 	Goto waiting
@@ -293,11 +288,12 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
+		observeResource basicrobot
 	}
 	Goto waiting
 	
 	State waiting {
-		println("\t $name: waiting for move requests!")
+		//println("\t $name: waiting for move requests!")
 	}
 	Transition t0 whenRequest move -> handleMoveRequest
 	
@@ -366,36 +362,40 @@ QActor custompathexecutor context ctxwasteservice {
 					
 	State execStep {
 		onMsg(toggleStop : toggleStop(ARG)){
-			//REPLY Inutile
-			//replyTo stopReq with stopRepl : stopRepl(Resumed)
 			println("\t $name: RESUMED!")
 		}
-		
+		[# var skip = false #]
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			[#
+				
 				val Resource = payloadArg(0)
 				val Value = payloadArg(1)
 				if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w'){
 					pathStep++
 				}
+				if(Value == "moveactivated(w)"){
+					skip = true
+				}
 			#]
-			println("\t $name: coapUpdate($Resource, $Value)")
+			//println("\t $name: coapUpdate($Resource, $Value)")
 		}
-		if[# pathStep <= pathLenght #]{
-			[#
-				val CMD = pathToDo.get(pathStep)
-			#]
-			println("\t $name: Forwarding to BasicRobot cmd($CMD)")
-			if[# CMD == 'w' #]{
-				forward basicrobot -m cmd : cmd($CMD)
+		if[# !skip #]{
+			if[# pathStep <= pathLenght #]{
+				[#
+					val CMD = pathToDo.get(pathStep)
+				#]
+				//println("\t $name: Forwarding to BasicRobot cmd($CMD)")
+				if[# CMD == 'w' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+				}
+				if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+					delay 1000
+					[# pathStep++ #]
+				}
+			}else{
+				forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 			}
-			if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
-				forward basicrobot -m cmd : cmd($CMD)
-				delay 1000
-				[# pathStep++ #]
-			}
-		}else{
-			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 		}
 	
 	}
@@ -404,11 +404,7 @@ QActor custompathexecutor context ctxwasteservice {
 					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> stepDone
 					//whenRequest move -> handleMoveRequestInMovement
 					whenMsg toggleStop -> stopped
-	
-	
-	
-
-	
+					
 	
 	
 	State stepDone {
@@ -433,8 +429,7 @@ QActor custompathexecutor context ctxwasteservice {
 			}
 			
 			println("\t $name: StepDone! - Pos: $Pos")
-			emit posEvent : posEvent($Pos)
-			
+			updateResource [# "Pos($Pos)" #]
 		}
 	}
 	Transition t2 	whenTime 100 -> working
@@ -449,8 +444,6 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	State stopped {
 		onMsg(toggleStop : toggleStop(ARG)){
-			//REPLY Inutile
-			//replyTo stopReq with stopRepl : stopRepl(Stopped)
 			forward basicrobot -m cmd : cmd(h)
 			delay 100
 			println("\t $name: STOPPED!")
