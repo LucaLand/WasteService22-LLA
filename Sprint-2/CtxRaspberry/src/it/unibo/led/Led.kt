@@ -55,15 +55,15 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 								}
 								CommUtils.outred("	 $name: Led state- $ledState")
 						}
-						if(  ledState = "LedOff"  
+						if(  ledState == "LedOff"  
 						 ){ runtime.exec("sudo bash led25GpioTurnOff.sh")  
 						}
-						if(  ledState = "LedBlink"  
+						if(  ledState == "LedBlink"  
 						 ){ runtime.exec("sudo bash led25GpioTurnOn.sh")  
 						delay(100) 
 						 runtime.exec("sudo bash led25GpioTurnOff.sh")  
 						}
-						if(  ledState = "LedOn"  
+						if(  ledState == "LedOn"  
 						 ){ runtime.exec("sudo bash led25GpioTurnOn.sh")  
 						}
 						//genTimer( actor, state )

@@ -14,16 +14,16 @@ System ctxwasteservice
  	//TransportTrolley - CustomPathExecutor
     Request move		:	move(CurrentPos, NewPos)
  	Reply   moveDone	:	moveDone(NewPos)
- 	Request goBack		:	goBack(ARG)
  	Dispatch toggleStop :	toggleStop(ARG)
  	
  	//CustomPathExecutor - BasicRobot22
  	Dispatch cmd       	: cmd(MOVE)
- 	Event 	posEvent	: posEvent(POS)
  	
  	//COAP UPDATE
  	Dispatch coapUpdate	: 	coapUpdate(RESOURCE, VALUE)
- 	Event coapUpdateEvent : coapUpdateEvent(RESOURCE, VALUE)
+ 	
+ 	//SonarQak23
+	Event sonardataAppl : distance(D)   //emitted  by sonarqak23
  	
  	//Sonar - TransportTrolley
  	Dispatch alarm 		: 	alarm(ARG)
@@ -35,15 +35,12 @@ System ctxwasteservice
  	
  	
 Context ctxraspberry ip[host="127.0.0.1" port=8076]
-Context ctxsmartdevice ip[host="127.0.0.1" port=8074] 	//Solo a scopo di architettura (caller==)
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 
-ExternalQActor smartdevice context ctxsmartdevice		//Solo a scopo di architettura (caller==)
 ExternalQActor basicrobot context ctxbasicrobot
-//ExternalQActor led context ctxraspberry
 
 
 
@@ -68,8 +65,6 @@ QActor wasteservice context ctxwasteservice {
 		val MAXGB = 100;
 		var CurrentPB = 0;
 		var CurrentGB = 0;
-		var oldPB = 0;
-		var oldGB = 0;
 	#]
 
 	State s0 initial {
@@ -131,7 +126,7 @@ QActor wasteservice context ctxwasteservice {
 	Goto pickingUp
 
 	State requestRejected {
-		replyTo depositRequest with loadrejecetd : loadrejecetd($ID) caller==smartdevice
+		replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
 		println("\t $name: Request -$ID- Refused!") color green
 	}
 	Goto waiting
@@ -163,7 +158,7 @@ QActor transporttrolley context ctxwasteservice {
 		var Pos = "" 		//Pos : home, indoor, plasticbox, glassbox
 		
 		var RobotState = "athome"
-		var PreviusState = ""
+		var PreviousState = ""
 	#]
 
 	State s0 initial{
@@ -283,7 +278,7 @@ QActor transporttrolley context ctxwasteservice {
 	//Sonar Alarm
 	State handleAlarm {
 		[# 
-			PreviusState = RobotState 
+			PreviousState = RobotState 
 			RobotState = "stopped"
 		#]
 		
@@ -294,7 +289,7 @@ QActor transporttrolley context ctxwasteservice {
 	Transition t3	whenMsg alarmStop -> resume
 	
 	State resume {
-		[# RobotState = PreviusState #]
+		[# RobotState = PreviousState #]
 		
 		println("\t $name: Resumed execution!") color blue
 		forward custompathexecutor -m toggleStop : toggleStop(resume)
@@ -342,18 +337,19 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
+		observeResource basicrobot
 	}
 	Goto waiting
-	
+
 	State waiting {
-		println("\t $name: waiting for move requests!")
+		//println("\t $name: waiting for move requests!")
 	}
 	Transition t0 whenRequest move -> handleMoveRequest
-	
-	
+
+
 	State handleMoveRequest {
 		onMsg(move : move(Pos, NewPos)){
-			[# 
+			[#
 				val NewPos = payloadArg(1)
 				pathStep = 0
 			#]
@@ -371,53 +367,53 @@ QActor custompathexecutor context ctxwasteservice {
 			}
 			println("\t $name: doing move($Pos, $NewPos)")
 		}
-		
-		[# 
-			stepToDo = PosToGo - Pos 
+
+		[#
+			stepToDo = PosToGo - Pos
 			if(stepToDo <= -3 ){
 				stepToDo += 4
 			}else if(stepToDo >= 3){
 				stepToDo += -4
 			}
 		#]
-		
+
 		println("\t $name: stepToDo=$stepToDo")
 	}
 	Goto working
-	
-	
+
+
 	State working {
-		[# pathStep = 0 
+		[# pathStep = 0
 			var backPath = ""
 		#]
-		
+
 		if[# stepToDo > 0 #]{
-			[# pathToDo = IncPosPath 
+			[# pathToDo = IncPosPath
 				backPath = goBackPath
 			#]
 		}
 		if[# stepToDo < 0 #]{
-			[# pathToDo = DecPosPath 
+			[# pathToDo = DecPosPath
 				backPath = goBackPath2
 			#]
 		}
-		
+
 		if[# turnBack #]{
 			[# pathToDo = backPath.plus(pathToDo) #]
 		}
-		
+
 		[# pathLenght = pathToDo.lastIndex #]
 	}
 	Goto execStep if[# stepToDo != 0 #] else pathDone
-					
-					
-					
-					
+
+
+
+
 	State execStep {
 		onMsg(toggleStop : toggleStop(ARG)){
 			println("\t $name: RESUMED!")
 		}
-		
+		[# var skip = false #]
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			[#
 				val Resource = payloadArg(0)
@@ -425,52 +421,53 @@ QActor custompathexecutor context ctxwasteservice {
 				if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w'){
 					pathStep++
 				}
+				if(Value == "moveactivated(w)"){
+					skip = true
+				}
 			#]
-			println("\t $name: coapUpdate($Resource, $Value)")
+			//println("\t $name: coapUpdate($Resource, $Value)")
 		}
-		if[# pathStep <= pathLenght #]{
-			[#
-				val CMD = pathToDo.get(pathStep)
-			#]
-			println("\t $name: Forwarding to BasicRobot cmd($CMD)")
-			if[# CMD == 'w' #]{
-				forward basicrobot -m cmd : cmd($CMD)
+		if[# !skip #]{
+			if[# pathStep <= pathLenght #]{
+				[#
+					val CMD = pathToDo.get(pathStep)
+				#]
+				//println("\t $name: Forwarding to BasicRobot cmd($CMD)")
+				if[# CMD == 'w' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+				}
+				if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+					delay 1000
+					[# pathStep++ #]
+				}
+			}else{
+				forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 			}
-			if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
-				forward basicrobot -m cmd : cmd($CMD)
-				delay 1000
-				[# pathStep++ #]
-			}
-		}else{
-			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 		}
-	
+
 	}
 	Transition t1 	whenTime 1200 -> execStep
-					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> execStep 
+					whenMsg coapUpdate and [# pathStep <= pathLenght #] -> execStep
 					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> stepDone
 					//whenRequest move -> handleMoveRequestInMovement
 					whenMsg toggleStop -> stopped
-	
-	
-	
 
-	
-	
-	
+
+
 	State stepDone {
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
-			
-			
+
+
 			if[# stepToDo > 0 && !turnBack #]{
-				[# 
-					stepToDo-- 
+				[#
+					stepToDo--
 					Pos = (Pos+1)%4
 				#]
 			}
 			if[# stepToDo < 0  && !turnBack #]{
-				[# 
-					stepToDo++ 
+				[#
+					stepToDo++
 					Pos = (Pos-1)%4
 				#]
 			}
@@ -478,10 +475,9 @@ QActor custompathexecutor context ctxwasteservice {
 				[# turnBack = false #]
 				println("\t $name: Turned Back! - Pos: $Pos")
 			}
-			
+
 			println("\t $name: StepDone! - Pos: $Pos")
-			emit posEvent : posEvent($Pos)
-			
+			updateResource [# "Pos($Pos)" #]
 		}
 	}
 	Transition t2 	whenTime 100 -> working
@@ -512,6 +508,45 @@ QActor custompathexecutor context ctxwasteservice {
 	Goto handleMoveRequest
 	
 }
+
+
+
+//SonarDataHandler
+QActor sonardatahandler context ctxwasteservice{
+	[#
+		val DLIMIT = 10
+		var stopped = false
+	#]
+
+	State s0 initial {
+
+	}
+	Goto handleSonarData
+
+
+	State handleSonarData{
+		onMsg(sonardataAppl : distance(D)){
+			[# val distance = payloadArg(0) #]
+
+			if[# distance.toInt() <= DLIMIT && stopped == false #]{
+				[# stopped = true #]
+				forward transporttrolley -m alarm : alarm(stop)
+				println("\t $name: Sending alarm(stop)!")
+			}
+
+			if[# distance.toInt() > DLIMIT && stopped == true #]{
+				[# stopped = false #]
+				forward transporttrolley -m alarmStop : alarmStop(resume)
+				println("\t $name: Sending alarmStop(resume)!")
+			}
+
+			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
+		}
+	}
+	Transition t0	whenEvent sonardataAppl -> handleSonarData
+}
+
+
 
 
 

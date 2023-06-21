@@ -10,7 +10,7 @@ Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
 	Event obstacle  : obstacle(D)   //emitted as stream by distancefilter
 	Dispatch coapUpdate : coapUpdate(RESOURCE, VALUE)
 	Event alarm		: alarm(X)
-
+	
 	//SonarData Appl
 	Event sonardataAppl : distance(D)   //emitted  by sonarqak23
 
@@ -33,11 +33,7 @@ CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //I
     //CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
 //CodedQActor datalogger     context ctxraspberry className "rx.dataLogger"
 CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
-CodedQActor distancefilter context ctxraspberry className "rx.distanceFilter"
-
-
-
-ExternalQActor transporttrolley context ctxwasteservice
+//CodedQActor distancefilter context ctxraspberry className "rx.distanceFilter"
 
 
 
@@ -74,22 +70,22 @@ QActor led context ctxraspberry {
         	if[# robotState == "stopped" #]{
         		[# ledState = "LedOn" #]
         	}
-			println("\t $name: Led state- $ledState") color red
+			println("\t $name: Led state - $ledState") color red
 		}
 		
 		
-        if[# ledState = "LedOff" #]{
+        if[# ledState == "LedOff" #]{
             //Spegni
             [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
         }
-        if[# ledState = "LedBlink" #]{
+        if[# ledState == "LedBlink" #]{
             //Accendi
             [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
             delay 100
             //Spegni
             [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
         }
-        if[# ledState = "LedOn" #]{
+        if[# ledState == "LedOn" #]{
             //Accendi
             [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
         }
@@ -108,22 +104,23 @@ QActor sonar23 context ctxraspberry{
 	[# var  ApplAlso = sysUtil.getActor("appl") != null #]
 	State s0 initial{  
 		println("sonar23 | start with appl: $ApplAlso") 
-		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 	}
 	Goto work
 	 
 	State work{
 		//println("sonar23 | waits ... ") 		
-		updateResource [# "sonar23 waiting ..." #]
+		//updateResource [# "sonar23 waiting ..." #]
 	}
 	Transition t0 whenEvent sonardata -> handlesonardata
 	              whenEvent obstacle  -> handleobstacle
 	
 	State handlesonardata{
-		printCurrentMessage
+		//printCurrentMessage
 		updateResource [# "sonar23 handles $currentMsg" #]
 		onMsg(sonardata : distance(D)){
 			[# val D = payloadArg(0) #]
+			println("\t HandleSonarData($D) - Emitting sonardataAppl($D)")
 			emit sonardataAppl : distance($D)
 		}
 		
@@ -142,42 +139,6 @@ QActor sonar23 context ctxraspberry{
 	State sonar23{
 		println("$name BYE")
 	}
-}
-
-//SonarDataHandler
-QActor sonardatahandler context ctxraspberry{
-	[# 
-		val DLIMIT = 10
-		var stopped = false
-	#]
-	
-	State s0 initial {
-		
-	}
-	Goto handleSonarData
-	
-	
-	State handleSonarData{
-		onMsg(sonardataAppl : distance(D)){
-			[# val distance = payloadArg(0) #]
-			
-			if[# distance.toInt() <= DLIMIT && stopped == false #]{
-				[# stopped = true #]
-				forward transporttrolley -m alarm : alarm(stop)
-				println("\t $name: Sending alarm(stop)!")
-			}
-			
-			if[# distance.toInt() > DLIMIT && stopped == true #]{
-				[# stopped = false #]
-				forward transporttrolley -m alarmStop : alarmStop(resume)
-				println("\t $name: Sending alarmStop(resume)!")
-			}
-			
-			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
-		}
-	}
-	Transition t0	whenEvent sonardataAppl -> handleSonarData
-	
 }
 
 

@@ -52,6 +52,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Started! $version")
+						CoapObserverSupport(myself, "127.0.0.1","8020","ctxbasicrobot","basicrobot")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -61,7 +62,6 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("waiting") { //this:State
 					action { //it:State
-						CommUtils.outblack("	 $name: waiting for move requests!")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -73,7 +73,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("move(CurrentPos,NewPos)"), Term.createTerm("move(Pos,NewPos)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 
+								
 												val NewPos = payloadArg(1)
 												pathStep = 0
 								if(  NewPos == "home"  
@@ -90,8 +90,8 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								}
 								CommUtils.outblack("	 $name: doing move($Pos, $NewPos)")
 						}
-						 
-									stepToDo = PosToGo - Pos 
+						
+									stepToDo = PosToGo - Pos
 									if(stepToDo <= -3 ){
 										stepToDo += 4
 									}else if(stepToDo >= 3){
@@ -107,14 +107,14 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				}	 
 				state("working") { //this:State
 					action { //it:State
-						 pathStep = 0 
+						 pathStep = 0
 									var backPath = ""
 						if(  stepToDo > 0  
-						 ){ pathToDo = IncPosPath 
+						 ){ pathToDo = IncPosPath
 										backPath = goBackPath
 						}
 						if(  stepToDo < 0  
-						 ){ pathToDo = DecPosPath 
+						 ){ pathToDo = DecPosPath
 										backPath = goBackPath2
 						}
 						if(  turnBack  
@@ -137,6 +137,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								CommUtils.outblack("	 $name: RESUMED!")
 						}
+						 var skip = false  
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
@@ -145,12 +146,14 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 												if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w'){
 													pathStep++
 												}
-								CommUtils.outblack("	 $name: coapUpdate($Resource, $Value)")
+												if(Value == "moveactivated(w)"){
+													skip = true
+												}
 						}
-						if(  pathStep <= pathLenght  
+						if(  !skip  
+						 ){if(  pathStep <= pathLenght  
 						 ){
-										val CMD = pathToDo.get(pathStep)
-						CommUtils.outblack("	 $name: Forwarding to BasicRobot cmd($CMD)")
+											val CMD = pathToDo.get(pathStep)
 						if(  CMD == 'w'  
 						 ){forward("cmd", "cmd($CMD)" ,"basicrobot" ) 
 						}
@@ -163,6 +166,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						else
 						 {forward("coapUpdate", "coapUpdate(custompathexecutor,stepDone)" ,"custompathexecutor" ) 
 						 }
+						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -182,13 +186,13 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								if(  stepToDo > 0 && !turnBack  
-								 ){ 
-													stepToDo-- 
+								 ){
+													stepToDo--
 													Pos = (Pos+1)%4
 								}
 								if(  stepToDo < 0  && !turnBack  
-								 ){ 
-													stepToDo++ 
+								 ){
+													stepToDo++
 													Pos = (Pos-1)%4
 								}
 								if(  turnBack  
@@ -196,7 +200,8 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								CommUtils.outblack("	 $name: Turned Back! - Pos: $Pos")
 								}
 								CommUtils.outblack("	 $name: StepDone! - Pos: $Pos")
-								emit("posEvent", "posEvent($Pos)" ) 
+								updateResourceRep( "Pos($Pos)"  
+								)
 						}
 						//genTimer( actor, state )
 					}

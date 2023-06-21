@@ -23,7 +23,7 @@ class Sonar23 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblack("sonar23 | start with appl: $ApplAlso")
-						 subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
+						 subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -33,8 +33,6 @@ class Sonar23 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 				}	 
 				state("work") { //this:State
 					action { //it:State
-						updateResourceRep( "sonar23 waiting ..."  
-						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -52,6 +50,7 @@ class Sonar23 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val D = payloadArg(0)  
+								CommUtils.outblack("HandleSonarData($D) - Emitting sonardataAppl($D)")
 								emit("sonardataAppl", "distance($D)" ) 
 						}
 						//genTimer( actor, state )

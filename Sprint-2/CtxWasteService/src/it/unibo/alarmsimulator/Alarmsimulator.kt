@@ -44,7 +44,7 @@ class Alarmsimulator ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 				 	 		stateTimer = TimerActor("timer_s1", 
 				 	 					  scope, context!!, "local_tout_alarmsimulator_s1", 8000.toLong() )
 					}	 	 
-					 transition(edgeName="t024",targetState="s2",cond=whenTimeout("local_tout_alarmsimulator_s1"))   
+					 transition(edgeName="t025",targetState="s2",cond=whenTimeout("local_tout_alarmsimulator_s1"))   
 				}	 
 				state("s2") { //this:State
 					action { //it:State
@@ -58,7 +58,7 @@ class Alarmsimulator ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( n
 				 	 		stateTimer = TimerActor("timer_s2", 
 				 	 					  scope, context!!, "local_tout_alarmsimulator_s2", 12000.toLong() )
 					}	 	 
-					 transition(edgeName="t025",targetState="s1",cond=whenTimeout("local_tout_alarmsimulator_s2"))   
+					 transition(edgeName="t026",targetState="s1",cond=whenTimeout("local_tout_alarmsimulator_s2"))   
 				}	 
 			}
 		}
