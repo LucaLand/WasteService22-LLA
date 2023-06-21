@@ -13,16 +13,13 @@ System generalarchitecturesprint2
  	//TransportTrolley - CustomPathExecutor
     Request move		:	move(CurrentPos, NewPos)
  	Reply   moveDone	:	moveDone(NewPos)
- 	Request goBack		:	goBack(ARG)
  	Dispatch toggleStop :	toggleStop(ARG)
 
  	//CustomPathExecutor - BasicRobot22
  	Dispatch cmd       	: cmd(MOVE)
- 	Event 	posEvent	: posEvent(POS)
 
  	//COAP UPDATE
  	Dispatch coapUpdate	: 	coapUpdate(RESOURCE, VALUE)
- 	Event coapUpdateEvent : coapUpdateEvent(RESOURCE, VALUE)
 
  	//Sonar - TransportTrolley
  	Dispatch alarm 		: 	alarm(ARG)
@@ -36,7 +33,6 @@ System generalarchitecturesprint2
 	//SonarQak23
 	Event sonardata : distance(D)   //emitted  by distancefilter
 	Event obstacle  : obstacle(D)   //emitted as stream by distancefilter
-	Dispatch coapUpdate : coapUpdate(RESOURCE, VALUE)
 	Event alarm		: alarm(X)
 
 	//SonarData Appl
@@ -45,16 +41,17 @@ System generalarchitecturesprint2
 
 
 Context ctxraspberry ip[host="localhots" port=8076]
-Context ctxsmartdevice ip[host="localhots" port=8074] 	//Solo a scopo di architettura (caller==)
+//Context ctxsmartdevice ip[host="localhots" port=8074] 	//Solo a scopo di architettura (caller==)
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
-    //CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
+//CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
+CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
 
 
-ExternalQActor smartdevice context ctxsmartdevice		//Solo a scopo di architettura (caller==)
+//ExternalQActor smartdevice context ctxsmartdevice		//Solo a scopo di architettura (caller==)
 ExternalQActor basicrobot context ctxbasicrobot
 
 
@@ -75,14 +72,12 @@ QActor wasteservice context ctxwasteservice {
 		var ID = 0
 		var Type = ""
 		var TruckLoad = 0
-
-
+		
+		
 		val MAXPB = 100;
 		val MAXGB = 100;
 		var CurrentPB = 0;
 		var CurrentGB = 0;
-		var oldPB = 0;
-		var oldGB = 0;
 	#]
 
 	State s0 initial {
@@ -102,9 +97,9 @@ QActor wasteservice context ctxwasteservice {
 
 	State requestHandling {
 		println("\t $name: Deposit Request arrived!") color green
-		[#
-			accepted = false
-			ID++
+		[# 
+			accepted = false 
+			ID++	
 		#]
 
 		onMsg(depositRequest : depositRequest(T, L)){
@@ -129,7 +124,7 @@ QActor wasteservice context ctxwasteservice {
 		}
 	}
 	Goto requestAccepted if[# accepted == true #] else requestRejected
-
+	
 	State requestAccepted {
 		println("\t $name: Request -$ID- Accepted!") color green
 		if[# Type == "plastic" #]{
@@ -144,7 +139,7 @@ QActor wasteservice context ctxwasteservice {
 	Goto pickingUp
 
 	State requestRejected {
-		replyTo depositRequest with loadrejecetd : loadrejecetd($ID) caller==smartdevice
+		replyTo depositRequest with loadrejecetd : loadrejecetd($ID)
 		println("\t $name: Request -$ID- Refused!") color green
 	}
 	Goto waiting
@@ -174,9 +169,9 @@ QActor transporttrolley context ctxwasteservice {
 		var ID = ""
 		var MaterialType = ""
 		var Pos = "" 		//Pos : home, indoor, plasticbox, glassbox
-
+		
 		var RobotState = "athome"
-		var PreviusState = ""
+		var PreviousState = ""
 	#]
 
 	State s0 initial{
@@ -188,7 +183,7 @@ QActor transporttrolley context ctxwasteservice {
 		[# Pos = "home" #]
 		[# RobotState = "athome" #]
 		emit robotStateEvent : robotStateEvent($RobotState)
-
+		
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
 
 		println("\t $name: ready and waiting for pickupRequest!") color blue
@@ -198,38 +193,38 @@ QActor transporttrolley context ctxwasteservice {
 
 	State handlePickupReq {
 		[# MaterialType =  "null" #]
-
+		
         onMsg(pickupReq : pickupReq(ID, TYPE)){
-            [#
+            [# 
             	ID = payloadArg(0)
-            	MaterialType = payloadArg(1)
+            	MaterialType = payloadArg(1) 
         	#]
 			println("\t $name: pickupRequest received! ($ID, $MaterialType)") color blue
         }
 	}
-	Goto waiting if[# MaterialType == "null" #] else goPickUp
-
-
+	Goto waiting if[# MaterialType == "null" #] else goPickUp 
+	
+	
 	State goPickUp {
 		[# RobotState = "moving" #]
 		emit robotStateEvent : robotStateEvent($RobotState)
-
+		
 		//Sending messages to BasicRobot22
 		println("\t $name: Going to Indoor!") color blue
 		println("\t $name: Robot going from $Pos to Indoor") color blue
 
 		//Robot Moving
 		request custompathexecutor -m move : move($Pos, indoor)
-
+		
 	}
 	Transition t1 whenReply moveDone -> pickupDone
 					whenInterrupt alarm -> handleAlarm
-
-
-
+	
+	
+	
 	State pickupDone {
 		[# Pos = "indoor" #]
-
+		
 		println("\t $name: Picking up...") color blue
 		delay 5000
 		//Sending pikcup finished
@@ -238,30 +233,30 @@ QActor transporttrolley context ctxwasteservice {
 	}
 	Transition t2 	whenTime 100 -> goDeposit
 					whenInterrupt alarm -> handleAlarm
-
+	
 
 
 	State goDeposit {
 		discardMsg Off
-
+		
 		if[# MaterialType == "plastic" #]{
 			//Goto PlasticBox
 			println("\t $name: Going to PlasticBox!") color blue
 			request custompathexecutor -m move : move($Pos, plasticbox)
 		}
-
+		
 		if[# MaterialType == "glass" #]{
 			//Goto GlassBox
 			println("\t $name: Going to GlassBox!") color blue
 			request custompathexecutor -m move : move($Pos, glassbox)
 		}
-
+		
 	}
 	Transition t1 whenReply moveDone -> depositDone
 					whenInterrupt alarm -> handleAlarm
-
-
-
+	
+	
+	
 	State depositDone {
 		onMsg(moveDone : moveDone(NewPos)){
 			[# val Arg = payloadArg(0) #]
@@ -274,7 +269,7 @@ QActor transporttrolley context ctxwasteservice {
 				println("$name: ERROR! [State: depositDone (ARG=$Arg)]!") color blue
 			}
 		}
-
+		
 	}
 	Transition t2 	whenTime 100 -> goHome
 					whenRequest pickupReq -> handlePickupReq //TEstare le richieste multiple (testare la coda)
@@ -290,45 +285,45 @@ QActor transporttrolley context ctxwasteservice {
 	Transition t3 	whenReply moveDone -> waiting
 					whenRequest pickupReq -> handlePickupReq
 					whenInterrupt alarm -> handleAlarm
-
-
-
+					
+					
+					
 	//Sonar Alarm
 	State handleAlarm {
-		[#
-			PreviusState = RobotState
+		[# 
+			PreviousState = RobotState 
 			RobotState = "stopped"
 		#]
-
+		
 		println("\t $name: Robot Stopped!") color blue
 		forward custompathexecutor -m toggleStop : toggleStop(stop)
 		emit robotStateEvent : robotStateEvent($RobotState)
 	}
 	Transition t3	whenMsg alarmStop -> resume
-
+	
 	State resume {
-		[# RobotState = PreviusState #]
-
+		[# RobotState = PreviousState #]
+		
 		println("\t $name: Resumed execution!") color blue
 		forward custompathexecutor -m toggleStop : toggleStop(resume)
 		emit robotStateEvent : robotStateEvent($RobotState)
-
+		
 		returnFromInterrupt
 	}
-
+     
 }
 
 QActor custompathexecutor context ctxwasteservice {
-	[#
+	[# 
 		val name = "CustomPathExecutor"
 		val version = "1"
-
-
+		
+		
 		var Pos = 0
 		var PosToGo = 0
-
+		
 //		enum class positions(val v : String) = {home(0), indoor(1), plasticbox(2), glassbox(3)}
-
+		
 //		enum class routes(val v : Int) = {
 //			HI(1),
 //			IP(1),
@@ -338,28 +333,29 @@ QActor custompathexecutor context ctxwasteservice {
 //			PH(2),
 //			GH(1)
 //		}
-
+		
 		var stepToDo = 0
 		var pathToDo = ""
 		var pathStep = 0
 		var pathLenght = -1
 		var turnBack = false
-
+		
 		val IncPosPath = "wl"
 		val DecPosPath = "lwrr"
 		val goBackPath = "hllwrr"
-		val goBackPath2 = "hllwrrr"
+		val goBackPath2 = "hllwrrr" 
 	#]
-
-
-
+	
+	
+	
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
+		observeResource basicrobot
 	}
 	Goto waiting
 
 	State waiting {
-		println("\t $name: waiting for move requests!")
+		//println("\t $name: waiting for move requests!")
 	}
 	Transition t0 whenRequest move -> handleMoveRequest
 
@@ -430,7 +426,7 @@ QActor custompathexecutor context ctxwasteservice {
 		onMsg(toggleStop : toggleStop(ARG)){
 			println("\t $name: RESUMED!")
 		}
-
+		[# var skip = false #]
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			[#
 				val Resource = payloadArg(0)
@@ -438,24 +434,29 @@ QActor custompathexecutor context ctxwasteservice {
 				if(Value.contains("obstacle") && pathToDo.get(pathStep) == 'w'){
 					pathStep++
 				}
+				if(Value == "moveactivated(w)"){
+					skip = true
+				}
 			#]
-			println("\t $name: coapUpdate($Resource, $Value)")
+			//println("\t $name: coapUpdate($Resource, $Value)")
 		}
-		if[# pathStep <= pathLenght #]{
-			[#
-				val CMD = pathToDo.get(pathStep)
-			#]
-			println("\t $name: Forwarding to BasicRobot cmd($CMD)")
-			if[# CMD == 'w' #]{
-				forward basicrobot -m cmd : cmd($CMD)
+		if[# !skip #]{
+			if[# pathStep <= pathLenght #]{
+				[#
+					val CMD = pathToDo.get(pathStep)
+				#]
+				//println("\t $name: Forwarding to BasicRobot cmd($CMD)")
+				if[# CMD == 'w' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+				}
+				if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
+					forward basicrobot -m cmd : cmd($CMD)
+					delay 1000
+					[# pathStep++ #]
+				}
+			}else{
+				forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 			}
-			if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
-				forward basicrobot -m cmd : cmd($CMD)
-				delay 1000
-				[# pathStep++ #]
-			}
-		}else{
-			forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 		}
 
 	}
@@ -464,10 +465,6 @@ QActor custompathexecutor context ctxwasteservice {
 					whenMsg coapUpdate and [# pathStep > pathLenght #] 	-> stepDone
 					//whenRequest move -> handleMoveRequestInMovement
 					whenMsg toggleStop -> stopped
-
-
-
-
 
 
 
@@ -493,20 +490,19 @@ QActor custompathexecutor context ctxwasteservice {
 			}
 
 			println("\t $name: StepDone! - Pos: $Pos")
-			emit posEvent : posEvent($Pos)
-
+			updateResource [# "Pos($Pos)" #]
 		}
 	}
 	Transition t2 	whenTime 100 -> working
 					whenRequest move -> handleMoveRequest
-
-
+	
+	
 	State pathDone {
 		println("\t $name: Path done in $Pos")
 		replyTo move with moveDone : moveDone($Pos) caller==transporttrolley
 	}
 	Goto waiting
-
+	
 	State stopped {
 		onMsg(toggleStop : toggleStop(ARG)){
 			forward basicrobot -m cmd : cmd(h)
@@ -515,123 +511,21 @@ QActor custompathexecutor context ctxwasteservice {
 		}
 	}
 	Transition t3 	whenMsg toggleStop -> execStep
-
-
+	
+	
 	//Optional implementation
 	State handleMoveRequestInMovement {
 		//Attahc to path the normal path, the go back path
 		[# turnBack = true #]
 	}
 	Goto handleMoveRequest
-
+	
 }
 
 
-//---- Led
-QActor led context ctxraspberry {
-	[#
-		val name = "LedActor"
-		val version = "V1.0"
-
-		var ledState = "LedOff"
-		var robotState = "athome"
-
-		val runtime = Runtime.getRuntime()
-
-	#]
-
-	State s0 initial {
-		println("\t $name: Started! $version") color red
-	}
-	Goto handleRobotStateEvent
-
-
-	State handleRobotStateEvent {
-
-        onMsg(robotStateEvent : robotStateEvent(STATE)){
-        	println("\t $name: Handling RobotState change!") color red
-        	[# robotState = payloadArg(0) #]
-        	if[# robotState == "athome" #]{
-        		[# ledState = "LedOff" #]
-        	}
-        	if[# robotState == "moving" #]{
-        		[# ledState = "LedBlink" #]
-        	}
-        	if[# robotState == "stopped" #]{
-        		[# ledState = "LedOn" #]
-        	}
-			println("\t $name: Led state- $ledState") color red
-		}
-
-
-        if[# ledState = "LedOff" #]{
-            //Spegni
-            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
-        }
-        if[# ledState = "LedBlink" #]{
-            //Accendi
-            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
-            delay 100
-            //Spegni
-            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
-        }
-        if[# ledState = "LedOn" #]{
-            //Accendi
-            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
-        }
-	}
-	Transition t0	whenTime 100 -> handleRobotStateEvent
-					whenEvent robotStateEvent -> handleRobotStateEvent
-
-}
-
-
-
-
-
-//----- SONAR
-QActor sonar23 context ctxraspberry{
-	[# var  ApplAlso = sysUtil.getActor("appl") != null #]
-	State s0 initial{
-		println("sonar23 | start with appl: $ApplAlso")
-		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
-	}
-	Goto work
-
-	State work{
-		//println("sonar23 | waits ... ")
-		updateResource [# "sonar23 waiting ..." #]
-	}
-	Transition t0 whenEvent sonardata -> handlesonardata
-	              whenEvent obstacle  -> handleobstacle
-
-	State handlesonardata{
-		printCurrentMessage
-		updateResource [# "sonar23 handles $currentMsg" #]
-		onMsg(sonardata : distance(D)){
-			[# val D = payloadArg(0) #]
-			emit sonardataAppl : distance($D)
-		}
-
-	}
-	Goto work
-
-	State handleobstacle{
-		onMsg( obstacle : obstacle(D)){
-			println("$name handleobstacle ALARM ${payloadArg(0)}") color magenta
-			emit alarm : alarm(obstacle)
-		}
-
-	}
-	Goto sonar23 if [# ApplAlso == true #]  else work
-
-	State sonar23{
-		println("$name BYE")
-	}
-}
 
 //SonarDataHandler
-QActor sonardatahandler context ctxraspberry{
+QActor sonardatahandler context ctxwasteservice{
 	[#
 		val DLIMIT = 10
 		var stopped = false
@@ -663,7 +557,112 @@ QActor sonardatahandler context ctxraspberry{
 		}
 	}
 	Transition t0	whenEvent sonardataAppl -> handleSonarData
+}
+
+
+
+
+
+//---- Led
+QActor led context ctxraspberry {
+	[#
+		val name = "LedActor"
+		val version = "V1.0"
+
+		var ledState = "LedOff"
+		var robotState = "athome"
+		
+		val runtime = Runtime.getRuntime()
+		
+	#]
+
+	State s0 initial {
+		println("\t $name: Started! $version") color red
+	}
+	Goto handleRobotStateEvent
+
+
+	State handleRobotStateEvent {
+		
+        onMsg(robotStateEvent : robotStateEvent(STATE)){
+        	println("\t $name: Handling RobotState change!") color red
+        	[# robotState = payloadArg(0) #]
+        	if[# robotState == "athome" #]{
+        		[# ledState = "LedOff" #]
+        	}
+        	if[# robotState == "moving" #]{
+        		[# ledState = "LedBlink" #]
+        	}
+        	if[# robotState == "stopped" #]{
+        		[# ledState = "LedOn" #]
+        	}
+			println("\t $name: Led state - $ledState") color red
+		}
+		
+		
+        if[# ledState == "LedOff" #]{
+            //Spegni
+            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
+        }
+        if[# ledState == "LedBlink" #]{
+            //Accendi
+            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+            delay 100
+            //Spegni
+            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
+        }
+        if[# ledState == "LedOn" #]{
+            //Accendi
+            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+        }
+	}
+	Transition t0	whenTime 100 -> handleRobotStateEvent
+					whenEvent robotStateEvent -> handleRobotStateEvent
 
 }
 
 
+
+
+
+//----- SONAR
+QActor sonar23 context ctxraspberry{ 
+	[# var  ApplAlso = sysUtil.getActor("appl") != null #]
+	State s0 initial{  
+		println("sonar23 | start with appl: $ApplAlso") 
+		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+	}
+	Goto work
+	 
+	State work{
+		//println("sonar23 | waits ... ") 		
+		//updateResource [# "sonar23 waiting ..." #]
+	}
+	Transition t0 whenEvent sonardata -> handlesonardata
+	              whenEvent obstacle  -> handleobstacle
+	
+	State handlesonardata{
+		//printCurrentMessage
+		updateResource [# "sonar23 handles $currentMsg" #]
+		onMsg(sonardata : distance(D)){
+			[# val D = payloadArg(0) #]
+			println("\t HandleSonarData($D) - Emitting sonardataAppl($D)")
+			emit sonardataAppl : distance($D)
+		}
+		
+	}
+	Goto work 
+	
+	State handleobstacle{
+		onMsg( obstacle : obstacle(D)){			
+			println("$name handleobstacle ALARM ${payloadArg(0)}") color magenta
+			emit alarm : alarm(obstacle)			
+		}
+		
+	}
+	Goto sonar23 if [# ApplAlso == true #]  else work  
+	
+	State sonar23{
+		println("$name BYE")
+	}
+}
