@@ -1,0 +1,132 @@
+System raspberry
+
+
+	//TransportTrolley - Led
+	Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
+
+
+	//SonarQak23
+	Event sonardata : distance(D)   //emitted  by datacleaner
+	Dispatch coapUpdate : coapUpdate(RESOURCE, VALUE)
+	
+	//SonarQak23 userà l'update Resource
+			//Event sonardataAppl : distance(D)   //emitted  by sonarqak23
+
+	//Sonar - TransportTrolley
+ 	Dispatch alarm 		: 	alarm(ARG)
+ 	Dispatch alarmStop 	: 	alarmStop(ARG)
+
+
+
+
+//Context ctxwasteservice ip[host="127.0.0.1" port=8072]
+
+Context ctxraspberry ip[host="localhost" port=8076]
+
+
+
+
+
+CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
+//CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
+CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
+
+
+
+//---- Led
+QActor led context ctxraspberry {
+	[#
+		val name = "LedActor"
+		val version = "V1.0"
+
+		var ledState = "LedOff"
+		var robotState = "athome"
+		
+		val runtime = Runtime.getRuntime()
+		
+	#]
+
+	State s0 initial {
+		println("\t $name: Started! $version") color red
+	}
+	Goto handleRobotStateEvent
+
+
+	State handleRobotStateEvent {
+		
+        onMsg(robotStateEvent : robotStateEvent(STATE)){
+        	println("\t $name: Handling RobotState change!") color red
+        	[# robotState = payloadArg(0) #]
+        	if[# robotState == "athome" #]{
+        		[# ledState = "LedOff" #]
+        	}
+        	if[# robotState == "moving" #]{
+        		[# ledState = "LedBlink" #]
+        	}
+        	if[# robotState == "stopped" #]{
+        		[# ledState = "LedOn" #]
+        	}
+			println("\t $name: Led state - $ledState") color red
+			
+			//TEST
+			updateResource [# "LedState($ledState)" #]
+		}
+		
+		
+        if[# ledState == "LedOff" #]{
+            //Spegni
+            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
+        }
+        if[# ledState == "LedBlink" #]{
+            //Accendi
+            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+            delay 100
+            //Spegni
+            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
+        }
+        if[# ledState == "LedOn" #]{
+            //Accendi
+            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+        }
+	}
+	Transition t0	whenTime 100 -> handleRobotStateEvent
+					whenEvent robotStateEvent -> handleRobotStateEvent
+
+}
+
+
+
+
+
+//----- SONAR
+QActor sonar23 context ctxraspberry{ 
+	
+
+	State s0 initial{  
+		println("sonar23 | start") 
+		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+	}
+	Goto work
+	 
+	State work{
+		//println("sonar23 | waits ... ") 		
+		//updateResource [# "sonar23 waiting ..." #]
+	}
+	Transition t0 whenEvent sonardata -> handlesonardata
+	
+	State handlesonardata{
+		
+		onMsg(sonardata : distance(D)){
+			[# val D = payloadArg(0) #]
+			println("\t HandleSonarData($D) - updating sonardata($D)")
+			updateResource [# "sonardata($D)" #]
+		}
+		
+	}
+	Goto work
+	
+}
+
+
+
+
