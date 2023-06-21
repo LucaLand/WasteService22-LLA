@@ -45,10 +45,12 @@
     <div class="remark">
     <p>La <b>WasteServiceStatusGUI</b> deve permettere al <b>Service-manager</b> di monitorare:
 	 <ul>
-        <lI>La <b>Position</b> del <b>Transport trolley</b></lI>
+        <lI>La <b>Position</b> del <b>Transport trolley</b>
+			<code><pre>Event posEvent:    posEvent(POS);</pre></code></lI>
         <lI>Il <b>Transporttrolleystate</b>, ossia lo stato attuale del <b>Transport trolley</b>.
-            <code><pre>enum class Transporttrolleystate = { IDLE, MOVING, PICKINGUP, DROPPINGOUT, HALT };</pre></code></lI>
-        <lI>Il peso corrente <b>currentPB</b> e <b>currentGB</b> del materiale contenuto in <b>PLASTICBOX</b> e in <b>GLASSBOX</b></lI>
+            <code><pre>Event RobotStateEvent:   RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED;</pre></code></li>
+        <lI>Il peso corrente <b>CurrentPB</b> e <b>CurrentGB</b> del materiale contenuto in <b>PLASTICBOX</b> e in <b>GLASSBOX</b></b>
+			<code><pre>var CurrentPB, CurrentGB: float;</pre></code></lI>
         <lI>Lo stato corrente del <b>LED</b>.
 			 <code><pre>enum LedState = { LedOff, LedOn, LedBlink};</pre></code></lI>
     </ul>
@@ -63,9 +65,9 @@
 	<p>Obiettivo dello SPRINT3 è estendere la demo dello SPRINT2 per realizzare il requisito riguardante la <b>WasteServiceStatusGUI</b> specificata dal committente.</p> 
 	<h4>Work plan:</h4>
 	<ul>
-		<li>Analisi del problema riguardo la tipologia di GUI da implementare</li>
+		<!--<li>Analisi del problema riguardo la tipologia di GUI da implementare</li>-->
 		<li>Analisi del problema riguardante il passaggio di informazioni alla GUI</li>
-		<li>Sviluppo componenti necessari?</li>
+		<li>Sviluppo componenti necessari</li>
 		<li>Creazione di un modello eseguibile utilizzando il metamodello QAK.</li>
 		<li>Elaborazione di un piano di test più completo per il modello realizzato.</li>
     </ul>
