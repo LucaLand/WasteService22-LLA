@@ -36,12 +36,12 @@ System ctxwasteservice
  	
  	
 //Context ctxraspberry ip[host="127.0.0.1" port=8076]
-Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
+//Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 
-ExternalQActor basicrobot context ctxbasicrobot
+//ExternalQActor basicrobot context ctxbasicrobot
 
 
 
@@ -362,7 +362,7 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
-		observeResource basicrobot
+		//observeResource basicrobot
 	}
 	Goto waiting
 
@@ -465,12 +465,12 @@ QActor custompathexecutor context ctxwasteservice {
 				#]
 				//println("\t $name: Forwarding to BasicRobot cmd($CMD)")
 				if[# CMD == 'w' #]{
-					forward basicrobot -m cmd : cmd($CMD)
+					//forward basicrobot -m cmd : cmd($CMD)
 					//TEST MODE
 					[# pathStep++ #]
 				}
 				if[# CMD == 'l' || CMD == 'r' || CMD == 'h' #]{
-					forward basicrobot -m cmd : cmd($CMD)
+					//forward basicrobot -m cmd : cmd($CMD)
 					delay 1000
 					[# pathStep++ #]
 				}
@@ -536,7 +536,7 @@ QActor custompathexecutor context ctxwasteservice {
 		updateResource [# "custompathexecutorState(stopped)" #]
 		
 		onMsg(toggleStop : toggleStop(ARG)){
-			forward basicrobot -m cmd : cmd(h)
+			//forward basicrobot -m cmd : cmd(h)
 			delay 100
 			println("\t $name: STOPPED!")
 		}
