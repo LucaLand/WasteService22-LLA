@@ -475,61 +475,6 @@ QActor custompathexecutor context ctxwasteservice {
 
 
 
-
-
-//SmartDevice
-QActor smartdevice context ctxsmartdevice{
-	[#
-		val name = "SmartDevice"
-		val version = "V1.0"
-
-		var request_ID = 0
-	#]
-
-	State s0 initial{
-		println("\t $name: Started! $version") color yellow
-	}
-	Goto idle
-
-	State idle {
-		println("\t $name: Waiting for Truck...") color yellow
-		[# request_ID ++ #]
-	}
-	Transition t0 whenTime 1000 -> truckArrived
-
-	State truckArrived {
-		[# val ID = request_ID #]
-		if[# ID.toInt()%3 == 0 #]{
-			delay 20000
-		}
-		println("\t $name: Truck Arrived!")
-		println("\t $name: Sending request -$request_ID-") color yellow
-
-		if[# ID.toInt()%2 == 0 #]{
-			request wasteservice -m depositRequest : depositRequest(plastic, 10)
-		} else {
-			request wasteservice -m depositRequest : depositRequest(glass, 8)
-		}
-	}
-	Transition t1	whenReply loadaccept -> truckGoAway
-					whenReply loadrejecetd -> truckGoAway
-
-
-	State truckGoAway {
-		onMsg(loadrejecetd : loadrejecetd(ARG)){
-			println("\t $name: Carico - $request_ID - Rifiutato!") color yellow
-		}
-
-		onMsg(loadaccept : loadaccept(ARG)){
-			println("\t $name: Scarico - $request_ID - Completato!") color yellow
-		}
-
-		println("\t $name: Il Truck può andare!") color yellow
-	}
-	Transition t3 whenTime 1000 -> idle  //Un po' di attesa per simulare il via del camion
-}
-
-
 QActor coapdispatcher context ctxbasicrobot{
  	State s0 initial { 	 
  		println("envsonarhandler | START")
