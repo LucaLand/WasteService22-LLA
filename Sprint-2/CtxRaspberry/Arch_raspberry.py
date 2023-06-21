@@ -26,7 +26,5 @@ with Diagram('raspberryArch', show=False, outformat='png', graph_attr=graphattr)
           datacleaner=Custom('datacleaner(coded)','./qakicons/codedQActor.png')
      sys >> Edge(color='red', style='dashed', xlabel='robotStateEvent', fontcolor='red') >> led
      sys >> Edge(color='red', style='dashed', xlabel='sonardata', fontcolor='red') >> sonar23
-     sys >> Edge(color='red', style='dashed', xlabel='obstacle', fontcolor='red') >> sonar23
      sonar23 >> Edge( xlabel='sonardataAppl', **eventedgeattr, fontcolor='red') >> sys
-     sonar23 >> Edge( xlabel='alarm', **eventedgeattr, fontcolor='red') >> sys
 diag

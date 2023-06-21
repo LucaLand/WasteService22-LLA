@@ -53,7 +53,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 								if(  robotState == "stopped"  
 								 ){ ledState = "LedOn"  
 								}
-								CommUtils.outred("	 $name: Led state- $ledState")
+								CommUtils.outred("	 $name: Led state - $ledState")
 						}
 						if(  ledState == "LedOff"  
 						 ){ runtime.exec("sudo bash led25GpioTurnOff.sh")  

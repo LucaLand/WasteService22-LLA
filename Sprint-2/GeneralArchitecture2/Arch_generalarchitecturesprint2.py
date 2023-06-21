@@ -45,7 +45,5 @@ with Diagram('generalarchitecturesprint2Arch', show=False, outformat='png', grap
      sys >> Edge(color='red', style='dashed', xlabel='sonardataAppl', fontcolor='red') >> sonardatahandler
      sys >> Edge(color='red', style='dashed', xlabel='robotStateEvent', fontcolor='red') >> led
      sys >> Edge(color='red', style='dashed', xlabel='sonardata', fontcolor='red') >> sonar23
-     sys >> Edge(color='red', style='dashed', xlabel='obstacle', fontcolor='red') >> sonar23
      sonar23 >> Edge( xlabel='sonardataAppl', **eventedgeattr, fontcolor='red') >> sys
-     sonar23 >> Edge( xlabel='alarm', **eventedgeattr, fontcolor='red') >> sys
 diag
