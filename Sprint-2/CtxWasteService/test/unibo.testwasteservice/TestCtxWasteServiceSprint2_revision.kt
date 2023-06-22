@@ -27,6 +27,7 @@ class TestCtxWasteServiceSprint2_revision {
     private lateinit var obsTransporttrolley: CoapTestObserver
     private lateinit var obsCustompathexecutor: CoapTestObserver
     private lateinit var obsSonarDataHandler: CoapTestObserver
+    private lateinit var obsLedStateUpdater: CoapTestObserver
 
     private var setupOk = false
 
@@ -36,6 +37,7 @@ class TestCtxWasteServiceSprint2_revision {
     private val StateHistoryTransportTrolley = LinkedList<String>()
     private val StateHistoryCustomPathExecutor = LinkedList<String>()
     private val StateHistorySonarDataHanlder = LinkedList<String>()
+    private val StateHistoryLedStateUpdater = LinkedList<String>()
 
     private val testName = "TestTransportTrolleyStop Srint-2"
 
@@ -86,7 +88,7 @@ class TestCtxWasteServiceSprint2_revision {
     }
 
     fun startObs(addr: String?) {
-        val setupOk = ArrayBlockingQueue<Boolean>(3)
+        val setupOk = ArrayBlockingQueue<Boolean>(4)
 
 
         object : Thread() {
@@ -147,6 +149,26 @@ class TestCtxWasteServiceSprint2_revision {
             }
         }.start()
 
+        object : Thread() {
+            override fun run() {
+                val ctx = "ctxwasteservice"
+
+                obsLedStateUpdater = CoapTestObserver()
+                val actor = "ledstateupdater"
+                val path = "$ctx/$actor"
+                val coapConn = CoapConnection(addr, path)
+
+                coapConn.observeResource(obsLedStateUpdater)
+
+                try {
+                    setupOk.put(true)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
+        }.start()
+
+        setupOk.take()
         setupOk.take()
         setupOk.take()
         setupOk.take()
@@ -162,7 +184,6 @@ class TestCtxWasteServiceSprint2_revision {
 
 
         //TT
-        StateHistoryTransportTrolley.add("transporttrolleyState(waiting)")
         StateHistoryTransportTrolley.add("transporttrolleyState(handlePickupReq)")
         StateHistoryTransportTrolley.add("transporttrolleyState(goPickUp)")
         StateHistoryTransportTrolley.add("transporttrolleyState(handleAlarm)")
@@ -195,6 +216,16 @@ class TestCtxWasteServiceSprint2_revision {
         StateHistoryCustomPathExecutor.add("custompathexecutorState(execStep)")
         StateHistoryCustomPathExecutor.add("custompathexecutorState(stepDone(3))")
         StateHistoryCustomPathExecutor.add("custompathexecutorState(pathDone(3))")
+
+
+        //LedUpdater
+        StateHistoryLedStateUpdater.add("ledState(LedOff)")
+        StateHistoryLedStateUpdater.add("ledState(LedBlink)")
+        StateHistoryLedStateUpdater.add("ledState(LedOn)")
+        StateHistoryLedStateUpdater.add("ledState(LedBlink)")
+        StateHistoryLedStateUpdater.add("ledState(LedOn)")
+        StateHistoryLedStateUpdater.add("ledState(LedBlink)")
+
 
     }
 
@@ -250,14 +281,16 @@ class TestCtxWasteServiceSprint2_revision {
 
         CommUtils.delay(500)
 
-
-        println("TransportTrolley StateHistory: ${obsTransporttrolley.getStateHistory()}")
+        val currentStateHistoryTT = obsTransporttrolley.getStateHistory().filter { s -> s.contains("transporttrolleyState") }
+        println("TransportTrolley StateHistory: $currentStateHistoryTT")
         println("CustomPathExecutor StateHistory: ${obsCustompathexecutor.getStateHistory()}")
         println("SonarDataHandler StateHistory: ${obsSonarDataHandler.getStateHistory()}")
+        println("LedStateUpdater StateHistory: ${obsLedStateUpdater.getStateHistory()}")
 
-        assertEquals(StateHistoryTransportTrolley, obsTransporttrolley.getStateHistory())
+        assertEquals(StateHistoryTransportTrolley, currentStateHistoryTT)
         assertEquals(StateHistoryCustomPathExecutor, obsCustompathexecutor.getStateHistory())
         assertEquals(StateHistorySonarDataHanlder, obsSonarDataHandler.getStateHistory())
+        assertEquals(StateHistoryLedStateUpdater, obsLedStateUpdater.getStateHistory())
 
         CommUtils.delay(500)
     }

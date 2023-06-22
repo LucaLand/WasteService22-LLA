@@ -37,13 +37,14 @@ System ctxwasteservice
  	
  	
 Context ctxraspberry ip[host="127.0.0.1" port=8076]
-//Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
+//Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
 
 //ExternalQActor basicrobot context ctxbasicrobot
 ExternalQActor sonar23 context ctxraspberry
+ExternalQActor led context ctxraspberry
 
 
 QActor wasteservice context ctxwasteservice {

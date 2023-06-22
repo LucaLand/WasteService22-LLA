@@ -619,6 +619,8 @@ QActor ledstateupdater context ctxwasteservice{
 	[#
 		var Value = ""
 		var robotState = ""
+		
+		var robotStateCurr = ""
 	#]
 
 	State s0 initial{
@@ -631,25 +633,29 @@ QActor ledstateupdater context ctxwasteservice{
 			[#
 				if(payloadArg(1).contains("robotState")){
 					Value = payloadArg(1).split("(")[1]
-					robotState = Value.dropLast(1)
+					robotStateCurr = Value.dropLast(1)
 				}
 			#]
-
-			println("\t $name: Handling RobotState change!") color red
-        	[# var LedState = "null" #]
-
-        	if[# robotState == "athome" #]{
-        		[# LedState = "LedOff" #]
-        	}
-        	if[# robotState == "moving" #]{
-        		[# LedState = "LedBlink" #]
-        	}
-        	if[# robotState == "stopped" #]{
-        		[# LedState = "LedOn" #]
-        	}
-
-        	forward led -m ledStateUpdate : state($LedState)
-			println("\t $name: Sending ledState: $LedState") color red
+			
+			if[# robotStateCurr != robotState #]{
+				[#  robotState = robotStateCurr #]
+				println("\t $name: Handling RobotState change!") color red
+	        	[# var LedState = "null" #]
+	
+	        	if[# robotState == "athome" #]{
+	        		[# LedState = "LedOff" #]
+	        	}
+	        	if[# robotState == "moving" #]{
+	        		[# LedState = "LedBlink" #]
+	        	}
+	        	if[# robotState == "stopped" #]{
+	        		[# LedState = "LedOn" #]
+	        	}
+	
+	        	//forward led -m ledStateUpdate : state($LedState)
+	        	updateResource[# "ledState($LedState)" #]
+				println("\t $name: Sending ledState: $LedState") color red
+			}
 		}
 	}
 	Transition t0	whenMsg coapUpdate -> handleRobotStateUpdate
