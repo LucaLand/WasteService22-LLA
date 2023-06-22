@@ -448,7 +448,75 @@ per consentire la comunicazione tra dispositivi con risorse limitate.</p>
 </div>
 
 
+<br>
+<h2 id="revision">Revisione Sprint-2 (Qak Plugin Update)</h2>
+<div class="remark">
+	<h4>Modifica per requisiti</h4>
+	<p>È stato modificato il <b>CustomPathExecutor</b> per interrompere il movimento con messaggi di <i>interrupt</i>. In modo da avere un blocco più veloce e immediato del robot.</p>
 
+	<h5>Test</h5>
+		<p><i>Testato</i> nella nuova <i>Test-Unit</i>: <a href="../CtxWasteService/test/unibo.testwasteservice/TestCtxWasteServiceSprint2_revision.kt">TestCtxWasteServiceSprint2_revision.kt</a>.<br>
+		Utilizzando il nuovo file di test basato sull'intera revisione: <a href="../CtxWasteService/src/ctxWasteService_revision_Test.qakq">ctxWasteService_revision_Test.qak</a></p>
+
+
+
+	<h4>Qak Plugin Update - ObserveResource Distributed</h4>
+	<p>Visto l'uscita di una nuova verisione del <i>Plugin</i> per il metamodello <i>Qak</i> <c>(version: 1.3.6)</c>, sono possibili i seguenti aggiornamenti:</p>
+	<ul>
+		<li>La funzione <i><code>observeResources</code></i> effettuata da un attore è ora possibile tra attori in <u>contesti diversi</u></li>
+	</ul>
+
+
+	<h4>Revisione</h4>
+	<p>Ciò porta alle seguenti modifiche e migliorie:</p>
+	<ul>
+		<li>È possibile modificare l'attore <b>Sonar23</b> eliminando l'evento <code>sonardataAppl</code> ed inserendo una <code>updateResource</code> della risorsa <code>"sonardata(D)"</code></li>
+		<li>L'attore <b>SonarDataHandler</b> si registrerà come <i>observer</i> al <b>Sonar23</b></li>
+	</ul>
+
+
+	<h4>Vantaggi</h4>
+	<p>Si producono così i seguenti <b>vantaggi</b>:</p>
+	<ul>
+		<li>L'eleiminazione dell'evento porta vantaggi in termini di ottimizzazione</li>
+		<li>Il contesto <b>ctxraspberry</b> non avrà più bisogno di essere <i>aware</i> del contesto <b>ctxwasteservice</b></li>
+			<ul><li>Isolamento e modularità dei componenti</li></ul>
+	</ul>
+	<p>L'evento <code>robotStateEvent</code> non è stato modificato in quanto ciò permette di mantenere il contesto del <b>Led</b> isolato e non <i>aware</i> di ulteriori contesti</p>
+	<ul>
+		<li>Sarà il contesto <b>ctxwasteservice</b> a conoscere la presenza del contesto <b>ctxraspberry</b> inoltrando l'evento</li>
+		<li>Con un modello basato su <code>updateResources</code> l'attore <b>Led</b> si sarebbe dovuto registrare all'attore <b>TransportTrolley</b> perdendo di isolamento e modularità</li>
+		<ul><li>Si introdurrebbe un <u>livello di dipendenza</u> del Led sul <b>TransportTrolley</b></li></ul>
+	</ul>
+
+
+	<h4>Archiettura Risultante Revisione</h4>
+
+	<img src="./img/GeneralArchitectureSprint2_revision.png" alt="GeneralArchitectureSprint2_revision">
+	<p>Nuovo modello:</p>
+	<a href="../CtxWasteService/src/ctxWasteService_revision.qak">CtxWasteService_revision.qak</a>
+	<a href="../CtxRaspberry/src/CtxRaspberry_revision.qak">CtxRaspberry_revision.qak</a>
+
+
+	<h4>Test-Unit Revision</h4>
+	<p>Le <i>Test-Unit</i> sono state modificate per adattarsi alle modifiche effettuate e testarle</p>
+	<p>Vi sono 3 nuove <i>Test-Unit</i>:</p>
+	<ol>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/TestCtxWasteServiceSprint2_revision.kt">TestCtxWasteServiceSprint2_revision.kt</a></li>
+			<ul><li>Stesso Test ma con il nuovo modello di riferimento e nuovi tipi di messaggi per il sonar</li></ul>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/Test2CtxWasteServiceSprint2_revision.kt">Test2CtxWasteServiceSprint2_revision.kt</a></li>
+			<ul><li>Testa il nuovo modello di comunicazione tra i due contesti. Va infatti avviato il test e poi avviato il contesto <b>ctxraspberry</b> di test.</li></ul>
+		<li><a href="../CtxRaspberry/test/testled/TestCtxRaspberry_revision.kt">TestCtxRaspberry_revision.kt</a></li>
+			<ul><li>Comprende due test: uno per il <c>sonar</c> uno per il <c>led</c> come il precedente</li></ul>
+	</ol>
+
+	<p>Nuovi Qak di test: </p>
+	<ul>
+		<li><a href="../CtxWasteService/src/ctxWasteService_revision_Test.qakq">ctxWasteService_revision_Test.qak</a></li>
+		<li><a href="../CtxWasteService/src/ctxWasteService_revision_Test2.qakq">ctxWasteService_revision_Test.qak</a></li>
+		<li><a href="../CtxRaspberry/src/CtxRaspberry_revision_Test.qakq">CtxRaspberry_revision_Test.qak</a></li>
+	</ul>
+</div>
 
 <br>
 <br>
