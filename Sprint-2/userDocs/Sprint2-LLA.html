@@ -119,15 +119,15 @@
 	<p>Il sonar riprende l'evento già fornito dal committente all'interno della documentazione prima citata e 
 	dovrà emettere un evento ad ogni nuova misurazione con la misurazione della distanza rilevata in quel momento.</p>
 	<pre><code>
-Event sonardata  :  sonardata(distance)
+Event sonardataAppl  :  distance(D)
 	</code></pre>
 	
-	<p>Nonostante l'evento <i>sonardata</i> venga gestito soltanto dal <b>SonarDataHandler</b>, è stato pensato di non modificare il tipo di messaggio dato che il componente <b>Sonar</b>
+	<p>Nonostante l'evento <i>sonardataAppl</i> venga gestito soltanto dal <b>SonarDataHandler</b>, è stato pensato di non modificare il tipo di messaggio dato che il componente <b>Sonar</b>
 	ci è stato già fornito dalla nostra <i>Software House</i> e presenta già dei messaggi predefiniti.</p>
 
 	<h4>Come bloccare il robot? </h4>
 	<h5>Come gestire le rilevazioni del Sonar? </h5>
-	<p>Il sonar emette l'evento <code>sonardata</code> che verrà gestito da un nuovo componente custom che chiameremo 
+	<p>Il sonar emette l'evento <code>sonardataAppl</code> che verrà gestito da un nuovo componente custom che chiameremo
 	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello
 	Sprint0.</p>
 	
@@ -375,7 +375,7 @@ per consentire la comunicazione tra dispositivi con risorse limitate.</p>
 
 
 
-<h2>Test-Unit</h2>
+<h2 id="test-unit">Test-Unit</h2>
 <div class="remark">
 	<tt><p>Implementiamo delle <i>Test-Unit</i> automatizzate che vadano a simulare e testare il funzionamento del sistema e delle modifiche apportate.</p>
 		<p>Come per lo <i>Sprint-1</i>, la nostra <i>SoftwareHouse</i> ci fornisce la classe <a href="../CtxWasteService/test/coapobs/CoapTestObserver.kt">CoapTestObserver</a> per la registrazione di <i>Observer Coap</i> agli attori del nostro sistema.</p>
@@ -385,7 +385,7 @@ per consentire la comunicazione tra dispositivi con risorse limitate.</p>
 	<h4>Casistiche testate:</h4>
 	<ul>
 		<li>Il <b>Led</b> ricevendo eventi di <i>Stato del Robot</i> aggiorna correttamente il suo stato</li>
-		<li>Il contesto <b>ctxwasteservice</b> ricevendo eventi <code>sonardata</code> dal <b>Sonar23</b> li gestisce correttamente bloccando il Robot</li>
+		<li>Il contesto <b>ctxwasteservice</b> ricevendo eventi <code>sonardataAppl</code> dal <b>Sonar23</b> li gestisce correttamente bloccando il Robot</li>
 		<ul>
 			Dunque:
 			<li>Il <b>SonarDataHandler</b> riceve e gestisce correttamente gli eventi del <b>Sonar23</b></li>
@@ -425,7 +425,7 @@ per consentire la comunicazione tra dispositivi con risorse limitate.</p>
 		<ul>
 			<li>Si avvierà il contesto</li>
 			<li>Si invierà una richiesta di scarico per far muovere il robot</li>
-			<li>Si simuleranno <i>eventi</i> <code>sonardata</code></li>
+			<li>Si simuleranno <i>eventi</i> <code>sonardataAppl</code></li>
 		</ul>
 	</ul>
 
