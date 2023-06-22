@@ -377,7 +377,72 @@ per consentire la comunicazione tra dispositivi con risorse limitate.</p>
 
 <h2>Test-Unit</h2>
 <div class="remark">
+	<tt><p>Implementiamo delle <i>Test-Unit</i> automatizzate che vadano a simulare e testare il funzionamento del sistema e delle modifiche apportate.</p>
+		<p>Come per lo <i>Sprint-1</i>, la nostra <i>SoftwareHouse</i> ci fornisce la classe <a href="../CtxWasteService/test/coapobs/CoapTestObserver.kt">CoapTestObserver</a> per la registrazione di <i>Observer Coap</i> agli attori del nostro sistema.</p>
+		<p>Alla classe sono state apportate delle aggiunte per il salvataggio degli aggiornamenti in una lista di <i>Stati</i></p></tt>
 
+
+	<h4>Casistiche testate:</h4>
+	<ul>
+		<li>Il <b>Led</b> ricevendo eventi di <i>Stato del Robot</i> aggiorna correttamente il suo stato</li>
+		<li>Il contesto <b>ctxwasteservice</b> ricevendo eventi <code>sonardata</code> dal <b>Sonar23</b> li gestisce correttamente bloccando il Robot</li>
+		<ul>
+			Dunque:
+			<li>Il <b>SonarDataHandler</b> riceve e gestisce correttamente gli eventi del <b>Sonar23</b></li>
+			<li>Il <b>TransportTrolley</b> riceve e gestisce correttamente i messaggi di allarme</li>
+			<li>Il <b>CustomPathExecutor</b> si stoppa e riprende correttamente l'esecuzione</li>
+		</ul>
+	</ul>
+
+	<h4>Test sviluppati</h4>
+	<p>I test sviluppati sono:</p>
+	<ul>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/TestWasteServiceApplicationQakSprint2.kt">TestWasteServiceApplicationQakSprint2.kt</a></li>
+		<li><a href="../CtxRaspberry/test/testled/TestLed.kt">TestLed.kt</a></li>
+	</ul>
+	<p>Con rispettivamente i <i>modelli Qak</i> di test:</p>
+	<ul>
+		<li><a href="../CtxWasteService/src/ctxWasteService_Test.qakq">ctxWasteService_Test.qak</a></li>
+		<li><a href="../CtxRaspberry/src/CtxRaspberry_Test.qakq">CtxRaspberry_Test.qak</a></li>
+	</ul>
+	<tt>Per l'avvio dei <i>Test</i> si ricorda di buildare i seguenti modelli Qak, adattati per il testing.</tt>
+	<p>I <i>modelli Qak</i> di test riprendono gli originali e aggiungono le <code>updateResources</code> per il <i>tracing</i> degli stati</p>
+	<p>Un'altra modifica effettuata è stata quella di eliminare le dipendenze tra i contesti, per poter rendere le <i>Test-Unit</i> automatiche e indipendenti da ulteriori contesti</p>
+	<ul>
+		<li>È stato dunque rimosso il contesto del <b>BasicRobot22</b> dal <b>ctxwasteservice</b> simulando comunque l'avanzamento degli step nel <b>CustomPathExecutor</b></li>
+		<ul><li>Essendo già stato testato il funzionamento nello <a href="../../Sprint-1/userDocs/Sprint1-LLA.html">Test-Unit Sprint-1</a></li></ul>
+		<li>Rimosso anche il <b>ctxraspberry</b> dal <b>ctxwasteservice</b> e viceversa. Simulando gli eventi da Test stesso</li>
+	</ul>
+
+	<p>Per riprodurre le casistiche analizzate si seguiranno i seguenti passi:</p>
+	<ul>
+		<li>Per il <b>Led</b>:</li>
+		<ul>
+			<li>Si avvierà il contesto <b>ctxraspberry</b></li>
+			<li>Si invieranno <i>eventi</i> <code>robotStateEvent</code></li>
+		</ul>
+		<li>Per il contesto <b>ctxwasteservice</b>:</li>
+		<ul>
+			<li>Si avvierà il contesto</li>
+			<li>Si invierà una richiesta di scarico per far muovere il robot</li>
+			<li>Si simuleranno <i>eventi</i> <code>sonardata</code></li>
+		</ul>
+	</ul>
+
+
+	<h4>Controllo del corretto funzionamento</h4>
+	<p>Il controllo avviene tramite la connessione dei <code>CoapTestObserver</code> sugli attori dei rispettivi contesti.<br>
+		Questi prendono le <i>CoapUpdate</i> effettuate dagli attori, come implementate nei <i>modelli Qak</i> di <i>Test</i> e ne salvano la storia in una lista.</p>
+	<p>Il <i>controllo</i> avverrà dunque proprio sulla <b>storia degli stati</b> che gli attori assumeranno durante l'esecuzione.<br>
+		Conoscendo il sistema è stata sviluppata una <b>lista di stati attesi</b>, che viene confrontata con quella ottenuta a <i>runtime</i></p>
+	<p>Il Test passa se le due coincidono.</p>
+
+	<h4>Configurazione del test</h4>
+	<p>Per poter runnare i test è necessario:</p>
+	<ul>
+		<li>Buildare i rispettivi <i>modelli Qak</i> di <i>Test</i></li>
+		<li>Avviare gli <i>Unit-Test</i> sopra citati</li>
+	</ul>
 
 
 </div>
