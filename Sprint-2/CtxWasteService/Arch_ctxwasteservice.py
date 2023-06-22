@@ -21,6 +21,7 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
      sys = Custom('','./qakicons/system.png')
      with Cluster('ctxraspberry', graph_attr=nodeattr):
           sonar23=Custom('sonar23(ext)','./qakicons/externalQActor.png')
+          led=Custom('led(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxwasteservice', graph_attr=nodeattr):
@@ -28,8 +29,8 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
           transporttrolley=Custom('transporttrolley','./qakicons/symActorSmall.png')
           custompathexecutor=Custom('custompathexecutor','./qakicons/symActorSmall.png')
           sonardatahandler=Custom('sonardatahandler','./qakicons/symActorSmall.png')
+          ledstateupdater=Custom('ledstateupdater','./qakicons/symActorSmall.png')
      wasteservice >> Edge(color='magenta', style='solid', xlabel='pickupReq', fontcolor='magenta') >> transporttrolley
-     transporttrolley >> Edge( xlabel='robotStateEvent', **eventedgeattr, fontcolor='red') >> sys
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='move', fontcolor='magenta') >> custompathexecutor
      transporttrolley >> Edge(color='darkgreen', style='dashed', xlabel='pickupOk', fontcolor='darkgreen') >> wasteservice
      transporttrolley >> Edge(color='blue', style='solid', xlabel='toggleStop', fontcolor='blue') >> custompathexecutor
@@ -40,4 +41,6 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
      sonar23 >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> sonardatahandler
      sonardatahandler >> Edge(color='blue', style='solid', xlabel='alarm', fontcolor='blue') >> transporttrolley
      sonardatahandler >> Edge(color='blue', style='solid', xlabel='alarmStop', fontcolor='blue') >> transporttrolley
+     transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> ledstateupdater
+     ledstateupdater >> Edge(color='blue', style='solid', xlabel='ledStateUpdate', fontcolor='blue') >> led
 diag

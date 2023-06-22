@@ -21,10 +21,14 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 		
 				val DLIMIT = 10
 				var stopped = false
+				
+				var Value = ""
+				var distance = ""
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblack("	 sonardatahandler: 	Started")
+						delay(1000) 
 						CoapObserverSupport(myself, "127.0.0.1","8076","ctxraspberry","sonar23")
 						//genTimer( actor, state )
 					}
@@ -38,8 +42,10 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-												val Value = payloadArg(1).split("(")[1]
-												val distance = Value.dropLast(1)
+												if(payloadArg(1).contains("sonardata")){
+													Value = payloadArg(1).split("(")[1]
+													distance = Value.dropLast(1)
+												}
 								if(  distance.toInt() <= DLIMIT && stopped == false  
 								 ){ stopped = true  
 								forward("alarm", "alarm(stop)" ,"transporttrolley" ) 

@@ -30,7 +30,9 @@ System ctxwasteservice
  	Dispatch alarmStop 	: 	alarmStop(ARG)
  	
  	//TransportTrolley - Led
-	Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
+	Dispatch ledStateUpdate : state(STATE)
+
+
  	
  	
  	
@@ -158,6 +160,7 @@ QActor transporttrolley context ctxwasteservice {
 
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
+		updateResource[# "Started!" #]
 	}
 	Goto waiting
 
@@ -168,7 +171,7 @@ QActor transporttrolley context ctxwasteservice {
 		
 		[# Pos = "home" #]
 		[# RobotState = "athome" #]
-		emit robotStateEvent : robotStateEvent($RobotState)
+		updateResource [# "robotState($RobotState)" #]
 		
 		println("\t $name: TransportTrolley at Home!") color blue			//We presume it starts in its home position
 
@@ -199,7 +202,7 @@ QActor transporttrolley context ctxwasteservice {
 		updateResource [# "transporttrolleyState(goPickUp)" #]
 		
 		[# RobotState = "moving" #]
-		emit robotStateEvent : robotStateEvent($RobotState)
+		updateResource [# "robotState($RobotState)" #]
 		
 		//Sending messages to BasicRobot22
 		println("\t $name: Going to Indoor!") color blue
@@ -304,7 +307,7 @@ QActor transporttrolley context ctxwasteservice {
 		
 		println("\t $name: Robot Stopped!") color blue
 		forward custompathexecutor -m toggleStop : toggleStop(stop)
-		emit robotStateEvent : robotStateEvent($RobotState)
+		updateResource [# "robotState($RobotState)" #]
 	}
 	Transition t3	whenMsg alarmStop -> resume
 	
@@ -316,7 +319,7 @@ QActor transporttrolley context ctxwasteservice {
 		
 		println("\t $name: Resumed execution!") color blue
 		forward custompathexecutor -m toggleStop : toggleStop(resume)
-		emit robotStateEvent : robotStateEvent($RobotState)
+		updateResource [# "robotState($RobotState)" #]
 		
 		returnFromInterrupt
 	}
@@ -564,6 +567,9 @@ QActor sonardatahandler context ctxwasteservice{
 	[#
 		val DLIMIT = 10
 		var stopped = false
+
+		var Value = ""
+		var distance = ""
 	#]
 
 	State s0 initial {
@@ -577,10 +583,11 @@ QActor sonardatahandler context ctxwasteservice{
 	State handleSonarData{
 		printCurrentMessage
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
-			
-			[# 
-				val Value = payloadArg(1).split("(")[1]
-				val distance = Value.dropLast(1)
+			[#
+				if(payloadArg(1).contains("sonardata")){
+					Value = payloadArg(1).split("(")[1]
+					distance = Value.dropLast(1)
+				}
 			#]
 			
 			
@@ -606,3 +613,50 @@ QActor sonardatahandler context ctxwasteservice{
 	}
 	Transition t0	whenMsg coapUpdate -> handleSonarData
 }
+
+
+
+
+QActor ledstateupdater context ctxwasteservice{
+	[#
+		var Value = ""
+		var robotState = ""
+	#]
+
+	State s0 initial{
+		observeResource transporttrolley
+	}
+	Goto handleRobotStateUpdate
+
+	State handleRobotStateUpdate {
+		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
+			[#
+				if(payloadArg(1).contains("robotState")){
+					Value = payloadArg(1).split("(")[1]
+					robotState = Value.dropLast(1)
+				}
+			#]
+
+			println("\t $name: Handling RobotState change!") color red
+        	[# var LedState = "null" #]
+
+        	if[# robotState == "athome" #]{
+        		[# LedState = "LedOff" #]
+        	}
+        	if[# robotState == "moving" #]{
+        		[# LedState = "LedBlink" #]
+        	}
+        	if[# robotState == "stopped" #]{
+        		[# LedState = "LedOn" #]
+        	}
+
+        	forward led -m ledStateUpdate : state($LedState)
+			println("\t $name: Sending ledState: $LedState") color red
+		}
+	}
+	Transition t0	whenMsg coapUpdate -> handleRobotStateUpdate
+}
+
+
+
+

@@ -32,6 +32,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Started! $version")
+						updateResourceRep( "Started!"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -43,7 +45,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					action { //it:State
 						 Pos = "home"  
 						 RobotState = "athome"  
-						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
+						updateResourceRep( "robotState($RobotState)"  
+						)
 						CommUtils.outblue("	 $name: TransportTrolley at Home!")
 						CommUtils.outblue("	 $name: ready and waiting for pickupRequest!")
 						//genTimer( actor, state )
@@ -76,7 +79,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("goPickUp") { //this:State
 					action { //it:State
 						 RobotState = "moving"  
-						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
+						updateResourceRep( "robotState($RobotState)"  
+						)
 						CommUtils.outblue("	 $name: Going to Indoor!")
 						CommUtils.outblue("	 $name: Robot going from $Pos to Indoor")
 						request("move", "move($Pos,indoor)" ,"custompathexecutor" )  
@@ -171,7 +175,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 									RobotState = "stopped"
 						CommUtils.outblue("	 $name: Robot Stopped!")
 						forward("toggleStop", "toggleStop(stop)" ,"custompathexecutor" ) 
-						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
+						updateResourceRep( "robotState($RobotState)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -184,7 +189,8 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						 RobotState = PreviousState  
 						CommUtils.outblue("	 $name: Resumed execution!")
 						forward("toggleStop", "toggleStop(resume)" ,"custompathexecutor" ) 
-						emit("robotStateEvent", "robotStateEvent($RobotState)" ) 
+						updateResourceRep( "robotState($RobotState)"  
+						)
 						returnFromInterrupt(interruptedStateTransitions)
 						//genTimer( actor, state )
 					}
