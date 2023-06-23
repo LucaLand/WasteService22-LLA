@@ -1,6 +1,7 @@
 package it.unibo.WasteServiceStatusGui;
 
 
+import it.unibo.coapobs.CoapObserverJava;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,12 +13,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HIControllerDemo {
+    CoapObserverJava obsGuiUpdater = new CoapObserverJava("localhost:8072", "ctxwasteservice", "transporttrolley");
+
     @Value("${spring.application.name}")
     String appName;
 
     @GetMapping("/")
     public String homePage(Model model) {
-        model.addAttribute("arg", appName);
+        model.addAttribute("arg", obsGuiUpdater.getCurrentState());
         return "welcome";
     }
 
