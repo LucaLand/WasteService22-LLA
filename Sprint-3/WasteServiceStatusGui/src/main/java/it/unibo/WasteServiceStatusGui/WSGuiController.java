@@ -16,7 +16,7 @@ import org.json.simple.JSONObject;
 
 
 @Controller
-public class HIControllerDemo {
+public class WSGuiController {
 
     CoapObserverJava obsGuiUpdater = new CoapObserverJava("localhost:8072", "ctxwasteservice", "guiupdater");
 
