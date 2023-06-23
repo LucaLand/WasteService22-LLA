@@ -20,6 +20,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.eclipse.californium:californium-core:3.5.0'
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
 
 	/* UNIBO *************************************************************************************************************** */

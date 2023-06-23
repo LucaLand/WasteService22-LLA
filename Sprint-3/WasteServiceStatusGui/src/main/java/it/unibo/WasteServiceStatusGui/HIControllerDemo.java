@@ -2,6 +2,8 @@ package it.unibo.WasteServiceStatusGui;
 
 
 import it.unibo.coapobs.CoapObserverJava;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.json.simple.JSONObject;
+
 
 @Controller
 public class HIControllerDemo {
@@ -20,28 +24,38 @@ public class HIControllerDemo {
     @Value("${spring.application.name}")
     String appName;
 
+    String robotState = "", robotPos = "", ledState = "", currentPB = "", currentGB = "";
+
     @GetMapping("/")
     public String homePage(Model model) {
-        /*String values = obsGuiUpdater.getCurrentState();
-        values = values.split("(")[1].substring(0, values.length());
-        List<String> valuesList = new LinkedList<>();
-        while(!Objects.equals(values.split(",")[0], "")){
-            valuesList.add(values.split(",")[0]);
-            values = values.split(",")[0];
-        }*/
-        /*String stringUpdate = obsGuiUpdater.getCurrentState();
-        JSONObject jsonUpdate;
-        if(stringUpdate.contains("jsonupdate")){
-            jsonUpdate = JSONObject().
-        }*/
+        String currentValue = obsGuiUpdater.getCurrentState();
+        if(currentValue.contains("jsonupdate")){
+            String stringUpdate = currentValue.split("jsonupdate")[1];
+            stringUpdate = stringUpdate.substring(1, stringUpdate.length()-1);
+            System.out.println(stringUpdate);
+            JSONObject jsonUpdate;
+            JSONParser parser = new JSONParser();
+            try {
+                jsonUpdate = (JSONObject) parser.parse(stringUpdate);
+                System.out.println(jsonUpdate);
+                robotState = (String) jsonUpdate.get("robotState");
+                robotPos = (String) jsonUpdate.get("robotPos");
+                ledState = (String) jsonUpdate.get("ledState");
+                currentPB = (String) jsonUpdate.get("currentPB");
+                currentGB = (String) jsonUpdate.get("currentGB");
+
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
 
 
-        model.addAttribute("robotState", obsGuiUpdater.getCurrentState());
-        model.addAttribute("robotPosition",obsGuiUpdater.getCurrentState());
-        model.addAttribute("ledState",obsGuiUpdater.getCurrentState());
-        model.addAttribute("pb",obsGuiUpdater.getCurrentState());
-        model.addAttribute("gb",obsGuiUpdater.getCurrentState());
+        model.addAttribute("robotState", robotState);
+        model.addAttribute("robotPosition", robotPos);
+        model.addAttribute("ledState", ledState);
+        model.addAttribute("pb", currentPB);
+        model.addAttribute("gb", currentGB);
         return "welcome";
     }
 
