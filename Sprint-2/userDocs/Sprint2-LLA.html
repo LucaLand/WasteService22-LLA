@@ -119,21 +119,26 @@
 	<p>Il sonar riprende l'evento già fornito dal committente all'interno della documentazione prima citata e 
 	dovrà emettere un evento ad ogni nuova misurazione con la misurazione della distanza rilevata in quel momento.</p>
 	<pre><code>
-Event sonardataAppl  :  distance(D)
+ Event sonardataAppl  :  distance(D)
 	</code></pre>
 	
 	<p>Nonostante l'evento <i>sonardataAppl</i> venga gestito soltanto dal <b>SonarDataHandler</b>, è stato pensato di non modificare il tipo di messaggio dato che il componente <b>Sonar</b>
 	ci è stato già fornito dalla nostra <i>Software House</i> e presenta già dei messaggi predefiniti.</p>
 
+
+
 	<h4>Come bloccare il robot? </h4>
+
 	<h5>Come gestire le rilevazioni del Sonar? </h5>
-	<p>Il sonar emette l'evento <code>sonardataAppl</code> che verrà gestito da un nuovo componente custom che chiameremo
-	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello
-	Sprint0.</p>
+
+	<p>Il sonar emette l'evento <code>sonardataAppl</code> che verrà gestito da un nuovo componente che chiameremo
+	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello Sprint0.</p>
+	<p>Il <b>SonarDataHandler</b> è un <i>attore</i> inserito nel contesto <c>ctxwasteservice</c>.<br>
+		Questo raccoglierà gli eventi di tipo <code>sonardataAppl</code> emessi dal <b>Sonar23</b> e li gestirà implementando la logica di funzionamento della nostra funzionalità.</p>
 
 		<img src="img/SonarDataHandler.png" alt="SonarDataHandler Actor" style="width: 240px;">
 
-	<pre><code>
+		<pre><code>
 QActor sonardatahandler context ctxraspberry{
 	[# 
 		val DLIMIT = 10
