@@ -541,26 +541,28 @@ QActor sonardatahandler context ctxwasteservice{
 	State handleSonarData{
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
 			[#
+				distance = "null"
 				if(payloadArg(1).contains("sonardata")){
 					Value = payloadArg(1).split("(")[1]
 					distance = Value.dropLast(1)
 				}
 			#]
 
-
-			if[# distance.toInt() <= DLIMIT && stopped == false #]{
-				[# stopped = true #]
-				forward transporttrolley -m alarm : alarm(stop)
-				println("\t $name: Sending alarm(stop)!")
+			if[# distance != "null" #] {
+				if[# distance.toInt() <= DLIMIT && stopped == false #]{
+					[# stopped = true #]
+					forward transporttrolley -m alarm : alarm(stop)
+					println("\t $name: Sending alarm(stop)!")
+				}
+	
+				if[# distance.toInt() > DLIMIT && stopped == true #]{
+					[# stopped = false #]
+					forward transporttrolley -m alarmStop : alarmStop(resume)
+					println("\t $name: Sending alarmStop(resume)!")
+				}
+	
+				println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 			}
-
-			if[# distance.toInt() > DLIMIT && stopped == true #]{
-				[# stopped = false #]
-				forward transporttrolley -m alarmStop : alarmStop(resume)
-				println("\t $name: Sending alarmStop(resume)!")
-			}
-
-			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 		}
 	}
 	Transition t0	whenMsg coapUpdate -> handleSonarData

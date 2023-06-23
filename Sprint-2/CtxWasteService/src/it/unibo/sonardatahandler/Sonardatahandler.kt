@@ -42,11 +42,13 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 						if( checkMsgContent( Term.createTerm("coapUpdate(RESOURCE,VALUE)"), Term.createTerm("coapUpdate(RESOURCE,VALUE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
+												distance = "null"
 												if(payloadArg(1).contains("sonardata")){
 													Value = payloadArg(1).split("(")[1]
 													distance = Value.dropLast(1)
 												}
-								if(  distance.toInt() <= DLIMIT && stopped == false  
+								if(  distance != "null"  
+								 ){if(  distance.toInt() <= DLIMIT && stopped == false  
 								 ){ stopped = true  
 								forward("alarm", "alarm(stop)" ,"transporttrolley" ) 
 								CommUtils.outblack("	 $name: Sending alarm(stop)!")
@@ -57,6 +59,7 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 								CommUtils.outblack("	 $name: Sending alarmStop(resume)!")
 								}
 								CommUtils.outblack("	 $name: Handling SonarData($distance) - Robot Stopped: $stopped")
+								}
 						}
 						//genTimer( actor, state )
 					}
