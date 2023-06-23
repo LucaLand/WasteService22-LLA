@@ -2,7 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head><title>Welcome</title></head>
     <body>
-        <h1>Welcome (in templates)</h1>
-            <p>Welcome to <b><span th:text="${arg}">Our Arg</span></b>.</p>
+        <h1>WasteServiceStatusGUI</h1>
+        <ul>
+            <li><p>RobotState: <b><span th:text="${robotState}">Our Arg</span></b>.</p></li>
+            <li><p>RobotPosition: <b><span th:text="${robotPosition}">Our Arg</span></b>.</p></li>
+            <li><p>LedState: <b><span th:text="${ledState}">Our Arg</span></b>.</p></li>
+            <li><p>PlasticBox: <b><span th:text="${pb}">Our Arg</span></b>.</p></li>
+            <li><p>GlassBox: <b><span th:text="${gb}">Our Arg</span></b>.</p></li>
+        </ul>
+
     </body>
+
+<script>
+
+    const delayInMilliseconds = 1500; //1 second
+    setTimeout(function() {
+        location.reload();
+    }, delayInMilliseconds);
+
+</script>
 </html>

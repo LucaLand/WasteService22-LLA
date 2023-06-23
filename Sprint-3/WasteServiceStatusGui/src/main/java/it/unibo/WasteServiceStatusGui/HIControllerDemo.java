@@ -13,14 +13,35 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HIControllerDemo {
-    CoapObserverJava obsGuiUpdater = new CoapObserverJava("localhost:8072", "ctxwasteservice", "transporttrolley");
+
+    CoapObserverJava obsGuiUpdater = new CoapObserverJava("localhost:8072", "ctxwasteservice", "guiupdater");
+
 
     @Value("${spring.application.name}")
     String appName;
 
     @GetMapping("/")
     public String homePage(Model model) {
-        model.addAttribute("arg", obsGuiUpdater.getCurrentState());
+        /*String values = obsGuiUpdater.getCurrentState();
+        values = values.split("(")[1].substring(0, values.length());
+        List<String> valuesList = new LinkedList<>();
+        while(!Objects.equals(values.split(",")[0], "")){
+            valuesList.add(values.split(",")[0]);
+            values = values.split(",")[0];
+        }*/
+        /*String stringUpdate = obsGuiUpdater.getCurrentState();
+        JSONObject jsonUpdate;
+        if(stringUpdate.contains("jsonupdate")){
+            jsonUpdate = JSONObject().
+        }*/
+
+
+
+        model.addAttribute("robotState", obsGuiUpdater.getCurrentState());
+        model.addAttribute("robotPosition",obsGuiUpdater.getCurrentState());
+        model.addAttribute("ledState",obsGuiUpdater.getCurrentState());
+        model.addAttribute("pb",obsGuiUpdater.getCurrentState());
+        model.addAttribute("gb",obsGuiUpdater.getCurrentState());
         return "welcome";
     }
 
