@@ -7,29 +7,33 @@ import unibo.basicomm23.coap.CoapConnection;
 public class CoapObserverJava implements CoapHandler {
 
     String currentState = null;
+    private String obsName = "obs";
+
+
 
 
     public CoapObserverJava(String addr, String ctxName, String actorName) {
-        new Thread(() -> {
-            String path = "$ctxName/$actorName";
+            String path = ctxName +"/"+ actorName;
             CoapConnection coapConn = new CoapConnection(addr, path);
             coapConn.observeResource(this);
             System.out.println("CoapConnection active! On: " +addr +"/"+ ctxName + "/" + actorName +" -- " + coapConn);
-        }).start();
+            this.obsName = addr+"/"+ctxName+"/"+actorName;
     }
 
     @Override
     public void onLoad(CoapResponse response) {
         currentState = response.getResponseText();
-        System.out.println("Stato: " + currentState);
+        System.out.println(obsName+ " || Stato: " + currentState);
     }
 
     @Override
     public void onError() {
-        System.out.println("ERROR");
+        System.out.println(obsName+ " || ERROR");
     }
 
     public String getCurrentState() {
         return currentState;
     }
+
+
 }
