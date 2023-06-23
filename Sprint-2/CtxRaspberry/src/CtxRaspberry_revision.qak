@@ -92,7 +92,7 @@ QActor sonar23 context ctxraspberry{
 	State s0 initial{  
 		println("sonar23 | start") 
 		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
-		updateResource[# "Started!" #]
+		updateResource[# "started(0)" #]
 	}
 	Goto work
 	 
