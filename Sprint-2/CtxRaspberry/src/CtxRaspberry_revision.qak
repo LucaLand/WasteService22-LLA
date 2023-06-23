@@ -28,7 +28,7 @@ Context ctxraspberry ip[host="localhost" port=8076]
 
 
 
-CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
+//CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
 //CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
 CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
 
@@ -43,6 +43,8 @@ QActor led context ctxraspberry {
 		var ledState = "LedOff"
 		
 		val runtime = Runtime.getRuntime()
+
+		val rasp = false
 		
 	#]
 
@@ -60,18 +62,18 @@ QActor led context ctxraspberry {
 		}
 		
 		
-        if[# ledState == "LedOff" #]{
+        if[# ledState == "LedOff" && rasp #]{
             //Spegni
             [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
         }
-        if[# ledState == "LedBlink" #]{
+        if[# ledState == "LedBlink" && rasp #]{
             //Accendi
             [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
             delay 100
             //Spegni
             [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
         }
-        if[# ledState == "LedOn" #]{
+        if[# ledState == "LedOn" && rasp #]{
             //Accendi
             [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
         }
@@ -91,7 +93,7 @@ QActor sonar23 context ctxraspberry{
 
 	State s0 initial{  
 		println("sonar23 | start") 
-		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		//[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		updateResource[# "started(0)" #]
 	}
 	Goto work
