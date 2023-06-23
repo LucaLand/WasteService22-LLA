@@ -32,7 +32,9 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("	 $name: Started! $version")
-						updateResourceRep( "Started!"  
+						updateResourceRep( "started"  
+						)
+						updateResourceRep( "ledState($ledState)"  
 						)
 						//genTimer( actor, state )
 					}
@@ -47,6 +49,8 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 ledState = payloadArg(0)  
 								CommUtils.outred("	 $name: Led state - $ledState")
+								updateResourceRep( "ledState($ledState)"  
+								)
 						}
 						if(  ledState == "LedOff" && rasp  
 						 ){ runtime.exec("sudo bash led25GpioTurnOff.sh")  

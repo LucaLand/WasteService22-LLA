@@ -32,7 +32,7 @@ class Transporttrolley ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Started! $version")
-						updateResourceRep( "Started!"  
+						updateResourceRep( "started"  
 						)
 						//genTimer( actor, state )
 					}

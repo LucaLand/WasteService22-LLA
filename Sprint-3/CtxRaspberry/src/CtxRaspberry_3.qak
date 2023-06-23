@@ -20,15 +20,10 @@ System raspberry
 
 
 
-//Context ctxwasteservice ip[host="127.0.0.1" port=8072]
-
 Context ctxraspberry ip[host="localhost" port=8076]
 
 
-
-
-
-CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
+//CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
 //CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
 CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
 
@@ -43,12 +38,15 @@ QActor led context ctxraspberry {
 		var ledState = "LedOff"
 		
 		val runtime = Runtime.getRuntime()
+
+		val rasp = false
 		
 	#]
 
 	State s0 initial {
 		println("\t $name: Started! $version") color red
-		updateResource[# "Started!" #]
+		updateResource[# "started" #]
+		updateResource [# "ledState($ledState)" #]
 	}
 	Goto handleLedStateUpdate
 
@@ -57,24 +55,22 @@ QActor led context ctxraspberry {
         onMsg(ledStateUpdate : state(STATE)){
         	[# ledState = payloadArg(0) #]
 			println("\t $name: Led state - $ledState") color red
-			
-			//TEST
-			updateResource [# "LedState($ledState)" #]
+			updateResource [# "ledState($ledState)" #]
 		}
 		
 		
-        if[# ledState == "LedOff" #]{
+        if[# ledState == "LedOff" && rasp #]{
             //Spegni
             [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
         }
-        if[# ledState == "LedBlink" #]{
+        if[# ledState == "LedBlink" && rasp #]{
             //Accendi
             [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
             delay 100
             //Spegni
             [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
         }
-        if[# ledState == "LedOn" #]{
+        if[# ledState == "LedOn" && rasp #]{
             //Accendi
             [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
         }
@@ -94,8 +90,8 @@ QActor sonar23 context ctxraspberry{
 
 	State s0 initial{  
 		println("sonar23 | start") 
-		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
-		updateResource[# "Started!" #]
+		//[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		updateResource[# "started" #]
 	}
 	Goto work
 	 

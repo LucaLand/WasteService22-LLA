@@ -12,3 +12,4 @@ context(ctxwasteservice, "localhost",  "TCP", "8072").
   qactor( custompathexecutor, ctxwasteservice, "it.unibo.custompathexecutor.Custompathexecutor").
   qactor( sonardatahandler, ctxwasteservice, "it.unibo.sonardatahandler.Sonardatahandler").
   qactor( ledstateupdater, ctxwasteservice, "it.unibo.ledstateupdater.Ledstateupdater").
+  qactor( guiupdater, ctxwasteservice, "it.unibo.guiupdater.Guiupdater").

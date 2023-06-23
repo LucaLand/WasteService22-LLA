@@ -30,6 +30,7 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
           custompathexecutor=Custom('custompathexecutor','./qakicons/symActorSmall.png')
           sonardatahandler=Custom('sonardatahandler','./qakicons/symActorSmall.png')
           ledstateupdater=Custom('ledstateupdater','./qakicons/symActorSmall.png')
+          guiupdater=Custom('guiupdater','./qakicons/symActorSmall.png')
      wasteservice >> Edge(color='magenta', style='solid', xlabel='pickupReq', fontcolor='magenta') >> transporttrolley
      transporttrolley >> Edge(color='magenta', style='solid', xlabel='move', fontcolor='magenta') >> custompathexecutor
      transporttrolley >> Edge(color='darkgreen', style='dashed', xlabel='pickupOk', fontcolor='darkgreen') >> wasteservice
@@ -43,4 +44,8 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
      sonardatahandler >> Edge(color='blue', style='solid', xlabel='alarmStop', fontcolor='blue') >> transporttrolley
      transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> ledstateupdater
      ledstateupdater >> Edge(color='blue', style='solid', xlabel='ledStateUpdate', fontcolor='blue') >> led
+     wasteservice >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
+     transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
+     custompathexecutor >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
+     led >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
 diag

@@ -53,6 +53,10 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 					action { //it:State
 						CommUtils.outblue("	 $name: Started! $version")
 						CoapObserverSupport(myself, "127.0.0.1","8020","ctxbasicrobot","basicrobot")
+						updateResourceRep( "started"  
+						)
+						updateResourceRep( "robotPos($Pos)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -196,7 +200,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 								CommUtils.outblack("	 $name: Turned Back! - Pos: $Pos")
 								}
 								CommUtils.outblack("	 $name: StepDone! - Pos: $Pos")
-								updateResourceRep( "Pos($Pos)"  
+								updateResourceRep( "robotPos($Pos)"  
 								)
 						}
 						//genTimer( actor, state )

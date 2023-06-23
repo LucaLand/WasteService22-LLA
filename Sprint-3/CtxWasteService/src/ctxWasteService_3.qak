@@ -74,10 +74,15 @@ QActor wasteservice context ctxwasteservice {
 	State s0 initial {
 		println("\t $name: Started! $version") color green
 		//Initialiting variables
+		updateResource[# "started" #]
 		[#
 			CurrentPB = 0;
 			CurrentGB = 0;
 		#]
+		println("\t CurrentPB = $CurrentPB") color green
+		println("\t CurrentGB = $CurrentGB") color green
+		
+		updateResource [# "current($CurrentPB, $CurrentGB)" #]
 	}
 	Goto waiting
 
@@ -126,8 +131,8 @@ QActor wasteservice context ctxwasteservice {
 		}
 		println("\t CurrentPB = $CurrentPB") color green
 		println("\t CurrentGB = $CurrentGB") color green
-		updateResource [# "currentPB($currentPB)" #]
-		updateResource [# "currentGB($currentGB)" #]
+		
+		updateResource [# "current($CurrentPB, $CurrentGB)" #]
 	}
 	Goto pickingUp
 
@@ -169,7 +174,7 @@ QActor transporttrolley context ctxwasteservice {
 
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
-		updateResource[# "Started!" #]
+		updateResource[# "started" #]
 	}
 	Goto waiting
 
@@ -345,6 +350,8 @@ QActor custompathexecutor context ctxwasteservice {
 	State s0 initial{
 		println("\t $name: Started! $version") color blue
 		observeResource basicrobot
+		updateResource [# "started" #]
+		updateResource [# "robotPos($Pos)" #]
 	}
 	Goto waiting
 
@@ -481,7 +488,7 @@ QActor custompathexecutor context ctxwasteservice {
 			}
 
 			println("\t $name: StepDone! - Pos: $Pos")
-			updateResource [# "Pos($Pos)" #]
+			updateResource [# "robotPos($Pos)" #]
 		}
 	}
 	Transition t2 	whenTime 100 -> working
@@ -617,14 +624,18 @@ QActor guiupdater context ctxwasteservice{
 	[#
 		var robotState = ""
 		var robotPos = ""
-		var LedState = ""
+		var ledState = ""
 		var currentGB = ""
 		var currentPB = ""
+		
+		var Value = ""
 	#]
 	
 	State s0 initial{
-		observeResource transporttrolley
+		delay 3000
 		observeResource wasteservice
+		observeResource transporttrolley
+		observeResource custompathexecutor
 		observeResource led
 	}
 	Goto handleCoapUpdate
@@ -632,46 +643,46 @@ QActor guiupdater context ctxwasteservice{
 
 
 	State handleCoapUpdate{
+		printCurrentMessage
 		onMsg(coapUpdate : coapUpdate(RESOURCE, VALUE)){
+			
 			[#
 				if(payloadArg(1).contains("robotState")){
 					Value = payloadArg(1).split("(")[1]
 					robotState = Value.dropLast(1)
 				}
 				
-				if(payloadArg(1).contains("Pos")){
+				if(payloadArg(1).contains("robotPos")){
 					Value = payloadArg(1).split("(")[1]
-					robotState = Value.dropLast(1)
+					robotPos = Value.dropLast(1)
 					}
 			
 				if(payloadArg(1).contains("ledState")){
 					Value = payloadArg(1).split("(")[1]
-					robotState = Value.dropLast(1)
+					ledState = Value.dropLast(1)
 					}
 					
-				if(payloadArg(1).contains("currentGB")){
+				if(payloadArg(1).contains("current")){
 					Value = payloadArg(1).split("(")[1]
-					robotState = Value.dropLast(1)
-					}
-					
-				if(payloadArg(1).contains("currentPB")){
-					Value = payloadArg(1).split("(")[1]
-					robotState = Value.dropLast(1)
-					}
+					Value = Value.dropLast(1)
+					currentPB = Value.split(",")[0]
+					currentGB = Value.split(",")[1]
+				}
 					
 				var jsonstring = JSONObject()
 				jsonstring.put("robotState","$robotState")
-				jsonstring.put("Pos","$Pos")
+				jsonstring.put("robotPos","$robotPos")
 				jsonstring.put("ledState","$ledState")
 				jsonstring.put("currentGB","$currentGB")
 				jsonstring.put("currentPB","$currentPB")
 				
 			#]
 			
-		updateResource [# "guiupdate($robotState,$Pos,$ledState,$currentGB,$currentPB)" #]		
+		updateResource [# "guiupdate($robotState,$robotPos,$ledState,$currentGB,$currentPB)" #]		
 		updateResource [# "jsonupdate($jsonstring)" #]					
+		}
 	}
+	Transition t0	whenMsg coapUpdate -> handleCoapUpdate
 	
-		Transition t0	whenMsg coapUpdate -> handleCoapUpdate
 }
 

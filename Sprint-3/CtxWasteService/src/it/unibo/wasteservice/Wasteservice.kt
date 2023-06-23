@@ -37,9 +37,15 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outgreen("	 $name: Started! $version")
+						updateResourceRep( "started"  
+						)
 						
 									CurrentPB = 0;
 									CurrentGB = 0;
+						CommUtils.outgreen("	 CurrentPB = $CurrentPB")
+						CommUtils.outgreen("	 CurrentGB = $CurrentGB")
+						updateResourceRep( "current($CurrentPB, $CurrentGB)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -104,6 +110,8 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 						}
 						CommUtils.outgreen("	 CurrentPB = $CurrentPB")
 						CommUtils.outgreen("	 CurrentGB = $CurrentGB")
+						updateResourceRep( "current($CurrentPB, $CurrentGB)"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
