@@ -1,5 +1,10 @@
 package unibo.testled
 
+/**
+ * PER AVVIARE QUESTA TEST-UNIT BUILDARE IL PROGETTO CON IL FILE CtxRaspberry_revision_Test.qak NELLA DIRECTORY di MAIN (src) del progetto
+ * RUN TESTS separately manually
+ */
+
 import it.unibo.ctxraspberry.main
 import it.unibo.kactor.QakContext
 import org.junit.Before
@@ -115,7 +120,7 @@ class TestCtxRaspberry_revision {
         StateHistoryLed.add("LedState(LedOff)")
 
 
-        StateHistorySonar23.add("ActorBasic(Resource) sonar23  | created  ")
+        StateHistorySonar23.add("Started!")
         StateHistorySonar23.add("sonardata(75)")
         StateHistorySonar23.add("sonardata(70)")
         StateHistorySonar23.add("sonardata(65)")
@@ -137,32 +142,33 @@ class TestCtxRaspberry_revision {
     @Test
     @Throws(InterruptedException::class)
     fun ledStateChangeTest() {
-        CommUtils.delay(3000)
+        //CommUtils.delay(3000)
 
-        val robotStateEventHome = "msg(robotStateEvent, event, testunit, none, robotStateEvent(athome), 12)"
-        val robotStateEventMoving = "msg(robotStateEvent, event, testunit, none, robotStateEvent(moving), 18)"
-        val robotStateEventStopped = "msg(robotStateEvent, event, testunit, none, robotStateEvent(stopped), 24)"
+        val ledOff = "msg(ledStateUpdate, dispatch, testunit, led, state(LedOff), 12)"
+        val ledOn = "msg(ledStateUpdate, dispatch, testunit, led, state(LedOn), 18)"
+        val ledBlink = "msg(ledStateUpdate, dispatch, testunit, led, state(LedBlink), 24)"
+
 
 
         try {
-            println("$testName	|   Message: $robotStateEventHome")
-            conn.forward(robotStateEventHome)
+            println("$testName	|   Message: $ledOff")
+            conn.forward(ledOff)
             CommUtils.delay(3000)
 
-            println("$testName	|	Message: $robotStateEventMoving")
-            conn.forward(robotStateEventMoving)
+            println("$testName	|	Message: $ledBlink")
+            conn.forward(ledBlink)
             CommUtils.delay(2000)
 
-            println("$testName	|	Message: $robotStateEventStopped")
-            conn.forward(robotStateEventStopped)
+            println("$testName	|	Message: $ledOn")
+            conn.forward(ledOn)
             CommUtils.delay(1000)
 
-            println("$testName	|	Message: $robotStateEventMoving")
-            conn.forward(robotStateEventMoving)
+            println("$testName	|	Message: $ledBlink")
+            conn.forward(ledBlink)
             CommUtils.delay(2000)
 
-            println("$testName	|	Message: $robotStateEventHome")
-            conn.forward(robotStateEventHome)
+            println("$testName	|	Message: $ledOff")
+            conn.forward(ledOff)
             CommUtils.delay(1000)
 
         } catch (e: Exception) {
@@ -171,7 +177,7 @@ class TestCtxRaspberry_revision {
 
 
         CommUtils.delay(500)
-        println("Led StateHistory: ${obsLed.getStateHistory()}")
+        println("Led StateHistory: ${obsLed.getUpdateHistory()}")
 
         assertEquals(StateHistoryLed, obsLed.getStateHistory())
         CommUtils.delay(500)

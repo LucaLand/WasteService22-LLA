@@ -1,54 +1,51 @@
-System ctxwasteservice
-//mqttBroker "broker.hivemq.com" : 1883 eventTopic "unibo/basicrobot"   //broker.hivemq.com
-	
+System generalarchitecturesprint2
+
 	// Smart Device - WasteService
 	Request depositRequest : depositRequest(Type, TruckLoad)	//TYPE : "plastic", "glass"
 	Reply loadaccept : loadaccept(ARG)
 	Reply loadrejecetd : loadrejecetd(ARG)
-	
-	
+
+
 	//WasteService - TransportTrolley
     Request pickupReq	:	pickupReq(ID, TYPE)		//Richiesta di pickup di un relativo materiale
  	Reply   pickupOk	:	pickupOk(ID)			//Risposta di fine pickup, relativa ad una richiesta
- 	
+
  	//TransportTrolley - CustomPathExecutor
     Request move		:	move(CurrentPos, NewPos)
  	Reply   moveDone	:	moveDone(NewPos)
  	Dispatch toggleStop :	toggleStop(ARG)
- 	
+
  	//CustomPathExecutor - BasicRobot22
  	Dispatch cmd       	: cmd(MOVE)
- 	
+
  	//COAP UPDATE
  	Dispatch coapUpdate	: 	coapUpdate(RESOURCE, VALUE)
- 	
- 	//SonarQak23 userà l'update Resource
- 	//CoapUpdate(sonar23, sonardata($distance))
- 	
+
  	//Sonar - TransportTrolley
  	Dispatch alarm 		: 	alarm(ARG)
  	Dispatch alarmStop 	: 	alarmStop(ARG)
- 	
+
  	//TransportTrolley - Led
-	Dispatch ledStateUpdate : state(STATE)
+	Dispatch ledStateUpdate : state(STATE)			//LedOn, LedOff, LedBlink
 	
 	
- 	
- 	
- 	
-Context ctxraspberry ip[host="127.0.0.1" port=8076]
+	
+	//SonarQak23
+	Event sonardata : distance(D)   //emitted  by distancefilter
+	//Event obstacle  : obstacle(D)   //emitted as stream by distancefilter
+	//Event alarm		: alarm(X)
+
+	//SonarData Appl
+	Event sonardataAppl : distance(D)   //emitted  by sonarqak23
+
+
+
+Context ctxraspberry ip[host="localhost" port=8076]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
-
 ExternalQActor basicrobot context ctxbasicrobot
-ExternalQActor sonar23 context ctxraspberry
-ExternalQActor led context ctxraspberry
-
-
-
-
 
 
 
@@ -607,6 +604,97 @@ QActor ledstateupdater context ctxwasteservice{
 		}
 	}
 	Transition t0	whenMsg coapUpdate -> handleRobotStateUpdate
+}
+
+
+
+
+
+
+
+
+
+
+
+//---- Led
+QActor led context ctxraspberry {
+	[#
+		val name = "LedActor"
+		val version = "V1.0"
+
+		var ledState = "LedOff"
+		
+		val runtime = Runtime.getRuntime()
+		
+	#]
+
+	State s0 initial {
+		println("\t $name: Started! $version") color red
+		updateResource[# "Started!" #]
+	}
+	Goto handleLedStateUpdate
+
+
+	State handleLedStateUpdate {
+        onMsg(ledStateUpdate : state(STATE)){
+        	[# ledState = payloadArg(0) #]
+			println("\t $name: Led state - $ledState") color red
+		}
+		
+		
+        if[# ledState == "LedOff" #]{
+            //Spegni
+            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
+        }
+        if[# ledState == "LedBlink" #]{
+            //Accendi
+            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+            delay 100
+            //Spegni
+            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
+        }
+        if[# ledState == "LedOn" #]{
+            //Accendi
+            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+        }
+	}
+	Transition t0	whenTime 100 -> handleLedStateUpdate
+					whenMsg ledStateUpdate -> handleLedStateUpdate
+
+}
+
+
+
+
+
+//----- SONAR
+QActor sonar23 context ctxraspberry{ 
+	
+
+	State s0 initial{  
+		println("sonar23 | start") 
+		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		updateResource[# "Started!" #]
+	}
+	Goto work
+	 
+	State work{
+		//println("sonar23 | waits ... ") 		
+		//updateResource [# "sonar23 waiting ..." #]
+	}
+	Transition t0 whenEvent sonardata -> handlesonardata
+	
+	State handlesonardata{
+		
+		onMsg(sonardata : distance(D)){
+			[# val D = payloadArg(0) #]
+			println("\t HandleSonarData($D) - updating sonardata($D)")
+			updateResource [# "sonardata($D)" #]
+		}
+		
+	}
+	Goto work
+	
 }
 
 

@@ -23,7 +23,6 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 				val version = "V1.0"
 		
 				var ledState = "LedOff"
-				var robotState = "athome"
 				
 				val runtime = Runtime.getRuntime()
 				
@@ -31,28 +30,20 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outred("	 $name: Started! $version")
+						updateResourceRep( "Started!"  
+						)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="handleRobotStateEvent", cond=doswitch() )
+					 transition( edgeName="goto",targetState="handleLedStateUpdate", cond=doswitch() )
 				}	 
-				state("handleRobotStateEvent") { //this:State
+				state("handleLedStateUpdate") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("robotStateEvent(STATE)"), Term.createTerm("robotStateEvent(STATE)"), 
+						if( checkMsgContent( Term.createTerm("state(STATE)"), Term.createTerm("state(STATE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								CommUtils.outred("	 $name: Handling RobotState change!")
-								 robotState = payloadArg(0)  
-								if(  robotState == "athome"  
-								 ){ ledState = "LedOff"  
-								}
-								if(  robotState == "moving"  
-								 ){ ledState = "LedBlink"  
-								}
-								if(  robotState == "stopped"  
-								 ){ ledState = "LedOn"  
-								}
+								 ledState = payloadArg(0)  
 								CommUtils.outred("	 $name: Led state - $ledState")
 						}
 						if(  ledState == "LedOff"  
@@ -70,11 +61,11 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
-				 	 		stateTimer = TimerActor("timer_handleRobotStateEvent", 
-				 	 					  scope, context!!, "local_tout_led_handleRobotStateEvent", 100.toLong() )
+				 	 		stateTimer = TimerActor("timer_handleLedStateUpdate", 
+				 	 					  scope, context!!, "local_tout_led_handleLedStateUpdate", 100.toLong() )
 					}	 	 
-					 transition(edgeName="t00",targetState="handleRobotStateEvent",cond=whenTimeout("local_tout_led_handleRobotStateEvent"))   
-					transition(edgeName="t01",targetState="handleRobotStateEvent",cond=whenEvent("robotStateEvent"))
+					 transition(edgeName="t00",targetState="handleLedStateUpdate",cond=whenTimeout("local_tout_led_handleLedStateUpdate"))   
+					transition(edgeName="t01",targetState="handleLedStateUpdate",cond=whenDispatch("ledStateUpdate"))
 				}	 
 			}
 		}

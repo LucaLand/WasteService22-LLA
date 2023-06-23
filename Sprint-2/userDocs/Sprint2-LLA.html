@@ -119,19 +119,26 @@
 	<p>Il sonar riprende l'evento già fornito dal committente all'interno della documentazione prima citata e 
 	dovrà emettere un evento ad ogni nuova misurazione con la misurazione della distanza rilevata in quel momento.</p>
 	<pre><code>
-Event sonardata  :  sonardata(distance)
+ Event sonardataAppl  :  distance(D)
 	</code></pre>
 	
-	<p>Nonostante l'evento <i>sonardata</i> venga gestito soltanto dal <b>SonarDataHandler</b>, è stato pensato di non modificare il tipo di messaggio dato che il componente <b>Sonar</b>
+	<p>Nonostante l'evento <i>sonardataAppl</i> venga gestito soltanto dal <b>SonarDataHandler</b>, è stato pensato di non modificare il tipo di messaggio dato che il componente <b>Sonar</b>
 	ci è stato già fornito dalla nostra <i>Software House</i> e presenta già dei messaggi predefiniti.</p>
 
+
+
 	<h4>Come bloccare il robot? </h4>
+
 	<h5>Come gestire le rilevazioni del Sonar? </h5>
-	<p>Il sonar emette l'evento <code>sonardata</code> che verrà gestito da un nuovo componente custom che chiameremo 
-	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello
-	Sprint0.</p>
-	
-	<pre><code>
+
+	<p>Il sonar emette l'evento <code>sonardataAppl</code> che verrà gestito da un nuovo componente che chiameremo
+	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello Sprint0.</p>
+	<p>Il <b>SonarDataHandler</b> è un <i>attore</i> inserito nel contesto <c>ctxwasteservice</c>.<br>
+		Questo raccoglierà gli eventi di tipo <code>sonardataAppl</code> emessi dal <b>Sonar23</b> e li gestirà implementando la logica di funzionamento della nostra funzionalità.</p>
+
+		<img src="img/SonarDataHandler.png" alt="SonarDataHandler Actor" style="width: 240px;">
+
+		<pre><code>
 QActor sonardatahandler context ctxraspberry{
 	[# 
 		val DLIMIT = 10
@@ -175,8 +182,8 @@ QActor sonardatahandler context ctxraspberry{
 distanza torna ad essere minore del valore <i>DLIMIT</i>: </p>
 	
 	<pre><code>
-Dispatch alarm       : alarm(_)
-Dispatch alarmstop : alarmstop(_)
+ Dispatch alarm       	:   alarm(_)
+ Dispatch alarmstop 	:   alarmstop(_)
 	</code></pre>
 	
 <p> Il componente <b>SonarDataHandler</b>,una volta arrivata l'informazione dal <b>Sonar</b> provvede subito ad effettuare le verifiche e, in seguito, è 
@@ -196,11 +203,11 @@ Le <i>Dispatch</i> vengono recepite e gestite dal <b>TransportTrolley</b> che sa
 	che già è stata dichiarata negli sprint precedenti.</p>
 	
 	<h4>Evoluzione TransportTrolley - Sprint-2 per Sonar</h4>
-<p>Il <b>TransportTrolley</b> è stato modificato aggiungendo in quasi tutti gli stati 
-la transizione <code>whenInterrupt</code> in modo da abilitare questo componente a gestire i messaggi di allarme 
+<p>Il <b>TransportTrolley</b> è stato modificato aggiungendo in quasi tutti gli stati
+la transizione <code>whenInterrupt</code> in modo da abilitare questo componente a gestire i messaggi di allarme
 che arrivano dal <b>SonarDataHandler</b>.</p>
 	<pre><code>
-whenInterrupt alarm -> handleAlarm
+ whenInterrupt alarm -> handleAlarm
 	</code></pre>
 
 
@@ -375,15 +382,193 @@ per consentire la comunicazione tra dispositivi con risorse limitate.</p>
 
 
 
-<h2>Test-Unit</h2>
+<h2 id="test-unit">Test-Unit</h2>
 <div class="remark">
+	<tt><p>Implementiamo delle <i>Test-Unit</i> automatizzate che vadano a simulare e testare il funzionamento del sistema e delle modifiche apportate.</p>
+		<p>Come per lo <i>Sprint-1</i>, la nostra <i>SoftwareHouse</i> ci fornisce la classe <a href="../CtxWasteService/test/coapobs/CoapTestObserver.kt">CoapTestObserver</a> per la registrazione di <i>Observer Coap</i> agli attori del nostro sistema.</p>
+		<p>Alla classe sono state apportate delle aggiunte per il salvataggio degli aggiornamenti in una lista di <i>Stati</i></p></tt>
 
+
+	<h4>Casistiche testate:</h4>
+	<ul>
+		<li>Il <b>Led</b> ricevendo eventi di <i>Stato del Robot</i> aggiorna correttamente il suo stato</li>
+		<li>Il contesto <b>ctxwasteservice</b> ricevendo eventi <code>sonardataAppl</code> dal <b>Sonar23</b> li gestisce correttamente bloccando il Robot</li>
+		<ul>
+			Dunque:
+			<li>Il <b>SonarDataHandler</b> riceve e gestisce correttamente gli eventi del <b>Sonar23</b></li>
+			<li>Il <b>TransportTrolley</b> riceve e gestisce correttamente i messaggi di allarme</li>
+			<li>Il <b>CustomPathExecutor</b> si stoppa e riprende correttamente l'esecuzione</li>
+		</ul>
+	</ul>
+
+	<h4>Test sviluppati</h4>
+	<p>I test sviluppati sono:</p>
+	<ul>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/TestWasteServiceApplicationQakSprint2.kt">TestWasteServiceApplicationQakSprint2.kt</a></li>
+		<li><a href="../CtxRaspberry/test/testled/TestLed.kt">TestLed.kt</a></li>
+	</ul>
+	<p>Con rispettivamente i <i>modelli Qak</i> di test:</p>
+	<ul>
+		<li><a href="../CtxWasteService/src/ctxWasteService_Test.qakq">ctxWasteService_Test.qak</a></li>
+		<li><a href="../CtxRaspberry/src/CtxRaspberry_Test.qakq">CtxRaspberry_Test.qak</a></li>
+	</ul>
+	<tt>Per l'avvio dei <i>Test</i> si ricorda di buildare i seguenti modelli Qak, adattati per il testing.</tt>
+	<p>I <i>modelli Qak</i> di test riprendono gli originali e aggiungono le <code>updateResources</code> per il <i>tracing</i> degli stati</p>
+	<p>Un'altra modifica effettuata è stata quella di eliminare le dipendenze tra i contesti, per poter rendere le <i>Test-Unit</i> automatiche e indipendenti da ulteriori contesti</p>
+	<ul>
+		<li>È stato dunque rimosso il contesto del <b>BasicRobot22</b> dal <b>ctxwasteservice</b> simulando comunque l'avanzamento degli step nel <b>CustomPathExecutor</b></li>
+		<ul><li>Essendo già stato testato il funzionamento nello <a href="../../Sprint-1/userDocs/Sprint1-LLA.html">Test-Unit Sprint-1</a></li></ul>
+		<li>Rimosso anche il <b>ctxraspberry</b> dal <b>ctxwasteservice</b> e viceversa. Simulando gli eventi da Test stesso</li>
+	</ul>
+
+	<p>Per riprodurre le casistiche analizzate si seguiranno i seguenti passi:</p>
+	<ul>
+		<li>Per il <b>Led</b>:</li>
+		<ul>
+			<li>Si avvierà il contesto <b>ctxraspberry</b></li>
+			<li>Si invieranno <i>eventi</i> <code>robotStateEvent</code></li>
+		</ul>
+		<li>Per il contesto <b>ctxwasteservice</b>:</li>
+		<ul>
+			<li>Si avvierà il contesto</li>
+			<li>Si invierà una richiesta di scarico per far muovere il robot</li>
+			<li>Si simuleranno <i>eventi</i> <code>sonardataAppl</code></li>
+		</ul>
+	</ul>
+
+
+	<h4>Controllo del corretto funzionamento</h4>
+	<p>Il controllo avviene tramite la connessione dei <code>CoapTestObserver</code> sugli attori dei rispettivi contesti.<br>
+		Questi prendono le <i>CoapUpdate</i> effettuate dagli attori, come implementate nei <i>modelli Qak</i> di <i>Test</i> e ne salvano la storia in una lista.</p>
+	<p>Il <i>controllo</i> avverrà dunque proprio sulla <b>storia degli stati</b> che gli attori assumeranno durante l'esecuzione.<br>
+		Conoscendo il sistema è stata sviluppata una <b>lista di stati attesi</b>, che viene confrontata con quella ottenuta a <i>runtime</i></p>
+	<p>Il Test passa se le due coincidono.</p>
+
+	<h4>Configurazione del test</h4>
+	<p>Per poter runnare i test è necessario:</p>
+	<ul>
+		<li>Buildare i rispettivi <i>modelli Qak</i> di <i>Test</i></li>
+		<li>Avviare gli <i>Unit-Test</i> sopra citati</li>
+	</ul>
 
 
 </div>
 
 
+<br>
+<h2 id="revision">Revisione Sprint-2 (Qak Plugin Update)</h2>
+<div class="remark">
+	<h4>Revisione <b>CustomPathExecutor</b></h4>
+	<p>È stato modificato il <b>CustomPathExecutor</b> per interrompere il movimento con messaggi di <i>interrupt</i>. In modo da avere un blocco più veloce e immediato del robot.</p>
+	<pre><code>
+ <del>whenMsg toggleStop -> stopped</del>
+	</code></pre>
 
+	<pre><code>
+ whenInterrupt toggleStop -> stopped
+	</code></pre>
+
+	<h5>Test</h5>
+		<p><i>Testato</i> nella nuova <i>Test-Unit</i>: <a href="../CtxWasteService/test/unibo.testwasteservice/TestCtxWasteServiceSprint2_revision.kt">TestCtxWasteServiceSprint2_revision.kt</a>.<br>
+		Utilizzando il nuovo file di test basato sull'intera revisione: <a href="../CtxWasteService/src/ctxWasteService_revision_Test.qakq">ctxWasteService_revision_Test.qak</a></p>
+
+
+	<h4>Revision <b>Led</b>: Disaccoppiamento della logica</h4>
+	<p>Per rendere il componente <b>ctxraspberry</b> ancora più modulare e indipendente dal sistema in nostra progettazione, abbiamo adottato la seguente modifica:</p>
+	<ul>
+		<li>Spostare la <i>Logica</i> di update dello stato del <b>Led</b> in un nuovo componente nel contesto <c>ctxwasteservice</c></li>
+		<ul><li>Rimuovendo la gestione degl stati del Robot dal <i>Led</i> nel contesto <c>ctxraspberry</c></li></ul>
+	</ul>
+	<p>In questo modo invece al componente <b>Led</b> sul <c>ctxraspberry</c> verrà inviato direttamente lo stato da assumere.<br>
+		Rendendolo così un componente modulare e indipendente dalla logica del nostro sistema, riutilizzabile in ulteriori applicativi e contesti.</p>
+
+	<p>Il <b>Led</b> non gestirà più un <code>robotStateEvent</code> ma delle dispatch dirette <code>ledStateUpdate</code>.</p>
+	<pre><code>
+ <del>Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped</del>
+	</code></pre>
+	<pre><code>
+ Dispatch ledStateUpdate : state(STATE)			//LedOn, LedOff, LedBlink
+	</code></pre>
+
+	<br>
+	<p>Il nuovo componente che gestirà la logica di interpretazione degli stati del Robot sarà il:</p>
+	<ul><li>LedStateUpdater</li></ul>
+	<img src="img/LedStateUpdater.png" alt="LedStateUpdater Actor" style="width: 240px;">
+
+
+	<p>Questo non riceverà un <code>robotStateEvent</code>, che è stato rimosso per una più efficace <code>resourceUpdate</code>.</p>
+	<ul>
+		<li>È stato dunque aggiornato il <b>TransportTrolley</b> rimuovendo <code>robotStateEvent</code> e inserendo una <code>resourceUpdate</code></li>
+		<pre><code>
+ <del>emit robotStateEvent : robotStateEvent($robotState)</del>
+
+ forward led -m ledStateUpdate : state($LedState)
+		</code></pre>
+		<li>Il <b>LedStateUpdater</b> si <i>registrerà</i> come osservatore al <b>TransportTrolley</b> per ricevere e gestire gli aggiornamenti di stato del robot</li>
+	</ul>
+
+	<p>Qui allegati i file Qak con le nuove modifiche implementate: <a href="../CtxRaspberry/src/CtxRaspberry_revision.qak">CtxRaspberry_revision.qak</a>  ||  <a href="../CtxWasteService/src/ctxWasteService_revision.qak">CtxWasteServcie_revision.qak</a></p>
+
+	<h4>Qak Plugin Update - ObserveResource Distributed</h4>
+	<p>Visto l'uscita di una nuova verisione del <i>Plugin</i> per il metamodello <i>Qak</i> <c>(version: 1.3.6)</c>, sono possibili i seguenti aggiornamenti:</p>
+	<ul>
+		<li>La funzione <i><code>observeResources</code></i> effettuata da un attore è ora possibile tra attori in <u>contesti diversi</u></li>
+	</ul>
+
+
+
+	<h4>Revisione</h4>
+	<p>Ciò porta alle seguenti modifiche e migliorie:</p>
+	<ul>
+		<li>È possibile modificare l'attore <b>Sonar23</b> eliminando l'evento <code>sonardataAppl</code> ed inserendo una <code>updateResource</code> della risorsa <code>"sonardata(D)"</code></li>
+		<li>L'attore <b>SonarDataHandler</b> si registrerà come <i>observer</i> al <b>Sonar23</b></li>
+	</ul>
+
+
+
+	<h4>Vantaggi</h4>
+	<p>Si producono così i seguenti <b>vantaggi</b>:</p>
+	<ul>
+		<li>L'eleiminazione dell'evento porta vantaggi in termini di ottimizzazione</li>
+		<li>Il contesto <b>ctxraspberry</b> non avrà più bisogno di essere <i>aware</i> del contesto <b>ctxwasteservice</b></li>
+			<ul><li>Isolamento e modularità dei componenti</li></ul>
+	</ul>
+	<p>L'evento <code>robotStateEvent</code> non è stato modificato in quanto ciò permette di mantenere il contesto del <b>Led</b> isolato e non <i>aware</i> di ulteriori contesti</p>
+	<ul>
+		<li>Sarà il contesto <b>ctxwasteservice</b> a conoscere la presenza del contesto <b>ctxraspberry</b> inoltrando l'evento</li>
+		<li>Con un modello basato su <code>updateResources</code> l'attore <b>Led</b> si sarebbe dovuto registrare all'attore <b>TransportTrolley</b> perdendo di isolamento e modularità</li>
+		<ul><li>Si introdurrebbe un <u>livello di dipendenza</u> del Led sul <b>TransportTrolley</b></li></ul>
+	</ul>
+
+
+
+	<h4>Archiettura Risultante Revisione</h4>
+
+	<img src="./img/GeneralArchitectureSprint2_revision.png" alt="GeneralArchitectureSprint2_revision">
+	<p>Nuovo modello:</p>
+	<a href="../CtxWasteService/src/ctxWasteService_revision.qak">CtxWasteService_revision.qak</a>
+	<a href="../CtxRaspberry/src/CtxRaspberry_revision.qak">CtxRaspberry_revision.qak</a>
+
+
+	<h4>Test-Unit Revision</h4>
+	<p>Le <i>Test-Unit</i> sono state modificate per adattarsi alle modifiche effettuate e testarle</p>
+	<p>Vi sono 3 nuove <i>Test-Unit</i>:</p>
+	<ol>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/TestCtxWasteServiceSprint2_revision.kt">TestCtxWasteServiceSprint2_revision.kt</a></li>
+			<ul><li>Stesso Test ma con il nuovo modello di riferimento e nuovi tipi di messaggi per il sonar</li></ul>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/Test2CtxWasteServiceSprint2_revision.kt">Test2CtxWasteServiceSprint2_revision.kt</a></li>
+			<ul><li>Testa il nuovo modello di comunicazione tra i due contesti. Va infatti avviato il test e poi avviato il contesto <b>ctxraspberry</b> di test.</li></ul>
+		<li><a href="../CtxRaspberry/test/testled/TestCtxRaspberry_revision.kt">TestCtxRaspberry_revision.kt</a></li>
+			<ul><li>Comprende due test: uno per il <c>sonar</c> uno per il <c>led</c> come il precedente</li></ul>
+	</ol>
+
+	<p>Nuovi Qak di test: </p>
+	<ul>
+		<li><a href="../CtxWasteService/src/ctxWasteService_revision_Test.qakq">ctxWasteService_revision_Test.qak</a></li>
+		<li><a href="../CtxWasteService/src/ctxWasteService_revision_Test2.qakq">ctxWasteService_revision_Test.qak</a></li>
+		<li><a href="../CtxRaspberry/src/CtxRaspberry_revision_Test.qakq">CtxRaspberry_revision_Test.qak</a></li>
+	</ul>
+</div>
 
 <br>
 <br>

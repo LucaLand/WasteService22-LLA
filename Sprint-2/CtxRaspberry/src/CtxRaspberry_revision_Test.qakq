@@ -2,7 +2,8 @@ System raspberry
 
 
 	//TransportTrolley - Led
-	Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
+	Dispatch ledStateUpdate : state(STATE)			//LedOn, LedOff, LedBlink
+	//Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
 
 
 	//SonarQak23
@@ -40,7 +41,6 @@ QActor led context ctxraspberry {
 		val version = "V1.0"
 
 		var ledState = "LedOff"
-		var robotState = "athome"
 		
 		val runtime = Runtime.getRuntime()
 		
@@ -48,24 +48,14 @@ QActor led context ctxraspberry {
 
 	State s0 initial {
 		println("\t $name: Started! $version") color red
+		updateResource[# "Started!" #]
 	}
-	Goto handleRobotStateEvent
+	Goto handleLedStateUpdate
 
 
-	State handleRobotStateEvent {
-		
-        onMsg(robotStateEvent : robotStateEvent(STATE)){
-        	println("\t $name: Handling RobotState change!") color red
-        	[# robotState = payloadArg(0) #]
-        	if[# robotState == "athome" #]{
-        		[# ledState = "LedOff" #]
-        	}
-        	if[# robotState == "moving" #]{
-        		[# ledState = "LedBlink" #]
-        	}
-        	if[# robotState == "stopped" #]{
-        		[# ledState = "LedOn" #]
-        	}
+	State handleLedStateUpdate {
+        onMsg(ledStateUpdate : state(STATE)){
+        	[# ledState = payloadArg(0) #]
 			println("\t $name: Led state - $ledState") color red
 			
 			//TEST
@@ -89,8 +79,8 @@ QActor led context ctxraspberry {
             [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
         }
 	}
-	Transition t0	whenTime 100 -> handleRobotStateEvent
-					whenEvent robotStateEvent -> handleRobotStateEvent
+	Transition t0	whenTime 100 -> handleLedStateUpdate
+					whenMsg ledStateUpdate -> handleLedStateUpdate
 
 }
 
@@ -105,6 +95,7 @@ QActor sonar23 context ctxraspberry{
 	State s0 initial{  
 		println("sonar23 | start") 
 		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		updateResource[# "Started!" #]
 	}
 	Goto work
 	 
