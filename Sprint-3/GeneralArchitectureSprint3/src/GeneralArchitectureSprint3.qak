@@ -497,7 +497,7 @@ QActor custompathexecutor context ctxwasteservice {
 	
 	State pathDone {
 		println("\t $name: Path done in $Pos")
-		replyTo move with moveDone : moveDone($Pos) caller==transporttrolley
+		//replyTo move with moveDone : moveDone($Pos) caller==transporttrolley
 	}
 	Goto waiting
 	
