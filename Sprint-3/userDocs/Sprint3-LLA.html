@@ -46,8 +46,8 @@
     <p>La <b>WasteServiceStatusGUI</b> deve permettere al <b>Service-manager</b> di monitorare:
 	 <ul>
         <lI>La <b>Position</b> del <b>Transport trolley</b>
-			<code><pre>Event posEvent:    posEvent(POS);</pre></code></lI>
-        <lI>Il <b>Transporttrolleystate</b>, ossia lo stato attuale del <b>Transport trolley</b>.
+			<code><pre>ELIMINARE EVENTO NELLO SPRINT1 E FAR SI CHE CHE LA GUI SI REGISTRI AL CUSTOMPATHEXECUTOR;</pre></code></lI>
+        <lI>Il <b>RobotState</b>, ossia lo stato attuale del <b>Transport trolley</b>.
             <code><pre>Event RobotStateEvent:   RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED;</pre></code></li>
         <lI>Il peso corrente <b>CurrentPB</b> e <b>CurrentGB</b> del materiale contenuto in <b>PLASTICBOX</b> e in <b>GLASSBOX</b></b>
 			<code><pre>var CurrentPB, CurrentGB: float;</pre></code></lI>
@@ -81,7 +81,7 @@
         <div class="remark remark2">
             <h4>Architettura logica precedente:</h4>
             <img src="./img/Logical_Architecture_Sprint1.png" alt="General Logical Architecture" style="width: 600px;" >
-            <p style="width: 100%; text-align: right;"><a href="./img/LegendaArchitetture.png">Legenda.png</a></p>
+            <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
             <br>
 
             <h4>Focus Sprint-3</h4>
@@ -97,13 +97,26 @@
         </div>
 		
 	<h3>Passaggio informazioni alla GUI</h3>
-	<img src="./img/Sprint3.jpg" alt="Idea_iterazioni" style="width: 600px;" >
+	<img src="./img/Sprint3.png" alt="Idea_iterazioni" style="width: 600px;" >
     <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
 	
-	<p>Il passaggio delle informazioni alla GUI per poter avere quest'ultima aggiornata può avvenire in tre modalità: <b>Event</b>, <b>Dispatch</b>, <b>CoapUpdate</b>.</br>
-	La nostra scelta progettuale verte su una soluzione di tipo <b>Event</b> in quanto risulta essere la scelta più veloce, inoltre essendo tutte variabili di stato, possono interessare
-	all'intero sistema.
+	<p>Il passaggio delle informazioni alla GUI, per poter avere quest'ultima aggiornata,  può avvenire in tre modalità: <b>Event</b>, <b>Dispatch</b>, <b>ObserveResources</b>.</br>
 	</p>
+	<h4>Come aggiornare la webGUI</h4>
+	<p>Ai fini del nostro progetto abbiamo deciso di introdurre un nuovo attore custom <b>GUIupdater</b> collocato all'interno del contesto
+	<b>ctxwasteservice</b>. Tale attore si occuperà di reperire le informazioni e di interagire con la <i>webGUI</i>. L'attore <b>GUIupdater</b> si registrerà
+	ai componenti <b>TransportTrolley</b>,<b>WasteService</b>,<b>custompathExecutor</b>,<b>Led</b> per prendere le ripsettive informazioni: <b>Position</b>,<b>CurrentPB/CurrentGB</b>,<b>RobotState</b>,<b>LedState</b>.
+	Una volta che l'attore <b>GUIupdater</b> avrà reperito le informazioni, attraverso una stringa <i>InfoUpdate</i>, le invierà alla nostra <b>WebGUI</b> il tutto attraverso framework
+	<b>Spring</b> così come precisato dal committente.</br>
+	In allegato la documentazione: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/WebApplications.html#webapplication-con-springboot">Spring</a>
+	</p>
+	
+	<h4>Vantaggi</h4>
+	<p>La scelta dell'utilizzo degli <b>ObserveResources</b>, in questo caso, ci permette di mantenere l'isolamente dei componenti e in tal modo il <b>ctxraspberry</b> continua a non 
+	aver bisogno di essere <i>aware</i> nei confronti del <b>ctxwasteservice</b>.</br>
+	Inoltre l'utilizzo di un'architettura del genere ci permette di non utilizzare gli <b>Event</b> e quindi di ottimizzare l'intero sistema.
+	</p>
+	
     </div>
 
 
