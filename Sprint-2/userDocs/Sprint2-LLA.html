@@ -1,0 +1,595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="it">
+
+
+<head>
+    <title>Iss2023-LLA-Sprint2</title>
+    <link href="./defaultStyle.css" rel="stylesheet">
+	<link href="./menuCss.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--  To solve accent problems  -->
+</head>
+
+
+<body>
+<div id="top">
+    <h1>Progetto Finale ISS - Waste Service</h1>
+</div>
+<div class="remark">
+<nav>
+    <ul>
+        <li><a href="../../Sprint-0/userDocs/Sprint0-LLA.html">sprint0</a></li>
+        <li><a href="../../Sprint-1/userDocs/Sprint1-LLA.html">sprint1</a></li>
+		<li><a href="./Sprint2-LLA.html">sprint2</a></li>
+		<li><a href="../../Sprint-3/userDocs/Sprint3-LLA.html">sprint3</a></li>
+    </ul>
+</nav>
+</div>
+
+    <h2>Introduction</h2>
+    <div class="remark">
+	<p>
+	Progetto finale di ISS che consiste nel realizzare un sistema di gestione dei rifiuti in cui un robot svolge il compito di trasportare i materiali dal camion ai relativi contenitori di smistamento. 
+	Attualmente, ci concentriamo su una fase preliminare di analisi dei requisiti, che consiste nel comprendere le esigenze del cliente e tradurle in una forma formalizzata e strutturata.
+	</p>
+	</div>
+
+    <h2>Requirements</h2>
+    <div class="remark">
+        <p>Si riporta la pagina di requisiti del committente: <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2022/blob/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/TemaFinale22.html" traget="_blank" >Waste
+            Service 22.pdf</a></p>
+		<p>Inoltre si riporta il file dei requisiti dello Sprint0: <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Requirements">Requisiti Sprint0</a>
+    </div>
+	
+	
+    <h2>Requirements analysis</h2>
+    <div class="remark">
+     <p>Una più dettagliata analisi insieme alle osservazioni qui presentate ci consente di delineare in modo più preciso il comportamento che il robot e il LED devono assumere in caso di allarmi:</p>
+	
+<ol>
+	<li>In caso di allarme, il robot deve fermarsi immediatamente a causa di un'emergenza, pertanto è opportuno interrompere, per quanto possibile, tutte le operazioni in corso. Tuttavia, abbiamo ricevuto indicazioni dal committente che il robot deve essere interrotto mentre è in movimento.
+		Di conseguenza, possiamo dedurre che le operazioni da interrompere e successivamente riprendere sono il prelievo (Pickup), il deposito (Dropout) e l'avanzamento (move forward).</li>
+	<li>Il LED deve segnalare quando il robot è in movimento o, più in generale, quando sta svolgendo un'operazione.</li>
+</ol>
+		<ol>Da ciò si deduce che il LED:
+			<li>Deve lampeggiare quando il robot sta svolgendo (o ha svolto e sta tornando alla posizione di partenza) un'azione di deposito, segnalando che il robot può muoversi.</li>
+			<li>Inoltre, se il robot si trova nella posizione di partenza (HOME) ma è in movimento (ad esempio, per riposizionarsi dopo aver completato un'azione di deposito), il LED deve comunque lampeggiare.</li>
+			<li>Il LED rimarrà acceso solo se l'azione di deposito viene interrotta da un allarme.</li>
+			<li>Il LED rimarrà spento quando sarà fermo in HOME</li>
+		</ol>
+    </div>
+
+    <!----------------------- REQUIREMENT ANALYSIS --------------------------->
+
+    <h2>Scrum Goal and Work Plan</h2>
+    <div class="remark">
+	<h4>Scrum goal:</h4>
+	<p>Obiettivo dello SPRINT2 è estendere la demo dello SPRINT1 per soddisfare i requisiti relativi al LED e al Sonar indicati dal committente. Questa parte è considerata più significativa e sostanziale rispetto all'interfaccia grafica (GUI).</p>
+	<h4>Work plan:</h4>
+	<ul>
+		<li>Studio del problema relativo a chi e in che modo riceve le informazioni riguardanti un allarme al fine di implementare l'interruzione (halt) del robot.</li>
+		<li>Analisi del problema riguardante chi e in che modo riceve le informazioni per aggiornare lo stato del LED.</li>
+		<li>Sviluppo o adattamento dei componenti necessari per affrontare le suddette problematiche.</li>
+		<li>Creazione di un modello eseguibile utilizzando il metamodello QAK.</li>
+		<li>Elaborazione di un piano di test più completo per il modello realizzato.</li>
+    </ul>
+        
+    </div>
+	
+	<!--PROBLEM ANALYSIS-->
+	<a NAME="ProblemAnalysis"></a>
+	<h2>Problem analysis</h2>
+	<div class="remark">
+        <div class="remark remark2">
+            <h4>Architettura logica precedente:</h4>
+            <img src="./img/GeneralArchitectureSprint1_revision.png" alt="General Logical Architecture" style="width: 600px;" >
+            <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
+            <br>
+			<span>Sprint-1:
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/CtxSmartDevice/src/SmartDevice.qak">SmartDevice</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/CtxWasteService/src/ctxWasteService.qak">WasteService</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/it.unibo.basicrobot22/src/basicrobot22_mod">BasicRobot22_Mod.qak</a>
+            </span>
+
+            <h4>Focus Sprint-2</h4>
+            <p>Nello Sprint-2 si vedrà dunque un focus sui seguenti componenti e sui loro modelli.</p>
+            <img src="img/Focus_Sprint-2.png" alt="Architecture Focus Sprint-2" style="width: 36%">
+
+        </div>
+    </div>
+
+
+
+
+
+
+    <h3>1 - Sonar</h3>
+    <div class="remark">
+	<h3>Dallo Sprint0</h3>
+    <p>Strumento connesso in input al componente RaspberryPI esterno al <r>DDR Robot</r>.</p>
+    <p>Il <b>Sonar</b> è un dispositivo che emette informazioni sulla presenza di oggetti a lui davanti e sulla loro distanza.</p>
+
+	<h4>Come prendiamo i dati dal Sonar fisico?</h4>
+	<p>L’attore che ci è stato fornito già si occupa di interfacciarsi con il sonar fisico infatti il Software per 
+	l'utilizzo del <i>Sonar fisico</i> installato sul <c>Raspberry</c> viene fornito dal committente 
+	nel progetto <a href="https://github.com/anatali/issLab2022/tree/main/unibo.sonarqak22">SonarActor22.</a></p>
+
+
+	<h4>Che informazioni invia il sonar?</h4>
+	
+	<p>Il sonar riprende l'evento già fornito dal committente all'interno della documentazione prima citata e 
+	dovrà emettere un evento ad ogni nuova misurazione con la misurazione della distanza rilevata in quel momento.</p>
+	<pre><code>
+ Event sonardataAppl  :  distance(D)
+	</code></pre>
+	
+	<p>Nonostante l'evento <i>sonardataAppl</i> venga gestito soltanto dal <b>SonarDataHandler</b>, è stato pensato di non modificare il tipo di messaggio dato che il componente <b>Sonar</b>
+	ci è stato già fornito dalla nostra <i>Software House</i> e presenta già dei messaggi predefiniti.</p>
+
+
+
+	<h4>Come bloccare il robot? </h4>
+
+	<h5>Come gestire le rilevazioni del Sonar? </h5>
+
+	<p>Il sonar emette l'evento <code>sonardataAppl</code> che verrà gestito da un nuovo componente che chiameremo
+	<b>SonarDataHandler</b> che si occuperà delle verifiche rispetto al valore <i>DLIMIT</i> fissato a priori nello Sprint0.</p>
+	<p>Il <b>SonarDataHandler</b> è un <i>attore</i> inserito nel contesto <c>ctxwasteservice</c>.<br>
+		Questo raccoglierà gli eventi di tipo <code>sonardataAppl</code> emessi dal <b>Sonar23</b> e li gestirà implementando la logica di funzionamento della nostra funzionalità.</p>
+
+		<img src="img/SonarDataHandler.png" alt="SonarDataHandler Actor" style="width: 240px;">
+
+		<pre><code>
+QActor sonardatahandler context ctxraspberry{
+	[# 
+		val DLIMIT = 10
+		var stopped = false
+	#]
+	
+	State s0 initial {
+		
+	}
+	Goto handleSonarData
+	
+	
+	State handleSonarData{
+		onMsg(sonardataAppl : distance(D)){
+			[# val distance = payloadArg(0) #]
+			
+			if[# distance.toInt() <= DLIMIT && stopped == false #]{
+				forward transporttrolley -m alarm : alarm(stop)
+				println("\t $name: Sending toggleStop(stop)!")
+			}
+			
+			if[# distance.toInt() > DLIMIT && stopped == true #]{
+				forward transporttrolley -m alarmStop : alarmStop(resume)
+				println("\t $name: Sending toggleStop(resume)!")
+			}
+			
+			println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
+		}
+	}
+	Transition t0	whenEvent sonardataAppl -> handleSonarData
+	
+}
+	</code></pre>
+	<img src="./img/raspberry_Arch.png" alt="SonarDataHandler">
+
+	
+	
+
+	<h5>Che messaggi invia per bloccare il TransportTrolley?</h5>
+<p>Il componente <b>SonarDataHandler</b>,una volta effettuate le verifiche,in caso di condizione verificata emetterà un allarme e si prevede anche un allarme non appena la
+distanza torna ad essere minore del valore <i>DLIMIT</i>: </p>
+	
+	<pre><code>
+ Dispatch alarm       	:   alarm(_)
+ Dispatch alarmstop 	:   alarmstop(_)
+	</code></pre>
+	
+<p> Il componente <b>SonarDataHandler</b>,una volta arrivata l'informazione dal <b>Sonar</b> provvede subito ad effettuare le verifiche e, in seguito, è 
+stato pensato di inviare delle <i>Dispatch</i> per comunicare l'inizio e lo stop dell'allarme perchè queste notificano soltanto un componente ed inviare degli eventi potrebbe influire
+in termini di prestazioni e di utilità. 
+Le <i>Dispatch</i> vengono recepite e gestite dal <b>TransportTrolley</b> che sarà delegato dell'immediato blocco operazionale del robot. </p>
+	
+    </div>
+    <h3>TransportTrolley</h3>
+    <div class="remark">
+
+	<h4>Come gestiamo i messaggi di allarme per bloccare il robot?</h4>
+	<p>In virtù di quanto spiegato, il componente <b>TransportTrolley</b> necessita di alcune modifiche rispetto a come era stato
+	pensato negli Sprint precedenti. Di fatto il <b>TransportTrolley</b> ora dovrà essere in grado di gestire le <i>Dispatch</i> di allarme che gli arrivano dal
+	<b>SonarDataHandler</b>. 
+	Invece per far bloccare il movimento del robot ordinerà la dispatch <code>toggleStop :	toggleStop(ARG)</code> 
+	che già è stata dichiarata negli sprint precedenti.</p>
+	
+	<h4>Evoluzione TransportTrolley - Sprint-2 per Sonar</h4>
+<p>Il <b>TransportTrolley</b> è stato modificato aggiungendo in quasi tutti gli stati
+la transizione <code>whenInterrupt</code> in modo da abilitare questo componente a gestire i messaggi di allarme
+che arrivano dal <b>SonarDataHandler</b>.</p>
+	<pre><code>
+ whenInterrupt alarm -> handleAlarm
+	</code></pre>
+
+
+
+ <p>Sono stati aggiunti due nuovi stati
+<code>handleAlarm</code> per quando arriva <code>alarm</code> e lo stato <code>resume</code> 
+per quando arriva <code>alarmstop</code> e in entrambi i casi il <b>TransportTrolley</b> delegherà il 
+<b>CustomPathExecutor</b> rispettivamente di bloccare o riprendere l'esecuzione
+e cambierà lo stato dell'evento <i>robotStateEvent</i>. Il robot quando esce dallo stato 
+di <code>resume</code> torna a quello che stava facendo prima
+grazie alla <i>returnFromInterrupt</i>.
+</p>	
+	<pre><code>
+	//Sonar Alarm
+	State handleAlarm {
+		println("\t $name: Robot Stopped!") color blue
+		forward custompathexecutor -m toggleStop : toggleStop(stop)
+	}
+	Transition t3	whenMsg alarmStop -> resume
+
+	State resume {
+		println("\t $name: Resumed execution!") color blue
+		forward custompathexecutor -m toggleStop : toggleStop(resume)
+
+		returnFromInterrupt
+	}
+	</code></pre>
+	
+	</div>
+	
+    <h3>2 - Led </h3>
+    <div class="remark">
+
+<h4>Come calcolare lo stato del Led?</h4>
+<pre><code>
+enum LedState = {LedOff, LedOn, LedBlink};
+</code></pre>
+<ul>Lo stato del Led dipende dal:</ul>
+
+<li>Robot che si trova o meno in HOME e quindi <code>LedState = LedOn</code></li>
+<li>Robot che sia in movimento (o che comunque stia operando) e quindi <code>LedState = LedBlink</code>.
+<li>Robot che si trova bloccato e quindi <code>LedState = LedOff</code>.</li>
+
+<h4>Come interagire con il componente Led?</h4>
+<p>Il componente Led può ricevere gli aggiornamenti di stato tramite un evento.</p>
+
+<p>
+È stato pensato di 
+L'aggiornamento per mezzo di questo evento gli arriva dal <r>TransportTrolley</r> e il componente LED potrà gestire
+questo evento e avrà a disposizione l'informazione sullo stato da assumere.</p>
+
+		<h4>Evoluzione del <r>TransportTrolley</r></h4>
+		<p>Il <r>TransportTrolley</r> si occuperà dunque di notificare al sistema i propri cambi di stato.</p>
+		<p>La notifica e l'aggiornamento dello stato vengono così gestite:</p>
+		<pre><code>
+State waiting {
+	[# RobotState = "athome" #]
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+	...
+}
+
+State goPickUp {
+	[# RobotState = "moving" #]
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+	...
+}
+
+State handleAlarm {
+	[#  PreviusState = RobotState
+		RobotState = "stopped" #]
+	...
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+} Transition t3	whenMsg alarmStop -> resume
+
+State resume {
+	[# RobotState = PreviusState #]
+	...
+	<q>emit robotStateEvent : robotStateEvent($RobotState)</q>
+
+	returnFromInterrupt
+}
+		</code></pre>
+
+
+	<h4>Come interagire con il LED fisico su Raspberry?</h4>
+		<p>Per poter controllare il led fisico collegato al Raspberry, innanzitutto il <i>Led</i> va collegato seguendo  <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab23/main/iss23Material/html/RaspBasicCode.html">questa guida</a> collegandolo al <i>GPIO25</i>.</p>
+    	<p>La nostra <i>Software House</i> dispone di due file <i>.bash</i> per l'accensione e lo spegnimento del Led.</p>
+		<ul>
+			<li><a href="../CtxRaspberry/resources/led25GpioTurnOn.sh"><i>led25GpioTurnOn.sh</i></a></li>
+			<li><a href="../CtxRaspberry/resources/led25GpioTurnOff.sh"><i>led25GpioTurnOff.sh</i></a></li>
+		</ul>
+
+		<p>Dunque il nostro Led sarà così gestito:</p>
+
+
+		<pre><code>
+State handleRobotStateEvent {
+
+        onMsg(robotStateEvent : robotStateEvent(STATE)){
+        	println("\t $name: Handling RobotState change!") color red
+        	[# robotState = payloadArg(0) #]
+        	if[# robotState == "athome" #]{
+        		[# ledState = "LedOff" #]
+        	}
+        	if[# robotState == "moving" #]{
+        		[# ledState = "LedBlink" #]
+        	}
+        	if[# robotState == "stopped" #]{
+        		[# ledState = "LedOn" #]
+        	}
+			println("\t $name: Led state- $ledState") color red
+	}
+
+
+        if[# ledState = "LedOff" #]{
+            //Spegni
+		<q>[# runtime.exec("sudo bash led25GpioTurnOff.sh") #]</q>
+        }
+        if[# ledState = "LedBlink" #]{
+            //Accendi
+		<q>[# runtime.exec("sudo bash led25GpioTurnOn.sh") #]</q>
+            delay 100
+            //Spegni
+		<q>[# runtime.exec("sudo bash led25GpioTurnOff.sh") #]</q>
+        }
+        if[# ledState = "LedOn" #]{
+            //Accendi
+		<q>[# runtime.exec("sudo bash led25GpioTurnOn.sh") #]</q>
+        }
+}Transition t0	whenTime 100 -> handleRobotStateEvent
+		whenEvent robotStateEvent -> handleRobotStateEvent
+		</code></pre>
+
+	</div>
+	
+	    <h3>TransportTrolley</h3>
+    <div class="remark">
+	<h4>Evoluzione TransportTrolley - Sprint-2 per LED</h4>
+<p>Il <b>TransportTrolley</b> è stato modificato aggiungendo l'emissione di un evento che notifica il nuovo stato del robot e questa informazione sarà fruibile dal 
+<b>LED</b> per aggiornare il suo tipo di comportamento.</p>
+<pre><code>
+	Event 	RobotStateEvent	:	RobotStateEvent(STATE) 	// STATE = HOME | MOVING | STOPPED
+</code></pre>
+
+<p>La notifica dello stato del robot <i>RobotStateEvent</i> è stato pensato come un evento perchè è un dato utile non solo al componente <b>LED</b> ma anche a componenti successivi.
+<p>Un'altra possibile implementazione può essere data sfruttando le <i>updateResources</i> e l'apertura di un canale di comunicazione <i>CoaP</i>. L' <i>updateResources</i> 
+rappresenta un'azione di aggiornamento delle risorse in un sistema o un'applicazione, mentre CoAP è un protocollo di comunicazione leggero e efficiente che può essere utilizzato 
+per consentire la comunicazione tra dispositivi con risorse limitate.</p>
+
+</div>
+	
+<!-- ------------------------------------------------------ -->
+<h2>Modello Eseguibile</h2>
+<div class="remark">
+            <h4>Componenti</h4>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-2/Sprint-2/GeneralArchitecture2/src/GeneralArchitectureSprint2.qak">Modello del sistema QAK</a>
+			<br>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-2/Sprint-2/CtxWasteService/src/ctxWasteService.qak">Primo metamodello QAK <i>ctxwasteservice</i></a> <br>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-2/Sprint-2/CtxRaspberry/src/CtxRaspberry.qak">Primo metamodello QAK <i>ctxraspberry</i></a> <br>
+
+		<h4>Interfacce</h4>
+		<div>
+		<br>
+		<br>
+		</div>
+		<div class="remark" style="background-color: #c3fbe8;">
+            <h3>Architettura logica risultante Sprint2</h3>
+            <img src="./img/LogicalArch_Sprint2.png" alt="General Logical Architecture">
+            <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
+        </div>
+</div>
+
+
+
+<h2 id="test-unit">Test-Unit</h2>
+<div class="remark">
+	<tt><p>Implementiamo delle <i>Test-Unit</i> automatizzate che vadano a simulare e testare il funzionamento del sistema e delle modifiche apportate.</p>
+		<p>Come per lo <i>Sprint-1</i>, la nostra <i>SoftwareHouse</i> ci fornisce la classe <a href="../CtxWasteService/test/coapobs/CoapTestObserver.kt">CoapTestObserver</a> per la registrazione di <i>Observer Coap</i> agli attori del nostro sistema.</p>
+		<p>Alla classe sono state apportate delle aggiunte per il salvataggio degli aggiornamenti in una lista di <i>Stati</i></p></tt>
+
+
+	<h4>Casistiche testate:</h4>
+	<ul>
+		<li>Il <b>Led</b> ricevendo eventi di <i>Stato del Robot</i> aggiorna correttamente il suo stato</li>
+		<li>Il contesto <b>ctxwasteservice</b> ricevendo eventi <code>sonardataAppl</code> dal <b>Sonar23</b> li gestisce correttamente bloccando il Robot</li>
+		<ul>
+			Dunque:
+			<li>Il <b>SonarDataHandler</b> riceve e gestisce correttamente gli eventi del <b>Sonar23</b></li>
+			<li>Il <b>TransportTrolley</b> riceve e gestisce correttamente i messaggi di allarme</li>
+			<li>Il <b>CustomPathExecutor</b> si stoppa e riprende correttamente l'esecuzione</li>
+		</ul>
+	</ul>
+
+	<h4>Test sviluppati</h4>
+	<p>I test sviluppati sono:</p>
+	<ul>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/TestWasteServiceApplicationQakSprint2.kt">TestWasteServiceApplicationQakSprint2.kt</a></li>
+		<li><a href="../CtxRaspberry/test/testled/TestLed.kt">TestLed.kt</a></li>
+	</ul>
+	<p>Con rispettivamente i <i>modelli Qak</i> di test:</p>
+	<ul>
+		<li><a href="../CtxWasteService/src/ctxWasteService_Test.qakq">ctxWasteService_Test.qak</a></li>
+		<li><a href="../CtxRaspberry/src/CtxRaspberry_Test.qakq">CtxRaspberry_Test.qak</a></li>
+	</ul>
+	<tt>Per l'avvio dei <i>Test</i> si ricorda di buildare i seguenti modelli Qak, adattati per il testing.</tt>
+	<p>I <i>modelli Qak</i> di test riprendono gli originali e aggiungono le <code>updateResources</code> per il <i>tracing</i> degli stati</p>
+	<p>Un'altra modifica effettuata è stata quella di eliminare le dipendenze tra i contesti, per poter rendere le <i>Test-Unit</i> automatiche e indipendenti da ulteriori contesti</p>
+	<ul>
+		<li>È stato dunque rimosso il contesto del <b>BasicRobot22</b> dal <b>ctxwasteservice</b> simulando comunque l'avanzamento degli step nel <b>CustomPathExecutor</b></li>
+		<ul><li>Essendo già stato testato il funzionamento nello <a href="../../Sprint-1/userDocs/Sprint1-LLA.html">Test-Unit Sprint-1</a></li></ul>
+		<li>Rimosso anche il <b>ctxraspberry</b> dal <b>ctxwasteservice</b> e viceversa. Simulando gli eventi da Test stesso</li>
+	</ul>
+
+	<p>Per riprodurre le casistiche analizzate si seguiranno i seguenti passi:</p>
+	<ul>
+		<li>Per il <b>Led</b>:</li>
+		<ul>
+			<li>Si avvierà il contesto <b>ctxraspberry</b></li>
+			<li>Si invieranno <i>eventi</i> <code>robotStateEvent</code></li>
+		</ul>
+		<li>Per il contesto <b>ctxwasteservice</b>:</li>
+		<ul>
+			<li>Si avvierà il contesto</li>
+			<li>Si invierà una richiesta di scarico per far muovere il robot</li>
+			<li>Si simuleranno <i>eventi</i> <code>sonardataAppl</code></li>
+		</ul>
+	</ul>
+
+
+	<h4>Controllo del corretto funzionamento</h4>
+	<p>Il controllo avviene tramite la connessione dei <code>CoapTestObserver</code> sugli attori dei rispettivi contesti.<br>
+		Questi prendono le <i>CoapUpdate</i> effettuate dagli attori, come implementate nei <i>modelli Qak</i> di <i>Test</i> e ne salvano la storia in una lista.</p>
+	<p>Il <i>controllo</i> avverrà dunque proprio sulla <b>storia degli stati</b> che gli attori assumeranno durante l'esecuzione.<br>
+		Conoscendo il sistema è stata sviluppata una <b>lista di stati attesi</b>, che viene confrontata con quella ottenuta a <i>runtime</i></p>
+	<p>Il Test passa se le due coincidono.</p>
+
+	<h4>Configurazione del test</h4>
+	<p>Per poter runnare i test è necessario:</p>
+	<ul>
+		<li>Buildare i rispettivi <i>modelli Qak</i> di <i>Test</i></li>
+		<li>Avviare gli <i>Unit-Test</i> sopra citati</li>
+	</ul>
+
+
+</div>
+
+
+<br>
+<h2 id="revision">Revisione Sprint-2 (Qak Plugin Update)</h2>
+<div class="remark">
+	<h4>Revisione <b>CustomPathExecutor</b></h4>
+	<p>È stato modificato il <b>CustomPathExecutor</b> per interrompere il movimento con messaggi di <i>interrupt</i>. In modo da avere un blocco più veloce e immediato del robot.</p>
+	<pre><code>
+ <del>whenMsg toggleStop -> stopped</del>
+	</code></pre>
+
+	<pre><code>
+ whenInterrupt toggleStop -> stopped
+	</code></pre>
+
+	<h5>Test</h5>
+		<p><i>Testato</i> nella nuova <i>Test-Unit</i>: <a href="../CtxWasteService/test/unibo.testwasteservice/TestCtxWasteServiceSprint2_revision.kt">TestCtxWasteServiceSprint2_revision.kt</a>.<br>
+		Utilizzando il nuovo file di test basato sull'intera revisione: <a href="../CtxWasteService/src/ctxWasteService_revision_Test.qakq">ctxWasteService_revision_Test.qak</a></p>
+
+
+	<h4>Revision <b>Led</b>: Disaccoppiamento della logica</h4>
+	<p>Per rendere il componente <b>ctxraspberry</b> ancora più modulare e indipendente dal sistema in nostra progettazione, abbiamo adottato la seguente modifica:</p>
+	<ul>
+		<li>Spostare la <i>Logica</i> di update dello stato del <b>Led</b> in un nuovo componente nel contesto <c>ctxwasteservice</c></li>
+		<ul><li>Rimuovendo la gestione degl stati del Robot dal <i>Led</i> nel contesto <c>ctxraspberry</c></li></ul>
+	</ul>
+	<p>In questo modo invece al componente <b>Led</b> sul <c>ctxraspberry</c> verrà inviato direttamente lo stato da assumere.<br>
+		Rendendolo così un componente modulare e indipendente dalla logica del nostro sistema, riutilizzabile in ulteriori applicativi e contesti.</p>
+
+	<p>Il <b>Led</b> non gestirà più un <code>robotStateEvent</code> ma delle dispatch dirette <code>ledStateUpdate</code>.</p>
+	<pre><code>
+ <del>Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped</del>
+	</code></pre>
+	<pre><code>
+ Dispatch ledStateUpdate : state(STATE)			//LedOn, LedOff, LedBlink
+	</code></pre>
+
+	<br>
+	<p>Il nuovo componente che gestirà la logica di interpretazione degli stati del Robot sarà il:</p>
+	<ul><li>LedStateUpdater</li></ul>
+	<img src="img/LedStateUpdater.png" alt="LedStateUpdater Actor" style="width: 240px;">
+
+
+	<p>Questo non riceverà un <code>robotStateEvent</code>, che è stato rimosso per una più efficace <code>resourceUpdate</code>.</p>
+	<ul>
+		<li>È stato dunque aggiornato il <b>TransportTrolley</b> rimuovendo <code>robotStateEvent</code> e inserendo una <code>resourceUpdate</code></li>
+		<pre><code>
+ <del>emit robotStateEvent : robotStateEvent($robotState)</del>
+
+ forward led -m ledStateUpdate : state($LedState)
+		</code></pre>
+		<li>Il <b>LedStateUpdater</b> si <i>registrerà</i> come osservatore al <b>TransportTrolley</b> per ricevere e gestire gli aggiornamenti di stato del robot</li>
+	</ul>
+
+	<p>Qui allegati i file Qak con le nuove modifiche implementate: <a href="../CtxRaspberry/src/CtxRaspberry_revision.qak">CtxRaspberry_revision.qak</a>  ||  <a href="../CtxWasteService/src/ctxWasteService_revision.qak">CtxWasteServcie_revision.qak</a></p>
+
+	<h4>Qak Plugin Update - ObserveResource Distributed</h4>
+	<p>Visto l'uscita di una nuova verisione del <i>Plugin</i> per il metamodello <i>Qak</i> <c>(version: 1.3.6)</c>, sono possibili i seguenti aggiornamenti:</p>
+	<ul>
+		<li>La funzione <i><code>observeResources</code></i> effettuata da un attore è ora possibile tra attori in <u>contesti diversi</u></li>
+	</ul>
+
+
+
+	<h4>Revisione</h4>
+	<p>Ciò porta alle seguenti modifiche e migliorie:</p>
+	<ul>
+		<li>È possibile modificare l'attore <b>Sonar23</b> eliminando l'evento <code>sonardataAppl</code> ed inserendo una <code>updateResource</code> della risorsa <code>"sonardata(D)"</code></li>
+		<li>L'attore <b>SonarDataHandler</b> si registrerà come <i>observer</i> al <b>Sonar23</b></li>
+	</ul>
+
+
+
+	<h4>Vantaggi</h4>
+	<p>Si producono così i seguenti <b>vantaggi</b>:</p>
+	<ul>
+		<li>L'eleiminazione dell'evento porta vantaggi in termini di ottimizzazione</li>
+		<li>Il contesto <b>ctxraspberry</b> non avrà più bisogno di essere <i>aware</i> del contesto <b>ctxwasteservice</b></li>
+			<ul><li>Isolamento e modularità dei componenti</li></ul>
+	</ul>
+	<p>L'evento <code>robotStateEvent</code> non è stato modificato in quanto ciò permette di mantenere il contesto del <b>Led</b> isolato e non <i>aware</i> di ulteriori contesti</p>
+	<ul>
+		<li>Sarà il contesto <b>ctxwasteservice</b> a conoscere la presenza del contesto <b>ctxraspberry</b> inoltrando l'evento</li>
+		<li>Con un modello basato su <code>updateResources</code> l'attore <b>Led</b> si sarebbe dovuto registrare all'attore <b>TransportTrolley</b> perdendo di isolamento e modularità</li>
+		<ul><li>Si introdurrebbe un <u>livello di dipendenza</u> del Led sul <b>TransportTrolley</b></li></ul>
+	</ul>
+
+
+
+	<h4>Archiettura Risultante Revisione</h4>
+
+	<img src="./img/GeneralArchitectureSprint2_revision.png" alt="GeneralArchitectureSprint2_revision">
+	<p>Nuovo modello:</p>
+	<a href="../CtxWasteService/src/ctxWasteService_revision.qak">CtxWasteService_revision.qak</a>
+	<a href="../CtxRaspberry/src/CtxRaspberry_revision.qak">CtxRaspberry_revision.qak</a>
+
+
+	<h4>Test-Unit Revision</h4>
+	<p>Le <i>Test-Unit</i> sono state modificate per adattarsi alle modifiche effettuate e testarle</p>
+	<p>Vi sono 3 nuove <i>Test-Unit</i>:</p>
+	<ol>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/TestCtxWasteServiceSprint2_revision.kt">TestCtxWasteServiceSprint2_revision.kt</a></li>
+			<ul><li>Stesso Test ma con il nuovo modello di riferimento e nuovi tipi di messaggi per il sonar</li></ul>
+		<li><a href="../CtxWasteService/test/unibo.testwasteservice/Test2CtxWasteServiceSprint2_revision.kt">Test2CtxWasteServiceSprint2_revision.kt</a></li>
+			<ul><li>Testa il nuovo modello di comunicazione tra i due contesti. Va infatti avviato il test e poi avviato il contesto <b>ctxraspberry</b> di test.</li></ul>
+		<li><a href="../CtxRaspberry/test/testled/TestCtxRaspberry_revision.kt">TestCtxRaspberry_revision.kt</a></li>
+			<ul><li>Comprende due test: uno per il <c>sonar</c> uno per il <c>led</c> come il precedente</li></ul>
+	</ol>
+
+	<p>Nuovi Qak di test: </p>
+	<ul>
+		<li><a href="../CtxWasteService/src/ctxWasteService_revision_Test.qakq">ctxWasteService_revision_Test.qak</a></li>
+		<li><a href="../CtxWasteService/src/ctxWasteService_revision_Test2.qakq">ctxWasteService_revision_Test.qak</a></li>
+		<li><a href="../CtxRaspberry/src/CtxRaspberry_revision_Test.qakq">CtxRaspberry_revision_Test.qak</a></li>
+	</ul>
+</div>
+
+<br>
+<br>
+<br>
+
+
+<!-- ------------------------------------------------------ -->
+
+
+
+<!-- FOOTER -->
+<br><br>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%; height: 28vw; text-align:left; color:white;">
+    <p style="text-align: center; font-size: 12pt;">Studenti: Luca Landolfi, Antonio Franzese, Luca De Risi</p>
+    <p style="text-align: center; font-size: 12pt;">Email: luca.landolfi3@studio.unibo.it,  antonio.franzese4@studio.unibo.it, luca.derisi@studio.unibo.it;</p>
+    <div style="display: block; margin: 0 15vw;">
+        <img src="./img/img_luca.png"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_anto.jpg"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_lude.JPG"   style="float: left; width: 19vw; height: 20vw">
+    </div>
+</div>
+
+</body>
+</html>

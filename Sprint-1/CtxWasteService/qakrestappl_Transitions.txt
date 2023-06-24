@@ -1,0 +1,4 @@
+{"actor":"custompathexecutor", "msgType":"dispatch", "curstate":"execStep", "nextstate":"execStep", "msgId":"coapUpdate"}
+{"actor":"custompathexecutor", "msgType":"dispatch", "curstate":"execStep", "nextstate":"stepDone", "msgId":"coapUpdate"}
+{"actor":"custompathexecutor", "msgType":"dispatch", "curstate":"execStep", "nextstate":"stopped", "msgId":"toggleStop"}
+{"actor":"custompathexecutor", "msgType":"dispatch", "curstate":"stopped", "nextstate":"execStep", "msgId":"toggleStop"}

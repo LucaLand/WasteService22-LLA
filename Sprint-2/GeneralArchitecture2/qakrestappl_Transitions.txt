@@ -1,0 +1,7 @@
+{"actor":"transporttrolley", "msgType":"dispatch", "curstate":"handleAlarm", "nextstate":"resume", "msgId":"alarmStop"}
+{"actor":"custompathexecutor", "msgType":"dispatch", "curstate":"execStep", "nextstate":"execStep", "msgId":"coapUpdate"}
+{"actor":"custompathexecutor", "msgType":"dispatch", "curstate":"execStep", "nextstate":"stepDone", "msgId":"coapUpdate"}
+{"actor":"custompathexecutor", "msgType":"dispatch", "curstate":"stopped", "nextstate":"resume", "msgId":"toggleStop"}
+{"actor":"sonardatahandler", "msgType":"dispatch", "curstate":"handleSonarData", "nextstate":"handleSonarData", "msgId":"coapUpdate"}
+{"actor":"ledstateupdater", "msgType":"dispatch", "curstate":"handleRobotStateUpdate", "nextstate":"handleRobotStateUpdate", "msgId":"coapUpdate"}
+{"actor":"led", "msgType":"dispatch", "curstate":"handleLedStateUpdate", "nextstate":"handleLedStateUpdate", "msgId":"ledStateUpdate"}

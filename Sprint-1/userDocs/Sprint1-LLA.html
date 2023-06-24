@@ -1,0 +1,910 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="it">
+
+
+<head>
+    <title>Iss2023-LLA-Sprint1</title>
+    <link href="./defaultStyle.css" rel="stylesheet">
+	<link href="./menuCss.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--  To solve accent problems  -->
+</head>
+
+
+<body>
+<div id="top">
+    <h1>Progetto Finale ISS - Waste Service</h1>
+</div>
+<div class="remark">
+<nav>
+    <ul>
+        <li><a href="../../Sprint-0/userDocs/Sprint0-LLA.html">sprint0</a></li>
+        <li><a href="./Sprint1-LLA.html">sprint1</a></li>
+		<li><a href="../../Sprint-2/userDocs/Sprint2-LLA.html">sprint2</a></li>
+		<li><a href="../../Sprint-3/userDocs/Sprint3-LLA.html">sprint3</a></li>
+    </ul>
+</nav>
+</div>
+
+    <h2>Introduction</h2>
+    <div class="remark">
+	<p>
+	Progetto finale di ISS che consiste nel realizzare un sistema di gestione dei rifiuti in cui un robot svolge il compito di trasportare i materiali dal camion ai relativi contenitori di smistamento. 
+	Attualmente, ci concentriamo su una fase preliminare di analisi dei requisiti, che consiste nel comprendere le esigenze del cliente e tradurle in una forma formalizzata e strutturata.
+	</p>
+	</div>
+
+    <h2>Requirements</h2>
+    <div class="remark">
+        <p>Si riporta la pagina di requisiti del committente: <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2022/blob/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/TemaFinale22.html" traget="_blank" >Waste
+            Service 22.pdf</a></p>
+		<p>Inoltre si riporta il file dei requisiti dello Sprint0: <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Requirements">Requisiti Sprint0</a>
+    </div>
+
+    <!----------------------- REQUIREMENT ANALYSIS --------------------------->
+
+    <h2>Scrum Goal and Work Plan</h2>
+    <div class="remark">
+	<h4>Scrum goal:</h4>
+	Obiettivo dello Sprint1 è la creazione di una prima demo (su ambiente virtuale) che tenga presente delle richiesete del commitente, ossia che il truck vada via il prima possibile 
+	e che il sistema possa ricevere altre richieste anche durante la fase di deposito dei rifiuti. Questi, di fatto, sono i punti principali che contengono la core business logic del problema (descrivono
+	infatti la <b>Service area</b> e la <b>Deposit action</b>).
+	
+	<h4>Work plan:</h4>
+	<ul>
+        <li>Analisi del problema di come affrontare la navigazione, anche in relazione al SW già sviluppato <br>
+            (possibile visitare la pagina riassuntiva <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/Applicazioni22.html">Applicazioni22</a> dei moduli sviluppati)</li>
+        <li>Analisi delle responsabilità e delle interazioni tra i componenti <i>wasteservice</i>, <i>trasporttrolley</i> e <i>basicrobot</i></li>
+        <li>Sviluppo / adattamento di tali componenti</li>
+        <li>Realizzazione di un modello eseguibile (a tal proposito verrà utilizzato il metamodello <a href="../../Sprint-0/userDocs/QAK.html">QAK</a>).</li>
+        <li>Realizzazione di un (più completo) test-plan per il modello</li>
+    </ul>
+        
+    </div>
+	
+	<!--PROBLEM ANALYSIS-->
+	<a NAME="ProblemAnalysis"></a>
+	<h2>Problem analysis</h2>
+	<div class="remark">
+        <div class="remark remark2">
+            <h4>Architettura logica precedente:</h4>
+            <img src="img/LogicalArch_R2.png" alt="General Logical Architecture" style="width: 600px;" >
+            <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
+            <br>
+
+            <h4>Focus Sprint-1</h4>
+            <p>Nello Sprint-1 si vedrà dunque un focus sui seguenti componenti e sui loro modelli.</p>
+            <img src="img/Spint-1_Focus_Initial.png" alt="Architecture Focus Sprint-1" style="width: 80%">
+            <span>Sprint-0:
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak">SmartDevice.qak</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/WasteService.qak">WasteService.qak</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak">TransportTrolley.qak</a>  ||
+                <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">BasicRobot22.qak</a>
+            </span>
+        </div>
+    </div>
+
+
+
+
+
+
+    <h3>1 - Simulazione Smart Device</h3>
+    <div class="remark">
+		<p>
+            Come da requisiti, lo <b>Smart Device</b> non dovrà essere implementato. Per facilitare la messa appunto dell'applicazione introduciamo un <b><i>Mock-object</i></b>,
+            cioè un dispositivo simulato che riproduce il comportamento dei dispositivi reali in modo controllato, in questo caso verrà utilizzato per la simulazione dello <b>Smart Device</b>.
+            Questo meccanismo ci consente di andare a simulare l'interazione tra lo <b>Smart Device</b> e il <b>WasteService</b>, in particolare il primo invierà una <i>DepositRequest</i>
+            e si metterà in attesa di una risposta.
+            </br>
+            </br>
+            Di seguito viene riportata la documentazione relativa ai <b><i>Mock-object</i></b>: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/RadarSystemProgetto.html#sprint1-componenti-per-i-dispositivi-di-i-o"> Mock
+            </a>
+		</p>
+    </div>
+
+    <h3>2 - Analisi della Core Business Logic </h3>
+    <div class="remark">
+        <p>In questa sezione iniziamo con il delineare una prima organizzazione della <i>Logica di Business</i> dei <i>Core Components</i>.</p>
+        <ul>
+            <li>SmartDevice</li>
+            <li><b>WasteService</b></li>
+            <li><b>Transport Trolley</b></li>
+            <li>BasicRobot22</li>
+        </ul>
+        <p>Per quanto riguarda lo <code><i>SmartDevice</i></code> e il <code><i>BasicRobot22</i></code> sono già stati definiti precedentemente per quello non verranno analizzati.</p>
+        <h4>Macro analisi delle funzionalità:</h4> <!-- e divisione dei compiti tra i componenti:</p> -->
+        <ol>
+            <li>Il <b>WasteService</b> prende le richieste dello <i>SmartDevice</i> e in base alla capienza dei Box le accetta o rifiuta.</li>
+            <li>Il <b>WasteServcie</b> comunica con il <b>Transport Trolley</b> richiedendo il <i>PickUp</i> dei rifiuti dal camion e lo scarico degli stessi in un determinato tipo di Box, in caso di richieste accettate.</li>
+            <li>Il <b>Transport Trolley</b> gestirà le richieste di <i>pickUp</i> del <b>WasteService</b> inviando comandi per muovere il <b>BasicRobot22</b> per raggiungere le posizioni desiderate.</li>
+            <li>Il <b>Transport Trolley</b> prevede l'invio di una conferma di <i>PickUp</i> al <b>WasteService</b> non appena avrà terminato il <i>pickUp</i>.</li>
+            <li>Il <b>Transport Trolley</b> deve prevedere la gestione di richieste di scarico mentre sta ancora eseguendo una <i>Deposit Action</i>.</li>
+        </ol>
+    </div>
+
+
+
+
+    <h3 id="sec-GestioneRichieste">3 - <b>WasteService</b>: Analisi Gestione delle richieste</h3>
+    <div class="remark">
+        <p>Dati i messaggi definiti da requisito nello Sprint-0:</p>
+        <pre><code>
+ Request depositRequest	: 	depositRequest(TYPE, TRUCKLOAD, ...)
+ Reply loadaccept	: 	loadaccept(...)
+ Reply loadrejecetd	: 	loadrejecetd(...)
+        </code></pre>
+
+        <img src="img/WasteTruckRequest_Architecture.png" alt="WasteTruckRequest Arch" style="width: 500px">
+
+        <p>Si evidenziano i seguenti problemi da anlizzare:</p>
+        <ul>
+            <li><b>Logica di gestione delle richieste</b></li>
+            <li><b>Quando rispondere allo SmartDevice</b></li>
+            <li><b>Possibilità di richieste ripetute</b></li>
+        </ul>
+
+        <h4>Logica Gestione delle richieste</h4>
+            <p>
+                Il <b>WasteService</b> per poter gestire le richieste che arrivano dallo <b>Smart Device</b> si avvale dell'utilizzo di due variabili inizializzate nello
+                <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Variables">Sprint0</a>.<br>
+                Le variabili contGB e contPB, inizializzate nello Sprint0, sono rispettivamente delle variabili contatori per i due tipi di materiali da depositare e verranno verificate
+                con la capienza massima dei box stabilita a priori tramite i valori di MAXGB e MAXPB.
+            </p>
+
+
+            <p>Pseudo codice di gestione delle richieste:</p>
+            <pre><code>
+When (Request depositRequest(TYPE, TRUCKLOAD)){
+    if(contGB OR  contPB + TRUCKLOAD) > MAXGB OR MAXPB{
+        Reply loadrejecetd
+    }else{
+        ... //Richiesta di pickUp del materiale al TransportTrolley
+    }
+}
+            </code></pre>
+
+        <img src="img/WasteService_SmartDevice_Interaction.png" alt="WasteTruckRequest Interaction">
+
+        <div class="remark remark2">
+            <span>Formalizzando in linguaggio qak, si traduce nella seguente evoluzione dello stato del <b>WasteService</b>:</span>
+            <pre><code>
+ State requestHandling {
+    ...
+    onMsg(depositRequest : depositRequest(ID, T, L)){
+        [# Type = payloadArg(0)
+            TruckLoad = payloadArg(1).toInt() #]
+        println("Request: ($ID, $Type, $TruckLoad)") color green
+        if[# Type == "plastic" #]{
+            if[# (currentPB + TruckLoad) < MAXPB #]{
+                [# accepted = true #]
+            }
+        }if[# Type == "glass" #]{
+            if[# (currentGB + TruckLoad) < MAXGB #]{
+                [# accepted = true #]
+            }
+        }
+    }
+ } Goto requestAccepted if[# accepted == true #] else requestRejected
+            </code></pre>
+
+            <pre><code>
+ State requestAccepted {
+    //Requesting PickUp to TransportTrolley
+    println("\t $name: Requesting Picking Up...") color green
+ }
+            </code></pre>
+        </div>
+
+        <tt>Il <b>WasteService</b> deve dunque richiedere il <i>PickUp</i> del materiale al <b>TransportTrolley</b></tt>
+
+
+
+<!---->
+        <h4>Aggiornamento e gestione delle variabili di stato dei Box</h4>
+            <p>Le variabili <code>currentPB</code> e <code>currentGB</code> vanno aggiornate per la corretta gestione delle richieste.</p>
+            <p>Siccome il <b>WasteService</b> può ricevere richieste anche prima che la <i>Deposit Action</i> sia stata completata, si evidenzia la seguente soluzione:</p>
+            <ol>
+                <li>Le variabili <code>currentPB</code> e <code>currentGB</code> saranno aggiornate non appena una richiesta viene accettata.</li>
+            </ol>
+            <div class="remark remark2">
+                <span>Formalizzazione in QAK:</span>
+                <pre><code>
+ State requestAccepted {
+        println("\t $name: Request -$ID- Accepted!") color green
+        if[# Type == "plastic" #]{
+            [# currentPB += TruckLoad #]
+        }
+        if[# Type == "glass" #]{
+            [# currentGB += TruckLoad #]
+        }
+    } Goto pickingUp
+                </code></pre>
+            </div>
+
+            <w>Warning! - In caso si preveda la possibilità di errori nello scarico dei rifiuti, si può implementare un meccanismo di transazioni con conferma.</w>
+            <ol>
+                <li>Si conserverà il valore precedente delle variabili in due ulteriori variabili: <code>oldPB</code> e <code>oldGB</code></li>
+                <li>In caso di conferma di scarico del materiale da parte del <b>TransportTrolley</b>: <code>oldPB</code> e <code>oldGB</code> saranno aggiornate a <code>currentPB</code> e <code>currentGB</code></li>
+                <li>In caso di errori e mancato scarico del materiale le variabili current</li>
+            </ol>
+        <p>In questo modo il sistema è protetto da eventuali errori nel deposito dei materiali, ma si introducono problemi relativi alla notifica degli errori e ulteriori messaggi di conferma scarico da parte del <b>TransportTrolley</b>.</p>
+        <p>Siccome il committente non specifica possibilità di errori o malfunzionamenti del robot, si consiglia, in caso di errori e malfunzionamenti di interrompere il funzionamento del sistema, senza la gestione delle variabili in caso di eventuali situazioni di errore.</p>
+
+
+        <tt>
+            Non verranno dunque considerate situazioni di gestione di errori dopo l'accettazione di una richiesta, in quanto i requisiti non lo richiedono.<br>
+            Inoltre, in caso di errori o malfunzionamenti da parte del Robot, il sistema rimarrebbe comunque inutilizzabile, previa manutenzione, dunque tenere le variabili aggionrate diventa un problema secondario.
+        </tt>
+
+
+
+<!---->
+        <h4>Quando rispondere allo <b>Smart device</b></h4>
+            <p>Nell'interazione con il committente, come indicato nello SPRINT-0, si è evidenziato come il <i>Waste Truck</i> sarà libero una volta ricevuta una risposta positiva o negativa. In modo da essere liberato il prima possibile.</p>
+            <p>In caso di <code><b>loadrejected</b></code>:</p>
+                <ul><li>La risposta viene inviata, come già descritto sopra, non  appena ci si accorge che non può essere accolta.</li></ul>
+            <pre><code>
+ State requestRejected {
+    replyTo depositRequest with loadrejecetd : loadrejecetd(0)
+    println("\t $name: Request -$ID- Refused!") color green
+ } Goto waiting
+            </code></pre>
+            <p>Nel caso di <code><b>loadaccepted</b></code>:</p>
+                <ul><li>La risposta deve essere inviata dopo che il <b>TransportTrolley</b> ha terminato il <i>PickUp</i></li></ul>
+            <pre><code>
+ State pickupOk {
+    println("\t $name: Pickup finished! Truck ($ID) can go away!") color green
+    replyTo depositRequest with loadaccept : loadaccept(0)
+ } Goto waiting
+            </code></pre>
+        <tt>Si necessità di una conferma del <i>PickUp</i> del <b>TransportTrolley</b> al <b>WasteService</b></tt>
+
+
+
+
+<!---->
+        <h4>Richiesta e Conferma di PickUp</h4>
+            <p>La necessità di richiesta e di conferma del <code>pickUp</code> rappresentano un ulteriore <i>Macro Problema</i>, per cui verranno analizzate nel dettaglio nella sezione successiva: <a href="#sec-Int-WS-TT">Interazione WasteService-TransportTrolley</a></p>
+
+
+        <h4>Gestione richieste in esecuzione</h4>
+        <p>Il <b>WasteService</b> da requisito può ricevere una sola richiesta per Truck, ma può ricevere richieste anche mentre il <b>TransportTrolley</b> sta ancora eseguendo la <i>Deposit Action</i> di un materiale.</p>
+        <p>Siccome:</p>
+        <ul>
+            <li>Il <b>WasteService</b> da requisito può ricevere una sola richiesta alla volta</li>
+            <li>La <i>Deposit Action</i> è gestita dal <b>Transport Trolley</b></li>
+            <li>Il <b>WasteService</b> risponde alla request subito dopo il <i>PickUp</i> e rimane libero</li>
+        </ul>
+        <tt>La possibilità di ricevere richieste durante l'esecuzione della <i>Deposit Action</i> non influisce sul <b>WasteService</b> ma riguarda il <b>TransportTrolley</b></tt>
+        <tt>Il <b>TransportTrolley</b> deve prevedere l'arrivo e la gestione di ulteriori richieste di <i>PickUp</i> da parte del <b>WasteService</b> durante l'esecuzione di una <i>Deposit Action</i>.</tt>
+
+
+
+<!--        <ul>-->
+<!--            <li>Per gestire eventuali casi di richieste ripetute <u>semplicemente si scartano le richieste che arrivano durante la gestione di una richiesta</u></li>-->
+<!--        </ul>-->
+    </div>
+
+
+
+
+
+<!--        -----4-----        -->
+    <h3 id="sec-Int-WS-TT">4 - Interazione <b>WasteService</b> e <b>TransportTrolley</b></h3>
+    <div class="remark">
+        <p>Come evidenziato nella sezione precedente (<a href="#sec-GestioneRichieste">Gestione Delle Richieste</a>) vi è la necessità di interazione tra il <b>WasteService</b> ed il <b>TransportTrolley</b>.</p>
+
+        <h4>Richiesta e Conferma <i>PickUp</i></h4>
+            <p>Le interazioni necessarie secondo l'analisi della <a href="#sec-GestioneRichieste">sezione precedente</a> sono:</p>
+            <ul>
+                <li>Richiesta di <i>PickUp</i> del <b>WasteService</b> al <b>TransportTrolley</b></li>
+                <li>Conferma di <i>PickUp</i> del <b>TransportTrolley</b> al <b>WasteService</b></li>
+            </ul>
+
+            <p>Essendo:</p>
+            <ul>
+                <li>L'interazione composta da una richiesta e una conferma obbligatoria</li>
+                <li>Ed essendo il <b>WasteService</b> non implicato in ulteriori operazioni durante l'attesa della risposta</li>
+            </ul>
+            <tt>L'interazione verrà modellata come una <b><i>Request / Response</i></b>.
+                <pre><code>
+ Request   pickupReq   :   pickupReq(...)
+ Reply     pickupOk    :   pickupOk(...)
+                </code></pre>
+            </tt>
+            <img src="img/WasteService_TransportTrolley_Interaction.png" alt="WasteService-TransportTrolley Arch" style="width: 400px">
+
+            <p>Avendo poi <u>delegato</u> l'operazione di <i>Deposit Action</i> al <b>TransportTrolley</b>, questo continuerà la <i>Deposit Action</i> dopo aver scaricato il materiale e aver inviato la <code>PickupOk</code> al <b>WasteServide</b>.
+            <br>Questo è possibile in quanto la richiesta di scarico dello <b>SmartDevice</b> è stata già approvata e non sono necessarie operazioni intermedie.</p>
+            <p>Dunque il <b>WasteService</b> sarà libero di gestire ulteriori richieste mentre il <b>TransportTrolley</b> continua nel deposito dei materiali.</p>
+            <tt>
+                <p>Per permettere al <b>TransportTrolley</b> di continuare nell'operazione di Deposito, modelleremo la richiesta con i seguenti parametri:</p>
+                <ul>
+                    <li><code>TYPE</code>: Necessario per indicare al <b>TransportTrolley</b> dove scaricare i materiali</li>
+                    <li><code>ID</code>: Per identificare le richieste e rendere più facile la gestione delle stesse in modifiche future</li>
+                </ul>
+                <pre><code>
+ Request  pickupReq   :   pickupReq(ID, TYPE)
+ Reply    pickupOK    :   pickupOk(ID)
+                </code></pre>
+            </tt>
+
+
+        <div class="remark remark2">
+            <span>Evoluzione del modello in qak del <b>WasteService</b>:</span>
+            <pre><code>
+ State pickingUp {
+    //Requesting PickUp to TransportTrolley
+    println("\t $name: Requesting Picking Up...") color green
+    request transporttrolley -m pickupReq : pickupReq(ID, Type)
+ } Transition t1 whenReply pickupOK -> pickupOk
+            </code></pre>
+
+            <span>Evoluzione del modello in qak del <b>TransportTrolley</b>:</span>
+            <pre><code>
+ State waiting {
+    ...
+ } Transition t0 whenRequest pickupReq -> handlePickupReq
+            </code></pre>
+
+            <pre><code>
+ State handlePickupReq {
+        onMsg(pickupReq : pickupReq(ID, TYPE)){
+            println("\t $name: pickupRequest received!") color blue
+        }
+ } Goto pickUp
+            </code></pre>
+
+            <pre><code>
+ State pickUp {
+    //Sending messages to move BasicRobot22 into Indoor
+    println("\t $name: Going to Indoor!") color blue
+    ...
+    //Sending pikcup finished
+    println("\t $name: Pickup Finished!") color blue
+    <q>replyTo pickupReq with pickupOk : pickuoOk(0) caller== wasteservice</q>
+ } Goto deposit
+            </code></pre>
+</div>
+        <p>Architettura</p>
+        <img src="img/Logical_Architecture_Sprint1-1.png" alt="">
+
+        <p>Interazione completa (in caso di richiesta accettata):</p>
+        <img src="img/WasteTruckRequest_Complete_Accept.png" alt="WasteTruckRequest complete interaction of accepted request" style="width: 800px">
+    </div>
+
+
+
+
+<!--  ----------5----------  -->
+    <h3>5 - Analisi <b>TransportTrolley</b></h3>
+    <div class="remark">
+
+        <p>Il <b>TransportTrolley</b> da requisiti si occuperà di muovere e rappresentare come entità Software il Robot fisico <i>DDR</i>.</p>
+        <p>Analizziamo qui dunque i <i>Macro-Problemi</i> relativi alla logica di business e di movimento.</p>
+
+        <h4>Delega Deposit Action</h4>
+        <p>La <i>Deposti Action</i> definita nello Sprint-0 come la sequenza di operazioni:</p>
+        <ul>
+            <li><b>PickUp</b></li>
+            <li><b>Deposit</b></li>
+            <li><b>Return Home</b></li>
+        </ul>
+        <p>Come analizzato nella <a href="#sec-Int-WS-TT">sezione precedente</a> questa viene <u>delegata</u> dal <b>WasteService</b> tramite la richietsa di <i>PickUp</i>.
+            Passando anche il parametro di <code>TYPE</code> del materiale, in modo che il <b>TransportTrolley</b>, una volta completato il <i>PickUp</i> possa proseguire autonomamente con la <i>Deposit</i></p>
+
+        <p>Vengono quindi instanziate le variabili: </p>
+        <pre><code>
+ var ID
+ var MaterialType
+            </code></pre>
+        <ul>
+            <li><code>ID</code>: per tenere traccia di quale richiesta si sta eseguendo</li>
+            <li><code>MaterialType</code>: per gestire dove scaricare i rifiuti una volta raccolti</li>
+        </ul>
+
+        <p>Queste vengono aggiornate ad ogni richiesta <code>pickupReq(ID, TYPE)</code> ricevuta, con i parametri della richiesta:</p>
+        <pre><code>
+ onMsg(pickupReq : pickupReq(ID, TYPE)){
+    [#
+        ID = payloadArg(0)
+        MaterialType = payloadArg(1)
+    #]
+    println("\t $name: pickupRequest received! ($ID, $MaterialType)") color blue
+ }
+            </code></pre>
+
+        <p>La <i>Deposit</i> verrà dunque poi gestita in base al tipo di materiale:</p>
+        <pre><code>
+ State deposit {
+    if[# materialType == "plastic" #]{
+        //Goto PlasticBox
+        println("\t $name: Going to PlasticBox!") color blue
+        ...
+    }
+
+    if[# materialType == "glass" #]{
+        //Goto GlassBox
+        println("\t $name: Going to GlassBox!") color blue
+        ...
+    }
+ }
+        </code></pre>
+
+        <h4>Rappresentazione della posizione nella <i>Service Area</i></h4>
+            <p>Analizzando la problematica le soluzioni indivudate sono 2:</p>
+            <ul>
+                <li>Rappresentazione tramite <b>Coordinate</b></li>
+                <li>Rappresentazione delle sole <b>posizioni salienti</b>: Home, Indoor, PlasticBox, GlassBox.</li>
+            </ul>
+        <p></p>
+
+        <h5>Vantaggi dell'utilizzo di un sistema basato su coordinate:</h5>
+        <p>Un sistema basato su coordinate prevede la divisione di tutta la service Area in una matrice con celle di dimensione <code>RD</code>, ovvero la dimensione del robot.</p>
+        <p>Il <i>Robot</i> dovrà quindi eseguire spostamenti di grandezza <code>RD</code> denominabili <i>Step</i>.</p>
+        <p>Così facendo la posizine del Robot sarà individuabile in ogni momento come coppia ordinata di numeri. () </p>
+        <pre><code>
+ pos = (x,y)
+        </code></pre>
+        <img src="img/ServiceAreaPosition-Coords.png" alt="" style="width: 500px">
+        <p>Vantaggi:</p>
+        <ul>
+            <li>Maggiore flessibilità: Un sistema basato su coordinate offre maggiore flessibilità nel gestire la posizione dei siti.
+                Ad esempio, può adattarsi facilmente se i siti non sono più posizionati agli angoli, se il robot deve seguire un percorso ottimale o se ci sono ostacoli nell'area di servizio.</li>
+            <li>Potenziale riutilizzo di moduli esistenti: Utilizzando un sistema basato su coordinate, è possibile sfruttare moduli sviluppati precedentemente come mapper e planner,
+                evitando la necessità di sviluppare nuove soluzioni da zero.</li>
+        </ul>
+
+        <h5>Vantaggi dell'utilizzo di un sistema senza coordinate:</h5>
+        <p>La disposizione specifica delle <i>zone salienti</i> e la presenza di un sonar on-board sul robot, permettono la realizzazione senza l'uso di coordinate.<br>
+            Il robot può spostarsi all'interno dell'area di servizio lungo le pareti, utilizzando la rilevazione delle collisioni con le pareti per orientarsi.</p>
+        <ul>
+            <li>Minor complessità e costo inferiore: L'assenza di un sistema basato su coordinate semplifica il design complessivo e riduce i costi associati all'implementazione.</li>
+            <li>Maggiore velocità di spostamento e reattività: Senza la necessità di completare passi specifici, un sistema senza coordinate consente movimenti più rapidi e una maggiore reattività ai comandi di arresto durante il movimento in avanti.</li>
+            <li> I robot reali potrebbero beneficiare di un sistema senza coordinate, in quanto non richiede l'uso di sistemi di feedback o hardware aggiuntivo per controllare i propri spostamenti in modo più preciso. A differenza di una soluzione basata su coordinate, un sistema basato sulla rilevazione di contatti con le pareti non è soggetto all'accumulo di errori ad ogni passo.</li>
+        </ul>
+        <img src="img/ServiceAreaPosition-4.png" alt="" style="width: 400px">
+
+        <p>Assunto che: (dallo Sprint-0)</p>
+        <ul>
+            <li>Il committente non specifica un particolare tipo di rappresentazioni delle posizioni</li>
+            <li>Il <i>Robot</i> si muoverà solo sul perimetro della stanza</li>
+            <li>La <i>Service Area</i> non contiene ulteriori ostacoli</li>
+        </ul>
+        <tt>La soluzione scelta è quella di un sistema di rappresentazione <b>senza coordinate</b>. Dati i vantaggi evidenziati.<br>
+            Si mappa dunque la posizione tramite le <i>posizioni salienti</i>:
+            <pre><code>
+ Enum Position = {Indoor, PlasticBox, GlassBox, Home}
+            </code></pre>
+        </tt>
+
+
+<!---->
+        <h4 id="Sec-4">Logica di Navigazione</h4>
+            <p>Data la scelta di adottare un sistema senza coordinate, nasce il problema della navigazione del <i>Robot</i> tra le 4 posizioni salienti.</p>
+            <p>Visti i percorsi effettuabili nello <a>Sprint-0</a></p>
+            <img src="img/ServiceAreaPosition-Routes3.png" alt="" style="width: 450px">
+            <p>Considerando le posizioni ordinate in senso antiorario: <code>Home, Indoor, PlasticBox, GlassBox</code>.</p>
+            <p>L'implementazione per la navigazione ordinata tra queste avverà con la seguente logica:</p>
+            <ul>
+                <li>Il robot si muove in avanti finché non rileva il muro</li>
+                <li>Il robot si ruota di 90° verso sinistra</li>
+                <li>Ripetere per la prossima posizione saliente</li>
+            </ul>
+<!-- TODO       <img src="" alt="" style="width: 450px;">-->
+<!-- TODO       <img src="" alt="">-->
+        <p>Questo ci permette di visitare in ordine le posizioni <code>Home, Indoor, PlasticBox, GlassBox</code>.</p>
+
+
+
+<!---->
+        <h4>Astrazione della navigazione per il <b>TransportTrolley</b></h4>
+            <p>Date le scelte sulla rappresentazione delle posizioni, il <b>TransportTrolley</b> navigherà solo sulla base delle 4 psizioni salienti:</p>
+            <p>Presentiamo varie soluzioni:</p>
+            <ol>
+                <li>Il <b>TransportTrolley</b> implementerà la logica di moviemento tra le 4 posizioni</li>
+                <li>Il <b>TransportTrolley</b> astrarrà dall'implementazione dei percorsi</li>
+            </ol>
+        <p>Per una più corretta progettazione e implementazione del codice decidiamo di astrarre il componente <b>TransportTrolley</b> dalla logica implementativa della navigazione.</p>
+
+        <p>Il <b>TransportTrolley</b> si occuperà dunque solo di:</p>
+        <ul>
+            <li><i>Conoscere</i> la posizione in cui si trova</li>
+            <li><i>Indicare</i> la posizione da raggiungere</li>
+        </ul>
+
+        <tt>
+            <p>Per fare ciò si introducono due messaggi che il <b>TransportTrolley</b> invierà con semantica <i>Request/Response</i>:</p>
+            <pre><code>
+ Request move        :    move(CurrentPos, NewPos)
+ Reply   moveDone    :    moveDone(NewPos)
+            </code></pre>
+        </tt>
+        <tt>
+            Vista l'astrazione introdotta risulta necessaria l'introduzione di un <b>nuovo componente</b> <i>mediatore</i> tra il <b>TransportTrolley</b> e il <b>BasicRobot22</b>.<br>
+            Che enalizzeremo nella <a href="#sec-6">Macro-Sezione Successiva</a>.
+            <img src="img/TransportTrolley_BasicRobot_Interaction.png" alt="" style="width: 600px">
+        </tt>
+        
+
+
+
+
+        <h4>Gestione richieste in esecuzione</h4>
+            <p>
+                Come da requisiti il <b>TransportTrolley</b> può ricevere più richieste durante l'esecuzione della <i>depositAction</i>.
+                Le richieste possono arrivare in due momenti, quando il <b>DDR Robot</b> è in movimento o quando sta effettuando l'operazione di deposito in uno dei due box.
+                Non essendoci vincoli da requisiti, la scelta progettuale che ci è parsa più conveniente è quella di far arrivare il <b>DDR Robot</b> alla prossima posizione anche se
+                quest'ultimo riceve richieste mentre è in movimento.
+                Andiamo ora ad analizzare due possibili soluzioni per poter gestire richieste durante l'esecuzione.
+            </p>
+
+		<h5>Soluzione 1: girare indietro</h5>
+            <p>
+                La prima soluzione da noi proposta è quella di far percorrere il percorso alla rovescia al <b>DDR Robot</b>, ossia di far girare quest'ultimo di 180°. Questa soluzione
+                risulta ottimale nel momento in cui il <b>DDR Robot</b> si trova più vicino alla posizione di <b>Indoor</b> rispetto che alla posizione di <b>Home</b>.
+            </p>
+<!-- TODO       <img src="" alt="">-->
+<!-- TODO       <img src="" alt="">-->
+<!-- TODO       <img src="" alt="">-->
+
+        <h5>Soluzione 2: passare per la Home</h5>
+            <p>
+                La seconda soluzione da noi proposta prevede invece di far completare l'intero percorso al <b>DDR Robot</b> al di là delle richieste durante l'esecuzione o meno.
+                Attuando questo tipo di soluzione il <b>DDR Robot</b> farà sempre lo stesso percorso, ossia <i>Home</i>-><i>Indoor</i>-><i>PlasticBox</i>-><i>GlassBox</i>-><i>Home</i>.
+                Riducendo così la complessità di movimento e movimento e di gestione.
+            </p>
+<!-- TODO       <img src="" alt="">-->
+<!-- TODO       <img src="" alt="">-->
+
+
+		<tt>
+            Siccome il committente richiede di effettuare i movimenti in maniera ottimizzata, si opta per la prima soluzione, lasciando al nuovo componente da introdurre la funzione di eseguire il path migliore.
+		</tt>
+
+    </div>
+
+
+	
+	<!--  -----------6-------------- V2  -->
+	<h3 id="sec-6">CustomPathExecutor e BasicRobot22</h3>
+    <div class="remark">
+
+        <p>Il TransportTrolley ha il compito di impersonare il DDR gestendo la <i>Macro-Funzionalità</i> dell'esecuzione della <i>Deposit Action</i>, con propria consapevolezza della sua posizione e della destinazione da raggiungere per eseguire le richieste di scarico.</p>
+        <p>Si opta dunque invece la delega della gestione del movimento ad un'altro componente, da noi introdotto, progettato e sviluppato.</p>
+        <ul><li>Il <b>CustomPathExecutor</b> </li></ul>
+        <img src="img/CustomPathExecutor.png" alt="" style="width: 160px">
+
+
+
+        <h4>Ripartizoine delle funzionalità</h4>
+        <p>La decisione proposta prevede che:</p>
+        <ul>
+            <li>Il <b>TransportTrolley</b> si occpuerà dell'esecuzione della <i>Deposit Action</i> delegategli dal <b>WasteService</b></li>
+            <li>Il <b>TransportTrolley</b> sarà consapevole dunque della propria posizione e della posizione da raggiungere</li>
+            <br>
+            <li>Il <b>CustomPathExecutor</b> implementerà la logica di movimento da una posizione all'altra</li>
+        </ul>
+
+
+
+        <h4>Interazione <b>TransportTrolley</b>-<b>CustomPathExecutor</b></h4>
+        <p>Si modella dunque l'interazione come segue:</p>
+        <pre><code>
+ //TransportTrolley - CustomPathExecutor
+ Request move		:	move(CurrentPos, NewPos)
+ Reply   moveDone	:	moveDone(NewPos)
+        </code></pre>
+
+        <p>Il TransportTrolley è consapevole della posizione iniziale e della destinazione del BasicRobot. Invia una richiesta (Request) a un nuovo componente personalizzato chiamato CustomPathExecutor,
+            il quale si prende l'incarico di guidare il BasicRobot verso la destinazione.</p>
+        <p>L'interazione è stata modellata come una <i>Request/Response</i> in quanto:<br>
+            - Il <b>TransportTrolley</b> effettua una richiesta al <b>CustomPathExecutor</b><br>
+            - Il è necessaria una conferma dell'arrivo a destinazione da parte del <b>CustomPathExecutor</b> in modo da rendere il <b>TransportTrolley</b> <i>aware</i> del suo arrivo a destinazoine.</p>
+
+
+
+
+        <h4>Business Logic CustomPathExecutor</h4>
+        <p>La <i>Business Logic</i> del <b>CustomPathExecutor</b> è stata modellata come segue:</p>
+        <ul>
+            <li>Ad ogni <b>Posizione Saliente</b> è stato assegnato un numero:</li>
+            <ul>
+                <li><code>Home: 0</code></li>
+                <li><code>Indoor: 1</code></li>
+                <li><code>PlasticBox: 2</code></li>
+                <li><code>GlassBox: 3</code></li>
+            </ul>
+            <li>Vi è una variabile pos <code>Pos</code> che mantiene il valore della posizione corrente</li>
+            <pre><code> var Pos = 0 </code></pre>
+            <li>Il contatore viene incrementato quando ci si sposta all'angolo successivo in senso antiorario</li>
+            <img src="img/ServiceArea-PositionMovement+1.png" alt="Service Area Increment Position" style="width: 450px;">
+            <li>Il contatore viene decrementato quando ci si sposta all'angolo precedente, cioè in senso orario</li>
+            <img src="img/ServiceArea-PositionMovement-1.png" alt="Service Area Decrement Position" style="width: 450px;">
+            <li>Il conteggio è effettuato in modulo 4</li>
+            <li>Ad ogni angolo viene inviata una notifica della posizione raggiunta</li>
+            <pre><code>
+ Event 	posEvent	: posEvent(POS)
+
+ emit posEvent : posEvent($Pos)
+            </code></pre>
+        </ul>
+        <p>Il <b>CustomPathExecutor</b> riceve dunque la posizione corrente e la posizione da raggiungere (Si suppone che la posizione corrente del <i>TransporTrolley</i> coincida con la propria) </p>
+        <w>Si potrebbe implementare un meccanismo di contorllo anche sulla posizione corrente per evitare inconsistenze</w>
+
+        <p>La logica che permette il calcolo automatico del <i>Path</i> più breve è implementata da una <b>funzione matematica</b>:</p>
+        <pre><code>
+    stepToDo = PosToGo - Pos
+
+    if(stepToDo <= -3 ){
+        stepToDo += 4
+    }else if(stepToDo >= 3){
+        stepToDo += -4
+    }
+        </code></pre>
+        <p>Dove:</p>
+        <ul>
+            <li><code>StepToDo</code> è una variabile che contiene la distanza dalla posizione corrente a quella da raggiungere</li>
+            <li>Basterà dunque <i>incrementare</i>/<i>decrementare</i> il valore <code>StepToDo</code> con spostamenti rispettivamente in senso <i>orario</i>/<i>antiorario</i> fino al raggiungimento dello zero</li>
+        </ul>
+
+
+
+
+        <h4>Richieste in esecuzoine</h4>
+        <p>In caso di richieste di scarico, mentre il <b>CustomPathExecutor</b> ha un path in esecuzione può essere gestito in due modi:</p>
+        <ul>
+            <li>Fermando il robot qualsiasi sia il suo avanzamento e farlo tornare alla scorsa posizione per poterlo poi reindirizzare</li>
+            <li>Attendere il suo arrivo nel prossimo angolo e poi gestire la nuova richiesta</li>
+        </ul>
+
+        <tt>E' stata scelta la seconda sooluzione ad implementazione in quanto la più veloce ed ottimale secondo una veloce stima, ma è stata fornita nel codice anche l'implementazione della prima soluzione con la <code>TurnBack</code> del robot.</tt>
+        <p>Il caso seguente avviene solo in caso il robot abbia già scaricato e stia tornando alla <code>HOME</code>.<br>
+            La gestione è stata impelementata come segue:</p>
+        <pre><code>
+    State stepDone {
+        ...
+    } Transition t2 	whenTime 100 -> working
+            <q>whenRequest move -> handleMoveRequest</q>
+        </code></pre>
+
+        <tt>Per ulteriori e più approfondite informazioni sull'implementazione dei seguenti meccanismi si veda il file <a href="../CtxWasteService/src/CustomPathExecutorModel.qakm">CustomPathExecutorModel</a></tt>
+
+
+
+
+        <h4>Implementazione della navigazione</h4>
+        <p>La navigazione da un <i>angolo</i> all'altro avviene secondo queste sequenze di mosse:</p>
+
+        <ul>
+            In caso di incremento (senso antiorario):
+            <li><code>W</code> finchè non incontra il muro</li>
+            <li><code>L</code> per posizionarsi verso l'angolo +1</li>
+        </ul>
+        <p>Questi due comandi permettono lo spostamento del <i>Robot</i> su tutto il perimetro, angolo per angolo, in senso antiorario</p>
+
+
+        <p>In caso di decremento (senso orario):</p>
+        <ul>
+            <li><code>L</code> per girarsi all'indietro</li>
+            <li><code>W</code> finchè non incontra il muro</li>
+            <li><code>L + L</code> per posizionarsi verso l'angolo +1</li>
+        </ul>
+
+
+
+
+
+        <h4>Interazione con il <b>BasicRobot</b></h4>
+        <p>L'interazione avviene attraverso i seguenti messaggi:</p>
+        <pre><code>
+    //CustomPathExecutor - BasicRobot22
+    Dispatch cmd       	: cmd(MOVE)
+
+    //COAP UPDATE
+    Dispatch coapUpdate	: coapUpdate(RESOURCE, VALUE)
+        </code></pre>
+
+        <ul>
+            <li>Il <b>CustomPathExecutor</b> invia le singole mosse da eseguire al <b>BasicRobot22</b> tramite la dispatch <code>CMD</code></li>
+            <li>Rileva collisioni con il muro con la lettura delle <code>CoapUpdate</code> effettuate dal <b>BasicRobot22</b></li>
+        </ul>
+
+        <p>Nel <b>BasicRobot22</b> è stato aggiunto un componente <code>coapdispatcher</code> che si registra come <i>CoapObserer</i> e inoltra le <code>CoapUpdate</code> al <b>CustomPathExecutor</b></p>
+        <w>Una miglioria potrebbe prevedere l'apertura di un canale COAP tra i due contesti seprarati per la registrazione diretts del <b>CustomPathExecutor</b> al <b>BasicRobot22</b>.</w>
+	
+	
+		<img src="img/CustomPathExecutor_Interaction.png" alt="" style="width: 600px">
+<!--        <img src="img/Logical_Architecture_Sprint1-3.png" alt="" style="width: 1000px;">-->
+
+    </div>
+
+
+
+
+		<br>
+        <br>
+        <br>
+
+<!-- ------------------------------------------------------ -->
+<h2>Modello Eseguibile</h2>
+<div class="remark">
+            <h4>Componenti</h4>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/GeneralArchitecture/src/GeneralArchitectureSprint1.qak" target="blank">Modello del sistema QAK</a><br>
+			<br>
+			<a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/CtxWasteService/src/ctxWasteService.qak" target="blank"><i>ctxwasteservice.qak</i></a>
+            <br>
+            <br>
+            <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-1/Sprint-1/it.unibo.basicrobot22/src/basicrobot_mod.qak" target="blank">BasicRobot22Mod</a>
+            <br>
+            <br>
+
+
+		<div class="remark" style="background-color: #c3fbe8;">
+            <h3>Architettura logica risultante Sprint1</h3>
+            <img src="./img/LogicalArch_Sprint1.png" alt="General Logical Architecture">
+            <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
+        </div>
+</div>
+
+
+
+<h2>Test-Unit</h2>
+<div class="remark">
+    <tt><p>Implementare una test unit generale automatizzata che vada a simulare tutti i possibili <b>casi critici</b> del nostro sistema.</p>
+    <p>La nostra <i>SoftwareHouse</i> ci fornisce la classe <a href="../CtxWasteService/test/coapobs/CoapTestObserver.kt">CoapTestObserver</a> per la registrazione di <i>Observer Coap</i> agli attori del nostro sistema.</p>
+    <p>Alla classe sono state apporatte delle aggiunte per il salvataggio degli aggiornamenti in una lista di <i>Stati</i></p></tt>
+
+
+    <h4>Possibili casi critici:</h4>
+    <ul>
+        <li>Il <b>WasteService</b> riceve una richiesta mentre il <b>TransportTrolley</b> sta ancora scaricando</li>
+        <li>Il <b>WasteService</b> riceve una richiesta di scarico mentre il <b>TransportTrolley</b> sta tornando alla <i>Home</i></li>
+        <li>Il <b>WasteService</b> rifiuta una richiesta di scarico a causa della mancanza di spazio sufficiente anche mentre il <b>TransportTrolley</b> deve ancora scaricare la richiesta precedente che ha riempito però o box</li>
+    </ul>
+
+    <h4>Come riproduciamo le situazioni:</h4>
+    <p>Per riprodurre questi 3 casi critici si seguiranno i seguenti passi:</p>
+    <ul>
+        <li>Invio di una richiesta <code>depositRequest(plastic, 20)</code></li>
+            <ul><li>Attesa e controllo della risposta (<code>requestAccepted</code>)</li></ul>
+        <li>Attesa di circa 18s (per permettere al robot di scaricare e avviarsi alla <i>Home</i>)</li>
+        <li>Invio di una <b>seconda</b> <code>depositRequest(plastic, 20)</code></li>
+            <ul><li>Attesa e controllo della risposta (<code>requestAccepted</code>)</li></ul>
+        <li>Invio di una <b>terza</b> <code>depositRequest</code> con parametri <code>(plastic, 70)</code></li>
+            <ul>
+                <li>Attesa della risposta (rejected)</li>
+                <li>Siccome il <code>PBMAX</code> è a <i>100</i> e le due precedenti richieste hanno riempito fino a 40.</li>
+                <li><i>70</i> non dovrà essere accettato anche se ancora non ha scaricato la precedente richiesta</li>
+            </ul>
+    </ul>
+
+    <h4>Controllo del corretto funzionamento</h4>
+    <p>Il controllo avviene tramite la connessione dei <code>CoapTestObserver</code> sui 3 attori del <c>ctxwasetservice</c>.<br>
+        Questi prendono le <i>CoapUpdate</i> effettuate dagli attori, come implementate nel <i>modello qak</i> di <i>Test</i> <a href="../CtxWasteService/src/ctxWasteService_Test.qakq" type="text" >ctxWasteService_Test.qakq</a> e ne salvano la storia in una lista.</p>
+    <p>Il <i>controllo</i> avverrà dunque proprio sulla <b>storia degli stati</b> che gli attori assumeranno durante l'esecuzione.</p>
+    <p>Gli stati attesi sono:</p>
+
+    <b>WasteService:</b>
+    <ul style="margin-left: 30px">
+        <li>requesthandling</li>
+        <li>requestAccepted</li>
+        <li>pickingUp</li>
+        <li>pickupOk</li>
+        <li>requesthandling</li>
+        <li>requestAccepted</li>
+        <li>pickingUp</li>
+        <li>pickupOk</li>
+        <li>requesthandling</li>
+        <li>requestRejected</li>
+    </ul>
+
+    <br>
+    <b>TransportTrolley:</b>
+    <ul style="margin-left: 30px">
+        <li>handlePickupReq</li>
+        <li>goPickUp</li>
+        <li>pickupDone</li>
+        <li>goDeposit</li>
+        <li>depositDone</li>
+        <li>goHome</li>
+        <li>handlePickupReq</li>
+        <li>goPickUp</li>
+        <li>pickupDone</li>
+        <li>goDeposit</li>
+    </ul>
+
+    <br>
+    <b>CustomPathExecutor:</b>
+    <ul style="margin-left: 30px">
+        <li>handleMoveRequest</li>
+        <li>stepDone(1)</li>
+        <li>pathDone(1)</li>
+        <li>handleMoveRequest</li>
+        <li>stepDone(2)</li>
+        <li>pathDone(2)</li>
+        <li>handleMoveRequest</li>
+        <li>stepDone(1)</li>
+        <li>handleMoveRequest</li>
+        <li>pathDone(1)</li>
+        <li>handleMoveRequest</li>
+    </ul>
+
+    <h4>Configurazione del test</h4>
+    <p>Per poter runnare il test è necessario:</p>
+    <ul>
+        <li>buildare il <i>modello qak</i> <a href="../CtxWasteService/src/ctxWasteService_Test.qakq" type="text" >ctxWasteService_Test.qakq</a></i></li>
+        <li>Avviare il <i>docker container</i> del <i>VirtualRobot23Disi</i></li>
+        <li>Runnare il progetto <i>it.unibo.basicRobot22</i> modded dello Sprint-1</li>
+        <li>Avviare lo <i>Unit-Test</i> <a href="../CtxWasteService/test/unibo.testwasteservice/TestWasteServiceApplicationQak.kt">TestWasteServiceApplicationQak.kt</a></li>
+    </ul>
+
+
+</div>
+
+
+
+
+<br>
+<h2>Revisione Sprint-1 (Qak Plugin Update)</h2>
+<div class="remark">
+    <h4>Qak Plugin Update - ObserveResource Distributed</h4>
+    <p>Visto l'uscita di una nuova verisione del <i>Plugin</i> per il metamodello <i>Qak</i> <c>(version: 1.3.6)</c>, sono possibili i seguenti aggiornamenti:</p>
+    <ul>
+        <li>La funzione <i><code>observeResources</code></i> effettuta da un attore è ora possibile tra attori in <u>contesti diversi</u></li>
+    </ul>
+
+    <h4>Revisione</h4>
+    <p>Ciò porta alle seguenti modifiche e migliorie:</p>
+    <ul>
+        <li>È possibile eliminare l'attore <b>CoapDispatcher</b> aggiunto nel progetto <c>it.unibo.basicrobot22</c></li>
+        <li>L'attore <b>CustomPathExecutor</b> si registrerà direttamente agli aggiornamenti dell'attore <b>BasicRobot22</b></li>
+        <li>Verrà eliminato l'evento <code>posEvent</code> in favore id una <code>updateResource</code> della variabile <code>Pos($Pos)</code></li>
+    </ul>
+
+    <h4>Vantaggi</h4>
+    <p>Si producono così i seguenti <b>vantaggi</b>:</p>
+    <ul>
+        <li>Il componente <b>BasicRobot22</b> non necessità modifiche o aggiunte di componenti per l'integrazione con il sistema</li>
+        <li>Il contesto del <b>BasicRobot</b> non necessita di essere <i>aware</i> del contesto <b>ctxwasteservice</b></li>
+        <ul><li>Maggior isolamento e modularità dei componenti</li></ul>
+        <li>L'eleiminazione dell'evento porta vantaggi in termini di ottimizzazione in quanto la registrazione solo degli attori interessati alla risorsa è ottimale rispetto a un <i>broadcast</i> dell'evento</li>
+    </ul>
+
+    <h4>Archiettura Risultante Revisione</h4>
+
+    <img src="./img/GeneralArchitectureSprint1_revision.png" alt="GeneralArchitectureSprint1_revision">
+    <p>Nuovo modello:</p>
+    <a href="../CtxWasteService/src/ctxWasteService_revision.qak">CtxWasteService.qak</a>
+    <a href="../it.unibo.basicrobot22/src/basicrobot.qak">basicrobot.qak</a>
+
+
+    <h4>Test-Unit Revision</h4>
+    <p>La test-unit non necessita di modifiche.<br>
+        Il test rimane lo stesso, viene modificato solo il file Qak per il modello di test, per testare le nuove modifiche.</p>
+    <p>Nuovo Qak di test: <a href="../CtxWasteService/src/ctxWasteService_Test_revision.qakq">ctxWasteService_Test_revision.qak</a></p>
+</div>
+
+<br>
+<br>
+<br>
+
+
+<!-- ------------------------------------------------------ -->
+
+
+
+<!-- FOOTER -->
+<br><br>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%; height: 28vw; text-align:left; color:white;">
+    <p style="text-align: center; font-size: 12pt;">Studenti: Luca Landolfi, Antonio Franzese, Luca De Risi</p>
+    <p style="text-align: center; font-size: 12pt;">Email: luca.landolfi3@studio.unibo.it,  antonio.franzese4@studio.unibo.it, luca.derisi@studio.unibo.it;</p>
+    <div style="display: block; margin: 0 15vw;">
+        <img src="./img/img_luca.png"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_anto.jpg"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_lude.JPG"   style="float: left; width: 22vw; height: 20vw">
+    </div>
+</div>
+
+</body>
+</html>
