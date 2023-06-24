@@ -119,34 +119,59 @@
             <h4>Componenti</h4>
             <a href="">Modello del sistema QAK</a>
 			<br>
-            <a href="">Primo metamodello QAK <i>smartdevice</i></a> <small></small><br>
-            <a href="">Primo metamodello QAK <i>wasteservice</i></a> <br>
-            <a href="">Primo metamodello QAK <i>transporttrolley</i></a> <br>
-            <a href="">Primo metamodello QAK <i>custompathexecutor</i></a> <br>
-            <a href="">Primo metamodello QAK <i>basicrobot</i></a> <br>
-			<a href="">Primo metamodello QAK <i>led</i></a> <br>
-            <a href="">Primo metamodello QAK <i>sonar</i></a> <br>
+            <a href="">Nuovo CtxWasteService.qak</a><br>
+            <a href="">Nuovo CtxRaspberry.qak</a><br>
+            <a href="">WasteServiceStatusGui (Spring Proj.)</a>
 
-		<h4>Interfacce</h4>
-		<div>
-		<br>
-		<br>
-		</div>
 		<div class="remark" style="background-color: #c3fbe8;">
             <h3>Architettura logica risultante Sprint1</h3>
-            <img src="" alt="General Logical Architecture">
+            <img src="img/GeneralArchitectureSprint3" alt="General Logical Architecture Sprint-3">
             <p style="width: 100%; text-align: right;"><a href="../../Sprint-0/userDocs/img/Legenda.png">Legenda.png</a></p>
         </div>
 </div>
 
 
 
-<h2>Test-Unit</h2>
-<div class="remark">
+    <h2 id="test-unit">Test-Unit</h2>
+    <div class="remark">
+        <tt><p>Implementiamo una <i>Test-Unit</i> automatizzata che vada a simulare e testare il funzionamento della <b>WasteServiceStatusGui</b>.</p>
+            <p>In questo caso la <i>Test-Unit</i> sarà implementata all'interno del progetto <i>Spring</i> utilizzato per la <i>Gui</i></p>
+        </tt>
+
+        <h4>Casistiche testate:</h4>
+        <p>Testiamo il corretto funzionamento delle seguenti caratteristiche:</p>
+        <ul>
+            <li>Corretta generazione di una pagina Web</li>
+            <li>Corretto reperimento e aggiornamento delle variabili di stato sulla Pagina Web</li>
+        </ul>
+
+        <h4>Test sviluppati</h4>
+        <p>Il Test sviluppato per questa unità è unico: <a href="../WasteServiceStatusGui/src/test/java/it/unibo/WasteServiceStatusGui/WasteServiceStatusGuiApplicationTests.java">WasteServiceStatusGuiApplicationTests</a></p>
+        <p>Questo test semplicemente controlla prima il corretto instanziamento del <i>Controller</i> e poi, avviando il <c>ctxwasteservice</c>, la corretta ricezione di update e display delle informazioni nell'interfaccia. Sviluppato utilizzando le utility di test del <i>framework Spring</i></p>
+
+        <h4>Controllo del corretto funzionamento</h4>
+        <p>Il controllo avviene tramite la configurazione di un <i>MockMVC</i>, fornito da Spring, con il quale eseguire le chiamate alla pagina web sviluppata, per testarne la corretta generazione e i dati al suo interno.</p>
+        <ul>
+            <li>Il <i>MockMVC</i> effettuerà una richiesta per il path della nostra <b>Gui</b></li>
+            <li>Controllerà lo status della risposta (200 ok)</li>
+            <li>Controllerà il contentenuto della pagina ottenuta, ottenendo anche le variabili presenti e i valori degli stessi nella pagina</li>
+            <li>Una volta collegato il <c>ctxwasteservice</c> controllerà che le informazioni di partenza del sistema siano all'interno della pagina:</li>
+            <ul>
+                <li>Ovvero, controllerà la presenza della Stringa <i><code>athome</code></i> (valore della proprietà <code>robotState</code></li>
+                <li>La presenza della Stringa <i><code>LedOff</code></i> (valore della proprietà <code>ledState</code></li>
+                <li>Controllerà che il valore della proprietà <code>currentPB</code> sia a <code>"0"</code></li>
+            </ul>
+        </ul>
 
 
-
-</div>
+        <h4>Configurazione del test</h4>
+        <p>Per poter eseguire il test è necessario:</p>
+        <ul>
+            <li>Avviare la <i>Unit-Test</i> sopra citata</li>
+            <li>Avviare il contesto <c>ctxwasteservcie</c> (versione 3) con il comando <code>gradle run</code></li>
+            <ul><li>Questo implica avviare anche il contesto <c>ctxraspberry</c> (v3) e il <c>basicrobot22</c> (Sprint-1)</li></ul>
+        </ul>
+    </div>
 
 
 
