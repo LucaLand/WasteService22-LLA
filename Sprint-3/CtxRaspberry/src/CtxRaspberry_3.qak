@@ -8,15 +8,8 @@ System raspberry
 
 	//SonarQak23
 	Event sonardata : distance(D)   //emitted  by datacleaner
-	Dispatch coapUpdate : coapUpdate(RESOURCE, VALUE)
 	
 	//SonarQak23 userà l'update Resource
-			//Event sonardataAppl : distance(D)   //emitted  by sonarqak23
-
-	//Sonar - TransportTrolley
- 	Dispatch alarm 		: 	alarm(ARG)
- 	Dispatch alarmStop 	: 	alarmStop(ARG)
-
 
 
 
