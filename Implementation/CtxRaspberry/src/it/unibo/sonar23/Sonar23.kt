@@ -22,6 +22,7 @@ class Sonar23 ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, sc
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblack("sonar23 | start")
+						 subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar")  
 						updateResourceRep( "started"  
 						)
 						//genTimer( actor, state )

@@ -56,12 +56,13 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 						 ){ runtime.exec("sudo bash led25GpioTurnOff.sh")  
 						}
 						if(  ledState == "LedBlink" && rasp  
-						 ){ runtime.exec("sudo bash led25GpioTurnOn.sh")  
+						 ){CommUtils.outblack("Rasp Exec LedOff")
+						 runtime.exec("sudo bash /led25GpioTurnOn.sh")  
 						delay(100) 
-						 runtime.exec("sudo bash led25GpioTurnOff.sh")  
+						 runtime.exec("sudo bash /led25GpioTurnOff.sh")  
 						}
 						if(  ledState == "LedOn" && rasp  
-						 ){ runtime.exec("sudo bash led25GpioTurnOn.sh")  
+						 ){ runtime.exec("sudo bash /led25GpioTurnOn.sh")  
 						}
 						//genTimer( actor, state )
 					}

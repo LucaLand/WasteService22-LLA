@@ -58,14 +58,15 @@ QActor led context ctxraspberry {
         }
         if[# ledState == "LedBlink" && rasp #]{
             //Accendi
-            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+            println("Rasp Exec LedOff")
+            [# runtime.exec("sudo bash /led25GpioTurnOn.sh") #]
             delay 100
             //Spegni
-            [# runtime.exec("sudo bash led25GpioTurnOff.sh") #]
+            [# runtime.exec("sudo bash /led25GpioTurnOff.sh") #]
         }
         if[# ledState == "LedOn" && rasp #]{
             //Accendi
-            [# runtime.exec("sudo bash led25GpioTurnOn.sh") #]
+            [# runtime.exec("sudo bash /led25GpioTurnOn.sh") #]
         }
 	}
 	Transition t0	whenTime 100 -> handleLedStateUpdate
@@ -83,7 +84,7 @@ QActor sonar23 context ctxraspberry{
 
 	State s0 initial{  
 		println("sonar23 | start") 
-		//[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		updateResource[# "started" #]
 	}
 	Goto work
