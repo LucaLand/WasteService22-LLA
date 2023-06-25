@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="it">
+
+
+<head>
+    <title>Iss2023-LLA-Sprint3</title>
+    <link href="./defaultStyle.css" rel="stylesheet">
+	<link href="./menuCss.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <!--  To solve accent problems  -->
+</head>
+
+
+<body>
+<div id="top">
+    <h1>Progetto Finale ISS - Waste Service</h1>
+</div>
+<div class="remark">
+<nav>
+    <ul>
+        <li><a href="../../Sprint-0/userDocs/Sprint0-LLA.html">sprint0</a></li>
+        <li><a href="../../Sprint-1/userDocs/Sprint1-LLA.html">sprint1</a></li>
+		<li><a href="../../Sprint-2/userDocs/Sprint2-LLA.html">sprint2</a></li>
+		<li><a href="./Sprint3-LLA.html">sprint3</a></li>
+    </ul>
+</nav>
+</div>
+
+    <h2>Introduction</h2>
+    <div class="remark">
+	<p>
+	Progetto finale di ISS che consiste nel realizzare un sistema di gestione dei rifiuti in cui un robot svolge il compito di trasportare i materiali dal camion ai relativi contenitori di smistamento. 
+	Attualmente, ci concentriamo su una fase preliminare di analisi dei requisiti, che consiste nel comprendere le esigenze del cliente e tradurle in una forma formalizzata e strutturata.
+	</p>
+	</div>
+
+    <h2>Requirements</h2>
+    <div class="remark">
+        <p>Si riporta la pagina di requisiti del committente: <a href="https://htmlpreview.github.io/?https://github.com/anatali/issLab2022/blob/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/TemaFinale22.html" traget="_blank" >Waste
+            Service 22.pdf</a></p>
+		<p>Inoltre si riporta il file dei requisiti dello Sprint0: <a href="../../Sprint-0/userDocs/Sprint0-LLA.html#Requirements">Requisiti Sprint0</a>
+    </div>
+	
+	
+    <h2>Requirements analysis</h2>
+    <div class="remark">
+    <p>La <b>WasteServiceStatusGUI</b> deve permettere al <b>Service-manager</b> di monitorare:
+	 <ul>
+        <lI>La <b>Position</b> del <b>Transport trolley</b>
+			<code><pre>var Pos : int</pre></code></lI>
+        <lI>Il <b>RobotState</b>, ossia lo stato attuale del <b>Transport trolley</b>.
+            <code><pre>Event RobotStateEvent:   RobotStateEvent(STATE) // STATE = HOME | MOVING | STOPPED;</pre></code></li>
+        <lI>Il peso corrente <b>CurrentPB</b> e <b>CurrentGB</b> del materiale contenuto in <b>PLASTICBOX</b> e in <b>GLASSBOX</b></b>
+			<code><pre>var CurrentPB, CurrentGB: float;</pre></code></lI>
+        <lI>Lo stato corrente del <b>LED</b>.
+			 <code><pre>enum LedState = { LedOff, LedOn, LedBlink};</pre></code></lI>
+    </ul>
+	</p>
+    </div>
+
+    <!----------------------- REQUIREMENT ANALYSIS --------------------------->
+
+    <h2>Scrum Goal and Work Plan</h2>
+    <div class="remark">
+	<h4>Scrum goal:</h4>
+	<p>Obiettivo dello SPRINT3 è estendere la demo dello SPRINT2 per realizzare il requisito riguardante la <b>WasteServiceStatusGUI</b> specificata dal committente.</p> 
+	<h4>Work plan:</h4>
+	<ul>
+		<!--<li>Analisi del problema riguardo la tipologia di GUI da implementare</li>-->
+		<li>Analisi del problema riguardante il passaggio di informazioni alla GUI</li>
+		<li>Sviluppo componenti necessari</li>
+		<li>Creazione di un modello eseguibile utilizzando il metamodello QAK.</li>
+		<li>Elaborazione di un piano di test più completo per il modello realizzato.</li>
+    </ul>
+        
+    </div>
+	
+	<!--PROBLEM ANALYSIS-->
+	<a NAME="ProblemAnalysis"></a>
+	<h2>Problem analysis</h2>
+	<div class="remark">
+        <div class="remark remark2">
+            <h4>Architettura logica precedente:</h4>
+            <img src="./img/Logical_Architecture_Sprint1.png" alt="General Logical Architecture" style="width: 600px;" >
+            <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
+            <br>
+
+            <h4>Focus Sprint-3</h4>
+            <p>Nello Sprint-3 si vedrà dunque un focus sui seguenti componenti e sui loro modelli.</p>
+            <img src="" alt="Architecture Focus Sprint-3" style="width: 80%">
+            <span>Sprint-0:
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/SmartDevice.qak">SmartDevice.qak</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/WasteService.qak">WasteService.qak</a>  ||
+                <a href="https://github.com/LucaLand/WasteService22-LLA/blob/dev/sprint-0/Sprint-0/Qak_Models/TransportTrolley.qak">TransportTrolley.qak</a>  ||
+				<a href="">CustomPathExecutor.qak</a>
+                <a href="https://github.com/anatali/issLab2022/blob/main/unibo.basicrobot22/src/basicrobot.qak">BasicRobot22.qak</a>
+            </span>
+        </div>
+		
+	<h3>Passaggio informazioni alla GUI</h3>
+	<img src="./img/Sprint3.png" alt="Idea_iterazioni" style="width: 600px;" >
+    <p style="width: 100%; text-align: right;"><a href="./img/Legenda.png">Legenda.png</a></p>
+	
+	<p>Il passaggio delle informazioni alla GUI, per poter avere quest'ultima aggiornata,  può avvenire in tre modalità: <b>Event</b>, <b>Dispatch</b>, <b>ObserveResources</b>.</br>
+	</p>
+	<h4>Come aggiornare la webGUI</h4>
+	<p>Ai fini del nostro progetto abbiamo deciso di introdurre un nuovo attore custom <b>GUIupdater</b> collocato all'interno del contesto
+	<b>ctxwasteservice</b>. Tale attore si occuperà di reperire le informazioni e di interagire con la <i>webGUI</i>. L'attore <b>GUIupdater</b> si registrerà
+	ai componenti <b>TransportTrolley</b>,<b>WasteService</b>,<b>custompathExecutor</b>,<b>Led</b> per prendere le ripsettive informazioni: <b>Position</b>,<b>CurrentPB/CurrentGB</b>,<b>RobotState</b>,<b>LedState</b>.
+	Una volta che l'attore <b>GUIupdater</b> avrà reperito le informazioni, attraverso una stringa <i>InfoUpdate</i>, le invierà alla nostra <b>WebGUI</b> il tutto attraverso framework
+	<b>Spring</b> così come precisato dal committente.</br>
+	In allegato la documentazione: <a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/anatali/issLab2022/main/it.unibo.issLabStart/userDocs/Dispense/lezioni/html/WebApplications.html#webapplication-con-springboot">Spring</a>
+	</p>
+	
+	<h4>Vantaggi</h4>
+	<p>La scelta dell'utilizzo degli <b>ObserveResources</b>, in questo caso, ci permette di mantenere l'isolamente dei componenti e in tal modo il <b>ctxraspberry</b> continua a non 
+	aver bisogno di essere <i>aware</i> nei confronti del <b>ctxwasteservice</b>.</br>
+	Inoltre l'utilizzo di un'architettura del genere ci permette di non utilizzare gli <b>Event</b> e quindi di ottimizzare l'intero sistema.
+	</p>
+	
+    </div>
+
+
+
+
+
+
+
+
+<!-- ------------------------------------------------------ -->
+<h2>Modello Eseguibile</h2>
+<div class="remark">
+            <h4>Componenti</h4>
+            <a href="">Modello del sistema QAK</a>
+			<br>
+            <a href="">Nuovo CtxWasteService.qak</a><br>
+            <a href="">Nuovo CtxRaspberry.qak</a><br>
+            <a href="">WasteServiceStatusGui (Spring Proj.)</a>
+
+		<div class="remark" style="background-color: #c3fbe8;">
+            <h3>Architettura logica risultante Sprint3</h3>
+            <img src="img/GenArch3.png" alt="General Logical Architecture Sprint-3">
+            <p style="width: 100%; text-align: right;"><a href="./img/LegendaArchitetture.png">Legenda.png</a></p>
+        </div>
+</div>
+
+
+
+    <h2 id="test-unit">Test-Unit</h2>
+    <div class="remark">
+        <tt><p>Implementiamo una <i>Test-Unit</i> automatizzata che vada a simulare e testare il funzionamento della <b>WasteServiceStatusGui</b>.</p>
+            <p>In questo caso la <i>Test-Unit</i> sarà implementata all'interno del progetto <i>Spring</i> utilizzato per la <i>Gui</i></p>
+        </tt>
+
+        <h4>Casistiche testate:</h4>
+        <p>Testiamo il corretto funzionamento delle seguenti caratteristiche:</p>
+        <ul>
+            <li>Corretta generazione di una pagina Web</li>
+            <li>Corretto reperimento e aggiornamento delle variabili di stato sulla Pagina Web</li>
+        </ul>
+
+        <h4>Test sviluppati</h4>
+        <p>Il Test sviluppato per questa unità è unico: <a href="../WasteServiceStatusGui/src/test/java/it/unibo/WasteServiceStatusGui/WasteServiceStatusGuiApplicationTests.java">WasteServiceStatusGuiApplicationTests</a></p>
+        <p>Questo test semplicemente controlla prima il corretto instanziamento del <i>Controller</i> e poi, avviando il <c>ctxwasteservice</c>, la corretta ricezione di update e display delle informazioni nell'interfaccia. Sviluppato utilizzando le utility di test del <i>framework Spring</i></p>
+
+        <h4>Controllo del corretto funzionamento</h4>
+        <p>Il controllo avviene tramite la configurazione di un <i>MockMVC</i>, fornito da Spring, con il quale eseguire le chiamate alla pagina web sviluppata, per testarne la corretta generazione e i dati al suo interno.</p>
+        <ul>
+            <li>Il <i>MockMVC</i> effettuerà una richiesta per il path della nostra <b>Gui</b></li>
+            <li>Controllerà lo status della risposta (200 ok)</li>
+            <li>Controllerà il contentenuto della pagina ottenuta, ottenendo anche le variabili presenti e i valori degli stessi nella pagina</li>
+            <li>Una volta collegato il <c>ctxwasteservice</c> controllerà che le informazioni di partenza del sistema siano all'interno della pagina:</li>
+            <ul>
+                <li>Ovvero, controllerà la presenza della Stringa <i><code>athome</code></i> (valore della proprietà <code>robotState</code></li>
+                <li>La presenza della Stringa <i><code>LedOff</code></i> (valore della proprietà <code>ledState</code></li>
+                <li>Controllerà che il valore della proprietà <code>currentPB</code> sia a <code>"0"</code></li>
+            </ul>
+        </ul>
+
+
+        <h4>Configurazione del test</h4>
+        <p>Per poter eseguire il test è necessario:</p>
+        <ul>
+            <li>Avviare la <i>Unit-Test</i> sopra citata</li>
+            <li>Avviare il contesto <c>ctxwasteservcie</c> (versione 3) con il comando <code>gradle run</code></li>
+            <ul><li>Questo implica avviare anche il contesto <c>ctxraspberry</c> (v3) e il <c>basicrobot22</c> (Sprint-1)</li></ul>
+        </ul>
+    </div>
+
+
+
+
+<br>
+<br>
+<br>
+
+
+<!-- ------------------------------------------------------ -->
+
+
+
+<!-- FOOTER -->
+<br><br>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%; height: 28vw; text-align:left; color:white;">
+    <p style="text-align: center; font-size: 12pt;">Studenti: Luca Landolfi, Antonio Franzese, Luca De Risi</p>
+    <p style="text-align: center; font-size: 12pt;">Email: luca.landolfi3@studio.unibo.it,  antonio.franzese4@studio.unibo.it, luca.derisi@studio.unibo.it;</p>
+    <div style="display: block; margin: 0 15vw;">
+        <img src="./img/img_luca.png"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_anto.jpg"   style="float: left; width: 19vw; height: 20vw">
+        <img src="./img/img_lude.JPG"   style="float: left; width: 19vw; height: 20vw">
+    </div>
+</div>
+
+</body>
+</html>

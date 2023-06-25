@@ -25,6 +25,8 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 				var ledState = "LedOff"
 				
 				val runtime = Runtime.getRuntime()
+		
+				val rasp = false
 				
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
@@ -46,15 +48,15 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 								 ledState = payloadArg(0)  
 								CommUtils.outred("	 $name: Led state - $ledState")
 						}
-						if(  ledState == "LedOff"  
+						if(  ledState == "LedOff" && rasp  
 						 ){ runtime.exec("sudo bash led25GpioTurnOff.sh")  
 						}
-						if(  ledState == "LedBlink"  
+						if(  ledState == "LedBlink" && rasp  
 						 ){ runtime.exec("sudo bash led25GpioTurnOn.sh")  
 						delay(100) 
 						 runtime.exec("sudo bash led25GpioTurnOff.sh")  
 						}
-						if(  ledState == "LedOn"  
+						if(  ledState == "LedOn" && rasp  
 						 ){ runtime.exec("sudo bash led25GpioTurnOn.sh")  
 						}
 						//genTimer( actor, state )

@@ -1,0 +1,39 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.0'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'it.unibo'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+	flatDir {   dirs '../unibolibs'	 }
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.eclipse.californium:californium-core:3.5.0'
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+
+	/* UNIBO *************************************************************************************************************** */
+	implementation name: 'uniboInterfaces'
+	implementation name: '2p301'
+	implementation name: 'unibo.qakactor23-3.5'
+	implementation name: 'unibo.basicomm23-1.0'
+
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

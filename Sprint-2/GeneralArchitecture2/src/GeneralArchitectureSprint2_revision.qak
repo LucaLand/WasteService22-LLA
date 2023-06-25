@@ -441,7 +441,7 @@ QActor custompathexecutor context ctxwasteservice {
 					[# pathStep++ #]
 				}
 			}else{
-				forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
+				//forward custompathexecutor -m coapUpdate : coapUpdate(custompathexecutor, stepDone)
 			}
 		}
 
