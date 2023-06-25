@@ -21,7 +21,6 @@ Context ctxraspberry ip[host="localhost" port=8076]
 CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
 //CodedQActor datalogger     context ctxsonarqak23 className "rx.dataLogger"
 CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
-CodedQActor distancefilter context ctxraspberry className "rx.distanceFilter"
 
 
 
@@ -87,7 +86,7 @@ QActor sonar23 context ctxraspberry{
 
 	State s0 initial{  
 		println("sonar23 | start") 
-		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		updateResource[# "started" #]
 	}
 	Goto work
