@@ -29,7 +29,7 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					action { //it:State
 						CommUtils.outblack("	 sonardatahandler: 	Started")
 						delay(1000) 
-						CoapObserverSupport(myself, "127.0.0.1","8076","ctxraspberry","sonar23")
+						CoapObserverSupport(myself, "192.168.1.22","8076","ctxraspberry","sonar23")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -51,14 +51,15 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 								 ){if(  distance.toInt() <= DLIMIT && stopped == false  
 								 ){ stopped = true  
 								forward("alarm", "alarm(stop)" ,"transporttrolley" ) 
+								CommUtils.outblack("	 $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 								CommUtils.outblack("	 $name: Sending alarm(stop)!")
 								}
 								if(  distance.toInt() > DLIMIT && stopped == true  
 								 ){ stopped = false  
 								forward("alarmStop", "alarmStop(resume)" ,"transporttrolley" ) 
+								CommUtils.outblack("	 $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 								CommUtils.outblack("	 $name: Sending alarmStop(resume)!")
 								}
-								CommUtils.outblack("	 $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 								}
 						}
 						//genTimer( actor, state )

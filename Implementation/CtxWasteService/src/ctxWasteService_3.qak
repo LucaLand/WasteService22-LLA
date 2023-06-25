@@ -36,8 +36,8 @@ System ctxwasteservice
  	
  	
  	
-Context ctxraspberry ip[host="127.0.0.1" port=8076]
-Context ctxbasicrobot ip [host="127.0.0.1" port=8020]  
+Context ctxraspberry ip[host="192.168.1.22" port=8076]
+Context ctxbasicrobot ip [host="192.168.1.7" port=8020]  
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
@@ -561,16 +561,18 @@ QActor sonardatahandler context ctxwasteservice{
 				if[# distance.toInt() <= DLIMIT && stopped == false #]{
 					[# stopped = true #]
 					forward transporttrolley -m alarm : alarm(stop)
+					println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 					println("\t $name: Sending alarm(stop)!")
 				}
 	
 				if[# distance.toInt() > DLIMIT && stopped == true #]{
 					[# stopped = false #]
 					forward transporttrolley -m alarmStop : alarmStop(resume)
+					println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 					println("\t $name: Sending alarmStop(resume)!")
 				}
 	
-				println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
+				//println("\t $name: Handling SonarData($distance) - Robot Stopped: $stopped")
 			}
 		}
 	}
@@ -587,6 +589,7 @@ QActor ledstateupdater context ctxwasteservice{
 	#]
 	
 	State s0 initial{
+		updateResource[# "started" #]
 		observeResource transporttrolley
 	}
 	Goto handleRobotStateUpdate
@@ -615,6 +618,7 @@ QActor ledstateupdater context ctxwasteservice{
         	
         	forward led -m ledStateUpdate : state($LedState)
 			println("\t $name: Sending ledState: $LedState") color red
+			updateResource[# "ledState($LedState)" #]
 		}
 	}
 	Transition t0	whenMsg coapUpdate -> handleRobotStateUpdate
@@ -637,6 +641,7 @@ QActor guiupdater context ctxwasteservice{
 		observeResource transporttrolley
 		observeResource custompathexecutor
 		observeResource led
+		observeResource ledstateupdater
 	}
 	Goto handleCoapUpdate
 	

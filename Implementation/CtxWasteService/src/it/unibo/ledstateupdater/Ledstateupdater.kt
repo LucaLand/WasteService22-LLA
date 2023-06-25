@@ -24,6 +24,8 @@ class Ledstateupdater ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						updateResourceRep( "started"  
+						)
 						CoapObserverSupport(myself, "localhost","8072","ctxwasteservice","transporttrolley")
 						//genTimer( actor, state )
 					}
@@ -54,6 +56,8 @@ class Ledstateupdater ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( 
 								}
 								forward("ledStateUpdate", "state($LedState)" ,"led" ) 
 								CommUtils.outred("	 $name: Sending ledState: $LedState")
+								updateResourceRep( "ledState($LedState)"  
+								)
 						}
 						//genTimer( actor, state )
 					}

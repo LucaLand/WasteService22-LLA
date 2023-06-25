@@ -52,7 +52,7 @@ class Custompathexecutor ( name: String, scope: CoroutineScope  ) : ActorBasicFs
 				state("s0") { //this:State
 					action { //it:State
 						CommUtils.outblue("	 $name: Started! $version")
-						CoapObserverSupport(myself, "127.0.0.1","8020","ctxbasicrobot","basicrobot")
+						CoapObserverSupport(myself, "192.168.1.7","8020","ctxbasicrobot","basicrobot")
 						updateResourceRep( "started"  
 						)
 						updateResourceRep( "robotPos($Pos)"  

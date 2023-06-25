@@ -48,4 +48,5 @@ with Diagram('ctxwasteserviceArch', show=False, outformat='png', graph_attr=grap
      transporttrolley >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
      custompathexecutor >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
      led >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
+     ledstateupdater >> Edge(color='blue', style='solid', xlabel='coapUpdate', fontcolor='blue') >> guiupdater
 diag
