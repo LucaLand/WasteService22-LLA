@@ -4,6 +4,7 @@ System raspberry
 	//TransportTrolley - Led
 	Dispatch ledStateUpdate : state(STATE)			//LedOn, LedOff, LedBlink
 	//Event robotStateEvent : robotStateEvent(STATE)		//STATE: athome, moving, stopped
+	Dispatch simulatorstart     : simulator(V)  
 
 
 	//SonarQak23
@@ -16,9 +17,14 @@ System raspberry
 Context ctxraspberry ip[host="localhost" port=8076]
 
 
-//CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
-CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
+//DATA SOURCES
+//CodedQActor sonarsimulator  context ctxsonar className "rx.sonarSimulator"  
+CodedQActor sonardatasource context ctxraspberry className "sensors.sonarHCSR04SupportActor"
+
+//Filters
+CodedQActor datalogger     context ctxraspberry className "rx.dataLogger"
 CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
+CodedQActor distancefilter context ctxraspberry className "rx.distanceFilter"
 
 
 
@@ -58,7 +64,7 @@ QActor led context ctxraspberry {
         }
         if[# ledState == "LedBlink" && rasp #]{
             //Accendi
-            println("Rasp Exec LedOff")
+            //println("Rasp Exec LedOff")
             [# runtime.exec("sudo bash /led25GpioTurnOn.sh") #]
             delay 100
             //Spegni
@@ -84,7 +90,8 @@ QActor sonar23 context ctxraspberry{
 
 	State s0 initial{  
 		println("sonar23 | start") 
-		[# subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
+		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonardatasource") #]
+		forward sonardatasource -m simulatorstart : simulatorstart(qasource)
 		updateResource[# "started" #]
 	}
 	Goto work
