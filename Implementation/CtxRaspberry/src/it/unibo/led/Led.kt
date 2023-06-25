@@ -26,7 +26,7 @@ class Led ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name, scope 
 				
 				val runtime = Runtime.getRuntime()
 		
-				val rasp = false
+				val rasp = true
 				
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State

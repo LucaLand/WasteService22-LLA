@@ -17,7 +17,7 @@ Context ctxraspberry ip[host="localhost" port=8076]
 
 
 //CodedQActor sonar  context ctxraspberry className "sonarSimulator"           //IN LOCALE
-//CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
+CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
 CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
 
 
@@ -32,7 +32,7 @@ QActor led context ctxraspberry {
 		
 		val runtime = Runtime.getRuntime()
 
-		val rasp = false
+		val rasp = true
 		
 	#]
 

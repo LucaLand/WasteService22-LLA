@@ -22,6 +22,7 @@ with Diagram('raspberryArch', show=False, outformat='png', graph_attr=graphattr)
      with Cluster('ctxraspberry', graph_attr=nodeattr):
           led=Custom('led','./qakicons/symActorSmall.png')
           sonar23=Custom('sonar23','./qakicons/symActorSmall.png')
+          sonar=Custom('sonar(coded)','./qakicons/codedQActor.png')
           datacleaner=Custom('datacleaner(coded)','./qakicons/codedQActor.png')
      sys >> Edge(color='red', style='dashed', xlabel='sonardata', fontcolor='red') >> sonar23
 diag
