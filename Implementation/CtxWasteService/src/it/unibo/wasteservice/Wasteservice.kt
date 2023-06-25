@@ -29,10 +29,10 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				var TruckLoad = 0
 				
 				
-				val MAXPB = 100;
-				val MAXGB = 100;
-				var CurrentPB = 0;
-				var CurrentGB = 0;
+				val MAXPB = 100.0;
+				val MAXGB = 100.0;
+				var CurrentPB = 0.0;
+				var CurrentGB = 0.0;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -73,15 +73,15 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 												Type = payloadArg(0)
-												TruckLoad = payloadArg(1).toInt()
+												TruckLoad = payloadArg(1).toFloat()
 								CommUtils.outgreen("Request: ($Type, $TruckLoad)")
 								if(  Type == "plastic"  
-								 ){if(  (CurrentPB + TruckLoad) < MAXPB  
+								 ){if(  (CurrentPB + TruckLoad) <= MAXPB
 								 ){ accepted = true  
 								}
 								}
 								if(  Type == "glass"  
-								 ){if(  (CurrentGB + TruckLoad) < MAXGB  
+								 ){if(  (CurrentGB + TruckLoad) <= MAXGB
 								 ){ accepted = true  
 								}
 								}
