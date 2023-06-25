@@ -1,8 +1,8 @@
 %====================================================================================
 % ctxwasteservice description   
 %====================================================================================
-context(ctxraspberry, "192.168.1.22",  "TCP", "8076").
-context(ctxbasicrobot, "192.168.1.7",  "TCP", "8020").
+context(ctxraspberry, "192.168.213.144",  "TCP", "8076").
+context(ctxbasicrobot, "192.168.213.100",  "TCP", "8020").
 context(ctxwasteservice, "localhost",  "TCP", "8072").
  qactor( basicrobot, ctxbasicrobot, "external").
   qactor( sonar23, ctxraspberry, "external").

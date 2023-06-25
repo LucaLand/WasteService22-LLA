@@ -29,7 +29,7 @@ class Sonardatahandler ( name: String, scope: CoroutineScope  ) : ActorBasicFsm(
 					action { //it:State
 						CommUtils.outblack("	 sonardatahandler: 	Started")
 						delay(1000) 
-						CoapObserverSupport(myself, "192.168.1.22","8076","ctxraspberry","sonar23")
+						CoapObserverSupport(myself, "192.168.213.144","8076","ctxraspberry","sonar23")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

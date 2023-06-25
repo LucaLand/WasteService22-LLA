@@ -18,7 +18,13 @@ import org.json.simple.JSONObject;
 @Controller
 public class WSGuiController {
 
-    CoapObserverJava obsGuiUpdater = new CoapObserverJava("localhost:8072", "ctxwasteservice", "guiupdater");
+    //@Value("${string.addr}")
+    String addr = "localhost";
+
+    //@Value("${string.port}")
+    String port = "8072";
+
+    CoapObserverJava obsGuiUpdater = new CoapObserverJava(addr+":"+port, "ctxwasteservice", "guiupdater");
 
 
     @Value("${spring.application.name}")

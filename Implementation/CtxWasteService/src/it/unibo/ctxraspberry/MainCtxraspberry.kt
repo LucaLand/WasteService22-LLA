@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 fun main() = runBlocking {
 	//System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
 	QakContext.createContexts(
-	        "192.168.1.22", this, "ctxwasteservice.pl", "sysRules.pl","ctxraspberry"
+	        "192.168.213.144", this, "ctxwasteservice.pl", "sysRules.pl","ctxraspberry"
 	)
 }
 

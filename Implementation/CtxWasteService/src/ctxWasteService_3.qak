@@ -36,8 +36,8 @@ System ctxwasteservice
  	
  	
  	
-Context ctxraspberry ip[host="192.168.1.22" port=8076]
-Context ctxbasicrobot ip [host="192.168.1.7" port=8020]  
+Context ctxraspberry ip[host="192.168.213.144" port=8076]
+Context ctxbasicrobot ip [host="192.168.213.100" port=8020]  
 
 Context ctxwasteservice ip[host="localhost" port=8072]
 
