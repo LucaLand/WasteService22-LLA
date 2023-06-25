@@ -61,7 +61,7 @@ class sonarHCSR04Support23 ( name : String ) : ActorBasic( name ) {
 						CommUtils.outred("sonarHCSR04Support23 doRead ERROR: $e "   )
 					}
 				}
-				delay( 50 ) 	//Avoid too fast generation
+				//delay( 50 ) 	//Avoid too fast generation
  		}
 		}
 	}
