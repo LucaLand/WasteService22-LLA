@@ -56,6 +56,12 @@ public class WSGuiController {
         }
 
 
+        switch (robotPos) {
+            case "0" -> robotPos = "Home";
+            case "1" -> robotPos = "Indoor";
+            case "2" -> robotPos = "PlasticBox";
+            case "3" -> robotPos = "GlassBox";
+        }
 
         model.addAttribute("robotState", robotState);
         model.addAttribute("robotPosition", robotPos);
