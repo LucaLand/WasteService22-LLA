@@ -17,12 +17,9 @@ System raspberry
 Context ctxraspberry ip[host="localhost" port=8076]
 
 
-//DATA SOURCES
-//CodedQActor sonarsimulator  context ctxsonar className "rx.sonarSimulator"  
-CodedQActor sonardatasource context ctxraspberry className "sensors.sonarHCSR04SupportActor"
-
-//Filters
-CodedQActor datalogger     context ctxraspberry className "rx.dataLogger"
+//CodedQActor sonar  context ctxsonarqak23 className "sonarSimulator"           //IN LOCALE
+CodedQActor sonar  context ctxraspberry className "sonarHCSR04Support23"   //SU RASP
+//CodedQActor datalogger     context ctxsonarqak23 className "rx.dataLogger"
 CodedQActor datacleaner    context ctxraspberry className "rx.dataCleaner"
 CodedQActor distancefilter context ctxraspberry className "rx.distanceFilter"
 
@@ -90,8 +87,7 @@ QActor sonar23 context ctxraspberry{
 
 	State s0 initial{  
 		println("sonar23 | start") 
-		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("sonardatasource") #]
-		forward sonardatasource -m simulatorstart : simulatorstart(qasource)
+		[# subscribeToLocalActor("distancefilter").subscribeToLocalActor("datacleaner").subscribeToLocalActor("sonar") #]
 		updateResource[# "started" #]
 	}
 	Goto work

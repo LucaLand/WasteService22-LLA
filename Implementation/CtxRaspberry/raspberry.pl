@@ -2,8 +2,7 @@
 % raspberry description   
 %====================================================================================
 context(ctxraspberry, "localhost",  "TCP", "8076").
- qactor( sonardatasource, ctxraspberry, "sensors.sonarHCSR04SupportActor").
-  qactor( datalogger, ctxraspberry, "rx.dataLogger").
+ qactor( sonar, ctxraspberry, "sonarHCSR04Support23").
   qactor( datacleaner, ctxraspberry, "rx.dataCleaner").
   qactor( distancefilter, ctxraspberry, "rx.distanceFilter").
   qactor( led, ctxraspberry, "it.unibo.led.Led").

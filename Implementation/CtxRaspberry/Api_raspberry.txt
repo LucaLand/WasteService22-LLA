@@ -21,3 +21,4 @@
 {"actor":"sonar23", "msgType":"eventtransition", "sender":"sys", "msgId":"sonardata"}
 {"actor":"sonardatasource", "msgType":"dispatch", "sender":"sonar23", "msgId":"simulatorstart"}
 {"actor":"sonar23", "msgType":"eventtransition", "sender":"sys", "msgId":"sonardata"}
+{"actor":"sonar23", "msgType":"eventtransition", "sender":"sys", "msgId":"sonardata"}
