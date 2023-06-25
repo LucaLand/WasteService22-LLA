@@ -29,8 +29,8 @@ class sonarHCSR04Support23 ( name : String ) : ActorBasic( name ) {
 		if( msg.msgId() == "sonarstart"){
 			//println("sonarHCSR04Support23 STARTING") //AVOID SINCE pipe ...
 			try{
-				//val p  = Runtime.getRuntime().exec("sudo ./SonarAlone")
-				val p  = Runtime.getRuntime().exec("python sonar.py")
+				val p  = Runtime.getRuntime().exec("sudo ./SonarAlone")
+				//val p  = Runtime.getRuntime().exec("python sonar.py")
 				reader = BufferedReader(  InputStreamReader(p.getInputStream() ))
 				doRead(   )
 			}catch( e : Exception){
