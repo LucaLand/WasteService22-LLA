@@ -34,7 +34,7 @@ class Guiupdater ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( name,
 						CoapObserverSupport(myself, "localhost","8072","ctxwasteservice","wasteservice")
 						CoapObserverSupport(myself, "localhost","8072","ctxwasteservice","transporttrolley")
 						CoapObserverSupport(myself, "localhost","8072","ctxwasteservice","custompathexecutor")
-						CoapObserverSupport(myself, "127.0.0.1","8076","ctxraspberry","led")
+						CoapObserverSupport(myself, "localhost","8072","ctxwasteservice","ledstateupdater")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
