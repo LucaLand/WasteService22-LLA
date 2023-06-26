@@ -26,13 +26,13 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 				var accepted = false;
 				var ID = 0
 				var Type = ""
-				var TruckLoad = 0
+				var TruckLoad = 0f
 				
 				
-				val MAXPB = 100.0;
-				val MAXGB = 100.0;
-				var CurrentPB = 0.0;
-				var CurrentGB = 0.0;
+				val MAXPB = 100.0f;
+				val MAXGB = 100.0f;
+				var CurrentPB = 0.0f;
+				var CurrentGB = 0.0f;
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -40,8 +40,8 @@ class Wasteservice ( name: String, scope: CoroutineScope  ) : ActorBasicFsm( nam
 						updateResourceRep( "started"  
 						)
 						
-									CurrentPB = 0;
-									CurrentGB = 0;
+									CurrentPB = 0f;
+									CurrentGB = 0f;
 						CommUtils.outgreen("	 CurrentPB = $CurrentPB")
 						CommUtils.outgreen("	 CurrentGB = $CurrentGB")
 						updateResourceRep( "current($CurrentPB, $CurrentGB)"  
